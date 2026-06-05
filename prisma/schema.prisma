@@ -1,0 +1,585 @@
+// Prisma Schema for Chilam Is Here (张智霖全面资讯网站)
+// Based on Database_Design_v1.md
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────
+// 枚举定义 (9 个)
+// ─────────────────────────────────────────────
+
+enum ProductionType {
+  MOVIE
+  TV_SERIES
+  VARIETY_SHOW
+}
+
+enum PerformanceType {
+  CONCERT
+  STAGE
+  MUSICAL
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  AUDIO
+  FILE
+}
+
+enum InterviewMediaType {
+  VIDEO
+  AUDIO
+  TEXT
+  LIVE
+}
+
+enum ImportMethod {
+  LINK_PARSE
+  CRAWLER
+  MANUAL
+}
+
+enum SubmitType {
+  LINK
+  UPLOAD
+  MIXED
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ProofreadStatus {
+  PENDING
+  PROOFREAD
+}
+
+enum AnnouncementType {
+  NOTICE
+  RULE
+  UPDATE
+}
+
+enum GuestbookTab {
+  MESSAGE
+  STORY
+  FEEDBACK
+}
+
+// ─────────────────────────────────────────────
+// 模型定义 (20 张表)
+// ─────────────────────────────────────────────
+
+/// 4.1 栏目树
+model Category {
+  id          String   @id @default(cuid())
+  parentId    String?  @map("parent_id")
+  name        String
+  slug        String   @unique
+  path        String
+  level       Int
+  sortOrder   Int      @default(0) @map("sort_order")
+  description String?
+  isVisible   Boolean  @default(true) @map("is_visible")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // 自关联
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children Category[] @relation("CategoryTree")
+
+  @@index([parentId])
+  @@map("categories")
+}
+
+/// 4.2 全站标签
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  tagGroup  String?  @map("tag_group")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // 多对多反向关系 (9 张内容表)
+  productions  Production[]
+  performances Performance[]
+  socialPosts  SocialPost[]
+  newsArticles NewsArticle[]
+  sightings    Sighting[]
+  endorsements Endorsement[]
+  interviews   Interview[]
+  albums       Album[]
+  magazines    Magazine[]
+
+  @@index([tagGroup])
+  @@map("tags")
+}
+
+/// 4.3 统一媒体资源
+model Media {
+  id           String    @id @default(cuid())
+  type         MediaType
+  url          String
+  thumbnailUrl String?   @map("thumbnail_url")
+  filename     String?
+  mimeType     String?   @map("mime_type")
+  size         Int?
+  width        Int?
+  height       Int?
+  duration     Float?
+  alt          String?
+  caption      String?
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  // 直接 FK 反向关系 (不产生数据库列)
+  posterOfProductions   Production[]       @relation("ProductionPoster")
+  posterOfPerformances  Performance[]      @relation("PerformancePoster")
+  coverOfAlbums         Album[]            @relation("AlbumCover")
+  coverOfMagazines      Magazine[]         @relation("MagazineCover")
+  originalOfInterviews  Interview[]        @relation("InterviewOriginalMedia")
+  performanceMediaFiles PerformanceMedia[] @relation("PerformanceMediaFile")
+
+  // 多对多反向关系
+  productionGalleries Production[]  @relation("ProductionGallery")
+  socialPosts         SocialPost[]  @relation("SocialPostMedia")
+  fanShots            FanShot[]     @relation("FanShotMedia")
+  endorsements        Endorsement[] @relation("EndorsementMedia")
+  sightings           Sighting[]    @relation("SightingMedia")
+  guestbooks          Guestbook[]   @relation("GuestbookImages")
+  magazineScans       Magazine[]    @relation("MagazineScans")
+  newsArticles        NewsArticle[] @relation("NewsArticleMedia")
+
+  @@map("media")
+}
+
+/// 4.4 跨内容关联 (多态)
+model ContentRelation {
+  id           String   @id @default(cuid())
+  sourceType   String   @map("source_type")
+  sourceId     String   @map("source_id")
+  targetType   String   @map("target_type")
+  targetId     String   @map("target_id")
+  relationType String   @map("relation_type")
+  note         String?
+  sortOrder    Int      @default(0) @map("sort_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([sourceType, sourceId])
+  @@index([targetType, targetId])
+  @@index([relationType])
+  @@map("content_relations")
+}
+
+/// 4.5 影视综作品
+model Production {
+  id       String         @id @default(cuid())
+  type     ProductionType
+  slug     String         @unique
+  title    String
+  titleEn  String?        @map("title_en")
+  year     Int
+  role     String?
+  synopsis String?
+
+  // 海报 (直接 FK)
+  posterId String? @map("poster_id")
+  poster   Media?  @relation("ProductionPoster", fields: [posterId], references: [id])
+
+  // 图册 (多对多)
+  gallery Media[] @relation("ProductionGallery")
+
+  watchLinks Json? @map("watch_links")
+
+  // 综艺专属字段
+  varietyRegion String? @map("variety_region")
+  varietyRole   String? @map("variety_role")
+  language      String?
+
+  // 标签 (多对多)
+  tags Tag[]
+
+  sortOrder Int      @default(0) @map("sort_order")
+  isVisible Boolean  @default(true) @map("is_visible")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([type])
+  @@index([year])
+  @@map("productions")
+}
+
+/// 4.6 演出
+model Performance {
+  id        String          @id @default(cuid())
+  type      PerformanceType
+  slug      String          @unique
+  title     String
+  titleEn   String?         @map("title_en")
+  year      Int
+  startDate DateTime?       @map("start_date")
+  endDate   DateTime?       @map("end_date")
+  venue     String?
+  city      String?
+  series    String?
+
+  // 海报 (直接 FK)
+  posterId String? @map("poster_id")
+  poster   Media?  @relation("PerformancePoster", fields: [posterId], references: [id])
+
+  setlist Json?
+
+  // 一对多
+  officialMedia PerformanceMedia[]
+  fanShots      FanShot[]
+
+  // 标签 (多对多)
+  tags Tag[]
+
+  sortOrder Int      @default(0) @map("sort_order")
+  isVisible Boolean  @default(true) @map("is_visible")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([type])
+  @@index([startDate(sort: Desc)])
+  @@map("performances")
+}
+
+/// 4.7 官摄素材
+model PerformanceMedia {
+  id            String  @id @default(cuid())
+  performanceId String  @map("performance_id")
+  title         String?
+
+  // 媒体文件 (直接 FK)
+  mediaId String @map("media_id")
+  media   Media  @relation("PerformanceMediaFile", fields: [mediaId], references: [id])
+
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // 关联演出 (级联删除)
+  performance Performance @relation(fields: [performanceId], references: [id], onDelete: Cascade)
+
+  @@index([performanceId])
+  @@map("performance_media")
+}
+
+/// 4.8 饭拍投稿
+model FanShot {
+  id            String @id @default(cuid())
+  performanceId String @map("performance_id")
+
+  originalUrl  String? @map("original_url")
+  title        String?
+  summary      String?
+  thumbnailUrl String? @map("thumbnail_url")
+
+  // 媒体 (多对多)
+  mediaItems Media[] @relation("FanShotMedia")
+  isFullCopy Boolean @default(false) @map("is_full_copy")
+
+  authorName  String           @map("author_name")
+  contactInfo String?          @map("contact_info")
+  submitType  SubmitType       @default(LINK) @map("submit_type")
+  status      ModerationStatus @default(PENDING)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // 关联演出 (级联删除)
+  performance Performance @relation(fields: [performanceId], references: [id], onDelete: Cascade)
+
+  @@index([performanceId])
+  @@index([status])
+  @@map("fan_shots")
+}
+
+/// 4.9 广告代言
+model Endorsement {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  brand       String
+  role        String?
+  category    String?
+  description String?
+  startYear   Int     @map("start_year")
+  endYear     Int?    @map("end_year")
+
+  // 素材 (多对多)
+  media Media[] @relation("EndorsementMedia")
+
+  // 标签 (多对多)
+  tags Tag[]
+
+  isVisible Boolean  @default(true) @map("is_visible")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("endorsements")
+}
+
+/// 4.10 访谈
+model Interview {
+  id        String             @id @default(cuid())
+  slug      String             @unique
+  title     String
+  summary   String?
+  source    String?
+  date      DateTime
+  mediaType InterviewMediaType @map("media_type")
+
+  originalUrl     String? @map("original_url")
+  originalMediaId String? @map("original_media_id")
+  originalMedia   Media?  @relation("InterviewOriginalMedia", fields: [originalMediaId], references: [id])
+
+  transcriptCantonese String?         @map("transcript_cantonese")
+  transcriptMandarin  String?         @map("transcript_mandarin")
+  proofreadStatus     ProofreadStatus @default(PENDING) @map("proofread_status")
+
+  // 标签 (多对多)
+  tags Tag[]
+
+  isVisible Boolean  @default(true) @map("is_visible")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([date(sort: Desc)])
+  @@map("interviews")
+}
+
+/// 4.11 专辑
+model Album {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  title       String
+  releaseYear Int     @map("release_year")
+  language    String?
+
+  // 封面 (直接 FK)
+  coverId String? @map("cover_id")
+  cover   Media?  @relation("AlbumCover", fields: [coverId], references: [id])
+
+  tracks         Json?
+  streamingLinks Json? @map("streaming_links")
+
+  // 标签 (多对多)
+  tags Tag[]
+
+  sortOrder Int      @default(0) @map("sort_order")
+  isVisible Boolean  @default(true) @map("is_visible")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([releaseYear])
+  @@map("albums")
+}
+
+/// 4.12 杂志
+model Magazine {
+  id    String   @id @default(cuid())
+  slug  String   @unique
+  title String
+  issue String?
+  date  DateTime
+
+  // 封面 (直接 FK)
+  coverId String? @map("cover_id")
+  cover   Media?  @relation("MagazineCover", fields: [coverId], references: [id])
+
+  // 扫描件 (多对多)
+  scans Media[] @relation("MagazineScans")
+
+  // 标签 (多对多)
+  tags Tag[]
+
+  isVisible Boolean  @default(true) @map("is_visible")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([date(sort: Desc)])
+  @@map("magazines")
+}
+
+/// 4.13 社交媒体动态
+model SocialPost {
+  id       String @id @default(cuid())
+  platform String
+
+  // Phase 1 (链接优先)
+  originalUrl  String    @map("original_url")
+  originalId   String?   @map("original_id")
+  title        String?
+  summary      String?
+  thumbnailUrl String?   @map("thumbnail_url")
+  publishedAt  DateTime? @map("published_at")
+
+  // Phase 2 (回填完整内容)
+  contentText String? @map("content_text")
+  mediaItems  Media[] @relation("SocialPostMedia")
+  isFullCopy  Boolean @default(false) @map("is_full_copy")
+
+  // 标签 (多对多)
+  tags Tag[]
+
+  importMethod ImportMethod @default(MANUAL) @map("import_method")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  @@unique([platform, originalId])
+  @@index([platform])
+  @@index([publishedAt(sort: Desc)])
+  @@map("social_posts")
+}
+
+/// 4.14 新闻报道
+model NewsArticle {
+  id           String    @id @default(cuid())
+  slug         String    @unique
+  originalUrl  String    @map("original_url")
+  title        String
+  summary      String?
+  source       String?
+  thumbnailUrl String?   @map("thumbnail_url")
+  publishedAt  DateTime? @map("published_at")
+
+  contentText String? @map("content_text")
+  mediaItems  Media[] @relation("NewsArticleMedia")
+  isFullCopy  Boolean @default(false) @map("is_full_copy")
+
+  // 标签 (多对多)
+  tags Tag[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([publishedAt(sort: Desc)])
+  @@map("news_articles")
+}
+
+/// 4.15 路透/踪迹
+model Sighting {
+  id   String @id @default(cuid())
+  slug String @unique
+
+  originalUrl  String?   @map("original_url")
+  title        String
+  summary      String?
+  thumbnailUrl String?   @map("thumbnail_url")
+  sightedAt    DateTime? @map("sighted_at")
+
+  content    String?
+  mediaItems Media[] @relation("SightingMedia")
+  isFullCopy Boolean @default(false) @map("is_full_copy")
+
+  authorName String           @map("author_name")
+  submitType SubmitType       @default(LINK) @map("submit_type")
+  status     ModerationStatus @default(PENDING)
+
+  // 标签 (多对多)
+  tags Tag[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([sightedAt(sort: Desc)])
+  @@map("sightings")
+}
+
+/// 4.16 首页时间线
+model TimelineEvent {
+  id          String   @id @default(cuid())
+  date        DateTime
+  title       String
+  description String?
+
+  relatedType String? @map("related_type")
+  relatedId   String? @map("related_id")
+
+  isVisible Boolean  @default(true) @map("is_visible")
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([date(sort: Desc)])
+  @@index([isVisible])
+  @@map("timeline_events")
+}
+
+/// 4.17 留言板
+model Guestbook {
+  id  String       @id @default(cuid())
+  tab GuestbookTab
+
+  nickname String
+  content  String
+  images   Media[] @relation("GuestbookImages")
+
+  storyTags   String[] @map("story_tags")
+  relatedYear Int?     @map("related_year")
+
+  likesCount Int              @default(0) @map("likes_count")
+  status     ModerationStatus @default(PENDING)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([tab])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("guestbook")
+}
+
+/// 4.18 评论 (多态)
+model Comment {
+  id         String   @id @default(cuid())
+  targetType String   @map("target_type")
+  targetId   String   @map("target_id")
+  nickname   String
+  content    String   @db.VarChar(300)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@index([targetType, targetId])
+  @@map("comments")
+}
+
+/// 4.19 公告
+model Announcement {
+  id          String           @id @default(cuid())
+  type        AnnouncementType
+  title       String
+  content     String
+  isPinned    Boolean          @default(false) @map("is_pinned")
+  publishDate DateTime         @map("publish_date")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  @@index([type])
+  @@index([publishDate(sort: Desc)])
+  @@index([isPinned])
+  @@map("announcements")
+}
+
+/// 4.20 管理员
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("admins")
+}
