@@ -4,7 +4,7 @@
 
 | 阶段 | 内容 | 状态 |
 |------|------|------|
-| P0 - 项目初始化 | 技术栈搭建、数据库设计、项目骨架 | 进行中 |
+| P0 - 项目初始化 | 技术栈搭建、数据库设计、项目骨架 | ✅ 已完成 |
 | P1 - 核心页面 | 首页 + 动态模块（最核心的内容展示） | 待开始 |
 | P2 - 作品模块 | 影视 + 演出（作品信息与关联内容） | 待开始 |
 | P3 - 活动与资料 | 活动 + 资料库（代言、访谈、杂志、专辑） | 待开始 |
@@ -32,17 +32,19 @@
   - `TimelineEvent` 时间线、`Guestbook` 留言、`Comment` 评论
   - `Announcement` 公告、`Admin` 管理员
   - `ContentRelation` 跨内容关联（多态）
-- [ ] 创建数据库迁移文件 (待 Supabase 配置)
+- [x] 配置 Supabase 连接 (Session pooler, ap-northeast-2)
+- [x] 创建数据库迁移文件 `20260605164411_init` (20 张表已同步)
+- [x] 生成 Prisma Client
 - [ ] 编写 Seed 数据 (测试用)
 
-### P0.3 项目骨架
-- [ ] 创建基础布局 (Header/Footer/Navigation)
-- [ ] 创建各栏目空页面路由
-- [ ] 设计全局样式 (颜色、字体、间距)
-- [ ] 创建通用组件 (Card、Tag、ImageGallery、Timeline)
+### P0.3 项目骨架 ✅ (2026-06-06)
+- [x] 创建基础布局 (Header/Footer/Navigation)
+- [x] 创建各栏目空页面路由
+- [x] 设计全局样式 (颜色、字体、间距)
+- [x] 创建通用组件 (Card、Tag、ImageGallery、Timeline)
 
 ### P0.4 基础服务配置
-- [ ] 注册 Supabase 项目 (或选定数据库方案)
+- [x] 注册 Supabase 项目 (已配置, ap-northeast-2)
 - [ ] 配置 Cloudflare R2 (或选定存储方案)
 - [ ] 配置 Vercel 部署 (或选定部署方案)
 
@@ -155,3 +157,15 @@
 - 文本内容存数据库
 - 图片/视频存 R2，数据库只存 URL
 - 社交媒体内容直接搬运文本+图片 (不做 embed)
+
+### 为什么选全站深色主题？
+- 基于参考图确立"时光电影感"(Cinematic Timeless) 设计调性
+- 深靛蓝 #1A1A2E 替代纯黑，更有舞台感和胶片质感
+- 琥珀金 #C49B63 作为唯一强调色，奢华但不刺眼
+- 胶片颗粒噪声 + 超细金线 + 毛玻璃效果，三层视觉质感叠加
+- 字体系统：宋体（情感标题）+ 黑体（正文）+ Garamond Italic（年份装饰）
+
+### 组件架构设计
+- 配置驱动：导航项(navigation.ts)、站点信息(site.ts) 集中管理，一处修改全站生效
+- 设计令牌：所有颜色/字体/间距定义在 globals.css 的 @theme inline 中
+- 组件分层：layout（布局）/ ui（通用）/ decorative（装饰），职责清晰

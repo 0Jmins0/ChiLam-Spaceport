@@ -4,15 +4,15 @@
 一个集合张智霖各平台、各阶段、各渠道资讯的综合性粉丝网站。
 
 ## 当前进度
-- **阶段**: P0 - 项目初始化（进行中）
-- **已完成**: P0.1 技术环境搭建、P0.2 数据库 Schema 设计（20 张表 + 10 个枚举）
-- **下一步**: P0.3 Supabase 配置 + 数据库迁移 → P0.4 项目骨架搭建
+- **阶段**: P0 - 项目初始化（已完成）
+- **已完成**: P0.1 技术环境搭建、P0.2 数据库设计 + Supabase 配置 + 迁移、P0.3 项目骨架搭建
+- **下一步**: P1.1 首页开发
 - **详细进度**: 查看 `/docs/PROGRESS.md`
 
 ## 技术栈
 - **前端**: Next.js 16.2.6 (App Router) + TypeScript 5.9 + Tailwind CSS 4.3
 - **后端**: Next.js API Routes + Prisma 7.8
-- **数据库**: PostgreSQL (Supabase - 待配置)
+- **数据库**: PostgreSQL (Supabase - 已配置, Session pooler)
 - **存储**: Cloudflare R2 (图片/视频/文件 - 待配置)
 - **部署**: Vercel (前端) + Supabase (数据库) - 待配置
 - **包管理**: pnpm 11.5
@@ -31,10 +31,14 @@
 │   ├── BEGINNER_GUIDE.md                            # 零基础开发指南
 │   └── chilam-website-design.md                     # 网站业务设计文档
 ├── src/
-│   ├── app/                                         # Next.js App Router 页面
-│   ├── components/                                  # React 组件（待创建）
-│   ├── lib/                                         # 工具函数、数据库客户端（待创建）
-│   └── types/                                       # TypeScript 类型定义（待创建）
+│   ├── app/                                         # Next.js App Router 页面（已创建 8 栏目路由）
+│   ├── components/
+│   │   ├── layout/                                  # 布局组件（Header, Footer, MobileNav 等）
+│   │   ├── ui/                                      # 通用 UI 组件（Button, Card, Tag 等）
+│   │   └── decorative/                              # 装饰组件（FilmGrain, YearMarquee）
+│   ├── config/                                      # 站点配置（site.ts, navigation.ts）
+│   ├── lib/                                         # 工具函数（cn.ts, fonts.ts, db.ts）
+│   └── generated/                                   # Prisma 生成的客户端代码
 ├── prisma/
 │   └── schema.prisma                                # 数据库 Schema（已完成，20 张表）
 └── public/                                          # 静态资源
@@ -59,9 +63,9 @@
   - `ContentRelation` 跨内容关联：多态引用（sourceType/Id → targetType/Id）
   - 渐进增强模式：链接优先 → 回填完整内容（social_posts / news_articles / sightings）
 
-## 服务器与数据库 (待配置)
+## 服务器与数据库
 - **域名**: 待定
-- **Supabase 项目**: 待创建
+- **Supabase 项目**: 已配置（Session pooler, ap-northeast-2, 迁移已完成）
 - **Cloudflare R2**: 待创建
 - **Vercel 项目**: 待创建
 

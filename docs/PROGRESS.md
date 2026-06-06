@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P0 - 项目初始化 (进行中)
+## 当前阶段: P0 - 项目初始化 (已完成)
 
 ---
 
@@ -8,8 +8,8 @@
 
 | 模块 | 状态 | 最后更新 |
 |------|------|----------|
-| 项目初始化 | 🔧 进行中 | 2026-06-02 |
-| 数据库设计 | ✅ 已完成 | 2026-06-05 |
+| 项目初始化 | ✅ 已完成 | 2026-06-06 |
+| 数据库设计 | ✅ 已完成 | 2026-06-06 |
 | 首页 | 未开始 | - |
 | 动态模块 | 未开始 | - |
 | 影视模块 | 未开始 | - |
@@ -24,6 +24,24 @@
 ---
 
 ## 详细记录
+
+### 2026-06-06 - P0.3 项目骨架搭建 (已完成)
+- 设计令牌系统：基于参考图建立全站深色主题（深靛蓝 #1A1A2E + 琥珀金 #C49B63）
+- 字体加载：5 款 Google Fonts（Playfair Display、Noto Serif/Sans SC、Inter、Cormorant Garamond）
+- 配置文件：site.ts（站点信息）、navigation.ts（7 个栏目导航）
+- 工具函数：cn.ts（tailwind-merge）、db.ts（Prisma 预留）
+- 布局组件：Header（毛玻璃导航栏）、MobileNav（抽屉菜单）、Footer（三栏 + 年份暗纹）、PageContainer、PageHeader
+- UI 组件：Button（3 变体）、Card（深色卡片）、Tag（金边标签）、TabBar（金线指示器）、GoldDivider、GlassOverlay、UnderConstruction
+- 装饰组件：FilmGrain（胶片颗粒）、YearMarquee（年份泛金动画）
+- 路由页面：8 个栏目列表页 + 6 个详情页 + 首页骨架 + 404 页面（共 16 个）
+- 全局样式：胶片颗粒噪声、琥珀金细线、毛玻璃效果、自定义滚动条
+- 构建验证通过：pnpm build + lint + format 全部通过
+
+### 2026-06-06 - P0.2 Supabase 数据库配置 + 迁移 (已完成)
+- 连接 Supabase 项目（Session pooler 模式，ap-northeast-2 区域）
+- 配置 `prisma.config.ts` 加载 `.env.local` 环境变量
+- 执行首次数据库迁移 `20260605164411_init`，20 张表 + 10 个枚举已同步到 Supabase
+- 生成 Prisma Client 到 `src/generated/prisma`
 
 ### 2026-06-05 - P0.2 数据库 Schema 设计 (已完成)
 - 基于 `docs/Database_Design_v1.md` 编写完整 `prisma/schema.prisma`
@@ -81,20 +99,28 @@
 ## P0.2 完成清单
 
 - [x] 设计核心数据表 Schema (Prisma) — 基于 Database_Design_v1.md
-- [ ] 创建数据库迁移文件 (待 Supabase 配置后执行)
+- [x] 配置 Supabase 连接（Session pooler）
+- [x] 创建数据库迁移文件 `20260605164411_init`
+- [x] 生成 Prisma Client
 - [ ] 编写 Seed 数据 (测试用)
 
-## 下一步: P0.3 项目骨架
+## P0.3 完成清单
 
-- [ ] 创建基础布局 (Header/Footer/Navigation)
-- [ ] 创建各栏目空页面路由
-- [ ] 设计全局样式 (颜色、字体、间距)
-- [ ] 创建通用组件 (Card、Tag、ImageGallery、Timeline)
+- [x] 创建基础布局 (Header/Footer/Navigation)
+- [x] 创建各栏目空页面路由
+- [x] 设计全局样式 (颜色、字体、间距)
+- [x] 创建通用组件 (Card、Tag、ImageGallery、Timeline)
+
+## 下一步: P1.1 首页开发
+
+- [ ] 首页大图/Banner 展示区
+- [ ] 时间线组件（数据对接 TimelineEvent 表）
+- [ ] 首页动态内容加载
 
 ---
 
 ## 待决事项
-- [ ] 数据库方案最终确认 (Supabase / 自建 / 其他)
+- [x] 数据库方案最终确认 → Supabase (PostgreSQL, ap-northeast-2)
 - [ ] 存储方案最终确认 (R2 / 其他)
 - [ ] 域名选择
 - [ ] 是否需要用户登录系统
