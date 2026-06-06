@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: 'JULIAN CHEUNG',
   nameCn: '张智霖',
-  tagline: '時光如書，情是初心',
+  tagline: '我們都在，一直都在',
   description: '张智霖全面资讯网站 — 集合各平台、各阶段、各渠道资讯',
   url: 'https://chilamishere.com',
   careerStartYear: 1991,
