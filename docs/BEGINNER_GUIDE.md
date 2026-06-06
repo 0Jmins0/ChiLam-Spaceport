@@ -2,7 +2,7 @@
 
 > 写给第一次做网站开发的你。本文档基于当前项目进度，一步步告诉你接下来该做什么、怎么做。
 >
-> 最后更新：2026-06-05 | 当前进度：P0.2 数据库设计已完成
+> 最后更新：2026-06-06 | 当前进度：P0 全部完成，准备进入 P1
 
 ---
 
@@ -11,9 +11,9 @@
 1. [你的项目现在长什么样](#1-你的项目现在长什么样)
 2. [核心概念速查](#2-核心概念速查)
 3. [日常开发命令](#3-日常开发命令)
-4. [下一步：P0.3 配置 Supabase 数据库](#4-下一步p03-配置-supabase-数据库)
-5. [下一步：P0.4 项目骨架搭建](#5-下一步p04-项目骨架搭建)
-6. [下一步：P0.5 基础服务配置](#6-下一步p05-基础服务配置)
+4. [已完成：Supabase 数据库配置](#4-已完成supabase-数据库配置)
+5. [已完成：项目骨架搭建](#5-已完成项目骨架搭建)
+6. [下一步：基础服务配置（可选）](#6-下一步基础服务配置可选)
 7. [进入 P1：首页与动态模块](#7-进入-p1首页与动态模块)
 8. [常见问题与排错](#8-常见问题与排错)
 9. [学习资源推荐](#9-学习资源推荐)
@@ -24,50 +24,77 @@
 
 ### 已完成的事
 
-| 步骤 | 状态 | 说明 |
-|------|------|------|
-| P0.1 技术环境搭建 | ✅ | Next.js + TypeScript + Tailwind + Prisma 都装好了 |
-| P0.2 数据库设计 | ✅ | 20 张表的 Schema 已写好在 `prisma/schema.prisma` |
+| 步骤                            | 状态 | 说明                                                 |
+| ------------------------------- | ---- | ---------------------------------------------------- |
+| P0.1 技术环境搭建               | ✅   | Next.js 16 + TypeScript + Tailwind CSS v4 + Prisma 7 |
+| P0.2 数据库设计 + Supabase 配置 | ✅   | 20 张表 Schema + Supabase 迁移完成                   |
+| P0.3 项目骨架搭建               | ✅   | 深色主题设计系统 + 16 个页面路由 + 14 个组件         |
 
 ### 当前项目文件结构
 
 ```
 Chilam_Is_Here/
 ├── docs/                          # 文档目录
-│   ├── DEVELOPMENT_PLAN.md        # 开发计划（看阶段任务）
-│   ├── PROGRESS.md                # 进度记录（看做了什么）
+│   ├── DEVELOPMENT_PLAN.md        # 开发计划
+│   ├── PROGRESS.md                # 进度记录
 │   ├── Database_Design_v1.md      # 数据库设计文档
-│   └── BEGINNER_GUIDE.md          # 本文件
+│   ├── chilam-website-design.md   # 网站设计文档
+│   ├── BEGINNER_GUIDE.md          # 本文件
+│   ├── 参考图/                     # UI 参考图
+│   └── draft_bak/                 # 设计草稿
 │
 ├── prisma/
-│   └── schema.prisma              # 数据库表结构定义（已完成）
+│   ├── schema.prisma              # 数据库表结构（20 张表）
+│   └── migrations/                # 数据库迁移记录
 │
 ├── src/
-│   └── app/                       # 网站页面代码
-│       ├── layout.tsx             # 全局布局（每个页面都会用到）
-│       ├── page.tsx               # 首页（目前是 Next.js 默认页面）
-│       └── globals.css            # 全局样式
+│   ├── app/                       # 页面路由
+│   │   ├── layout.tsx             # 全局布局（Header + Footer + FilmGrain）
+│   │   ├── page.tsx               # 首页（Hero + 时间线占位 + 栏目入口）
+│   │   ├── not-found.tsx          # 404 页面
+│   │   ├── globals.css            # 全局样式 + 设计令牌
+│   │   ├── updates/               # 动态栏目
+│   │   ├── screens/               # 影视综栏目
+│   │   ├── performances/          # 演出栏目
+│   │   ├── activities/            # 活动栏目
+│   │   ├── archives/              # 资料库栏目
+│   │   ├── messages/              # 留言板栏目
+│   │   └── announcements/         # 公告栏目
+│   │
+│   ├── components/                # 可复用组件
+│   │   ├── layout/                # 布局（Header, Footer, MobileNav, PageContainer, PageHeader）
+│   │   ├── ui/                    # 通用 UI（Button, Card, Tag, TabBar, GoldDivider, GlassOverlay, UnderConstruction）
+│   │   └── decorative/            # 装饰（FilmGrain, YearMarquee）
+│   │
+│   ├── config/                    # 配置文件
+│   │   ├── site.ts                # 站点信息（名称、社交链接等）
+│   │   └── navigation.ts          # 导航栏目配置
+│   │
+│   ├── lib/                       # 工具函数
+│   │   ├── cn.ts                  # 样式类名合并工具
+│   │   ├── fonts.ts               # 字体配置（5 款 Google Fonts）
+│   │   └── db.ts                  # 数据库连接（P1 配置）
+│   │
+│   └── generated/                 # Prisma 生成的代码（自动生成，不要手动修改）
 │
-├── public/                        # 静态资源（图片、图标等）
-├── package.json                   # 项目依赖配置
-├── .env.local                     # 环境变量（数据库密码等，不提交到 Git）
-├── tsconfig.json                  # TypeScript 配置
-├── next.config.ts                 # Next.js 配置
-├── eslint.config.mjs              # 代码检查配置
-├── .prettierrc                    # 代码格式化配置
-└── CLAUDE.md                      # Claude 读取的项目说明
+├── public/                        # 静态资源
+├── package.json                   # 项目依赖
+├── .env.local                     # 环境变量（不提交 Git）
+└── CLAUDE.md                      # Claude 项目说明
 ```
 
 ### 你需要理解的关键文件
 
-| 文件 | 作用 | 什么时候看 |
-|------|------|-----------|
-| `src/app/layout.tsx` | 网站的"外壳"——导航栏、页脚在这里定义，所有页面共享 | 改网站整体布局时 |
-| `src/app/page.tsx` | 首页内容 | 改首页时 |
-| `src/app/xxx/page.tsx` | 某个栏目的页面（还没创建） | 开发各栏目时 |
-| `prisma/schema.prisma` | 数据库表结构 | 改数据库时 |
-| `.env.local` | 存放密码、API 密钥等敏感信息 | 配置数据库/存储时 |
-| `package.json` | 项目用了哪些工具包 | 安装新工具时 |
+| 文件                       | 作用                                   | 什么时候看           |
+| -------------------------- | -------------------------------------- | -------------------- |
+| `src/app/layout.tsx`       | 网站"外壳"——导航栏、页脚、胶片颗粒效果 | 改网站整体布局时     |
+| `src/app/page.tsx`         | 首页（Hero + 时间线 + 栏目入口）       | 改首页时             |
+| `src/app/globals.css`      | 设计令牌（配色、字体、特效）           | 改全站视觉风格时     |
+| `src/config/navigation.ts` | 导航栏栏目配置                         | 添加/修改/删除栏目时 |
+| `src/config/site.ts`       | 站点名称、社交链接等                   | 改站点基本信息时     |
+| `src/components/`          | 各种可复用组件                         | 修改组件样式或行为时 |
+| `prisma/schema.prisma`     | 数据库表结构                           | 改数据库时           |
+| `.env.local`               | 密码、API 密钥                         | 配置数据库/存储时    |
 
 ---
 
@@ -228,8 +255,10 @@ pnpm add -D 包名
 
 ---
 
-## 4. 下一步：P0.3 配置 Supabase 数据库
+## 4. 已完成：Supabase 数据库配置
 
+> ✅ 此步骤已完成。以下内容保留作为参考，帮助你理解数据库是如何配置的。
+>
 > 目标：让你的数据库 Schema 真正变成可用的数据库表。
 
 ### 4.1 注册 Supabase
@@ -274,6 +303,7 @@ npx prisma migrate dev --name init
 ```
 
 运行后你应该看到类似输出：
+
 ```
 Applying migration `20260605_init`
 The following migration(s) have been applied:
@@ -298,129 +328,85 @@ npx prisma studio
 
 ---
 
-## 5. 下一步：P0.4 项目骨架搭建
+## 5. 已完成：项目骨架搭建
 
-> 目标：搭好网站的基本框架——导航栏、页脚、各栏目空页面。完成后你将拥有一个可以点击导航的空网站。
+> ✅ 此步骤已完成。以下内容描述了骨架的设计思路和文件结构。
 
-### 5.1 创建文件夹结构
+### 5.1 设计系统
 
-你需要创建以下目录和文件（可以让 Claude 帮你做）：
+项目采用 **全站深色主题**（时光电影感），核心视觉元素：
 
-```
-src/
-├── app/
-│   ├── layout.tsx              # 修改：加入导航栏和页脚
-│   ├── page.tsx                # 修改：首页内容
-│   ├── globals.css             # 修改：全局样式
-│   │
-│   ├── updates/                # 动态
-│   │   └── page.tsx
-│   ├── screens/                # 影视
-│   │   └── page.tsx
-│   ├── performances/           # 演出
-│   │   └── page.tsx
-│   ├── activities/             # 活动
-│   │   └── page.tsx
-│   ├── archives/               # 资料库
-│   │   └── page.tsx
-│   ├── messages/               # 留言
-│   │   └── page.tsx
-│   └── announcements/          # 公告
-│       └── page.tsx
-│
-├── components/                 # 可复用的组件
-│   ├── layout/
-│   │   ├── Header.tsx          # 导航栏
-│   │   ├── Footer.tsx          # 页脚
-│   │   └── Navigation.tsx      # 导航菜单
-│   └── ui/                     # 通用 UI 组件（后面逐步添加）
-│       └── (暂时空)
-│
-├── lib/                        # 工具函数
-│   └── prisma.ts               # Prisma 客户端实例
-│
-└── types/                      # TypeScript 类型定义
-    └── (暂时空)
-```
+| 元素                   | 说明                 | 修改位置                          |
+| ---------------------- | -------------------- | --------------------------------- |
+| 深靛蓝背景 `#1A1A2E`   | 全站默认背景         | `globals.css` → `--color-bg-dark` |
+| 琥珀金强调色 `#C49B63` | 按钮、高亮、时间线   | `globals.css` → `--color-accent`  |
+| 胶片颗粒效果           | 3% 透明度噪点覆盖    | `FilmGrain` 组件                  |
+| 毛玻璃导航栏           | 滚动时激活 blur 效果 | `Header` 组件                     |
+| 琥珀金细线             | 0.5px 渐变分隔线     | `.gold-line` class                |
 
-### 5.2 创建 Prisma 客户端实例
+### 5.2 组件体系
 
-文件 `src/lib/prisma.ts`——整个项目共用一个数据库连接：
+| 分类 | 组件              | 作用                              |
+| ---- | ----------------- | --------------------------------- |
+| 布局 | Header            | 顶部导航（透明→毛玻璃）           |
+| 布局 | MobileNav         | 移动端侧边抽屉菜单                |
+| 布局 | Footer            | 三栏页脚 + 年份暗纹               |
+| 布局 | PageContainer     | 页面内容容器                      |
+| 布局 | PageHeader        | 页面标题（中文 + 英文 + 金线）    |
+| UI   | Button            | 三种变体：primary/secondary/ghost |
+| UI   | Card              | 深色卡片，hover 金边框            |
+| UI   | Tag               | 琥珀金标签                        |
+| UI   | TabBar            | 分类切换（底部金线指示器）        |
+| UI   | GoldDivider       | 琥珀金细线分隔                    |
+| UI   | GlassOverlay      | 毛玻璃弹窗遮罩                    |
+| UI   | UnderConstruction | "建设中"占位                      |
+| 装饰 | FilmGrain         | 胶片颗粒噪声                      |
+| 装饰 | YearMarquee       | 年份泛金动画                      |
 
-```typescript
-import { PrismaClient } from "@/generated/prisma";
+### 5.3 路由页面
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
-};
+所有 8 个栏目已创建路由，目前显示"建设中"占位内容：
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient();
+| 页面   | 地址             | 文件                             |
+| ------ | ---------------- | -------------------------------- |
+| 首页   | `/`              | `src/app/page.tsx`               |
+| 动态   | `/updates`       | `src/app/updates/page.tsx`       |
+| 影视综 | `/screens`       | `src/app/screens/page.tsx`       |
+| 演出   | `/performances`  | `src/app/performances/page.tsx`  |
+| 活动   | `/activities`    | `src/app/activities/page.tsx`    |
+| 资料库 | `/archives`      | `src/app/archives/page.tsx`      |
+| 留言板 | `/messages`      | `src/app/messages/page.tsx`      |
+| 公告   | `/announcements` | `src/app/announcements/page.tsx` |
+| 404    | 任意不存在的路径 | `src/app/not-found.tsx`          |
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
-```
+### 5.4 如何修改全站风格
 
-> **为什么这么写？** Next.js 开发模式下会频繁重新加载代码，如果每次都创建新连接会导致数据库连接用完。这段代码确保只创建一个连接。
+想改全站配色？只需修改 `src/app/globals.css` 中的 `@theme inline` 区块：
 
-### 5.3 搭建布局：导航栏 + 页脚
-
-**Header.tsx** 需要包含：
-
-```
-┌─────────────────────────────────────────────────────────┐
-│  LOGO/站名    首页  动态  影视  演出  活动  资料库  留言  公告  │
-└─────────────────────────────────────────────────────────┘
-```
-
-导航栏对应的路由：
-
-| 栏目名 | 路由 |
-|--------|------|
-| 首页 | `/` |
-| 动态 | `/updates` |
-| 影视 | `/screens` |
-| 演出 | `/performances` |
-| 活动 | `/activities` |
-| 资料库 | `/archives` |
-| 留言 | `/messages` |
-| 公告 | `/announcements` |
-
-### 5.4 创建各栏目空页面
-
-每个栏目先创建一个最简单的占位页面，例如 `src/app/updates/page.tsx`：
-
-```tsx
-export default function UpdatesPage() {
-  return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold">动态</h1>
-      <p className="mt-4 text-gray-500">内容开发中...</p>
-    </div>
-  );
+```css
+@theme inline {
+  --color-bg-dark: #1a1a2e; /* 改这里换主背景色 */
+  --color-accent: #c49b63; /* 改这里换强调色 */
+  /* ... */
 }
 ```
 
-### 5.5 怎么让 Claude 帮你做
+想改导航栏目？修改 `src/config/navigation.ts`：
 
-你可以直接对 Claude 说：
-
-> "请帮我完成 P0.4 项目骨架：创建 Header/Footer/Navigation 组件，创建所有栏目的空页面路由，修改 layout.tsx 使用新组件。风格简洁现代，中文为主。"
-
-Claude 会帮你创建所有文件。完成后运行 `pnpm dev` 查看效果。
-
-### 5.6 验收标准
-
-完成后你应该能：
-- [ ] 打开 http://localhost:3000 看到有导航栏和页脚的首页
-- [ ] 点击导航栏上的每个栏目，能跳转到对应的空页面
-- [ ] 每个页面都有导航栏和页脚（layout.tsx 的作用）
-- [ ] 手机宽度下导航栏能正常显示（响应式）
+```typescript
+export const NAV_ITEMS = [
+  { label: '动态', labelEn: 'Updates', href: '/updates' },
+  // 增删改这里的条目即可
+];
+```
 
 ---
 
-## 6. 下一步：P0.5 基础服务配置
+## 6. 下一步：基础服务配置（可选）
 
+> 此步骤可选，可以等到 P1 需要时再配置。Supabase 数据库已配好，R2 和 Vercel 待配。
+>
 > 目标：配置图片存储（Cloudflare R2）和部署平台（Vercel）。
-> 这一步可以先跳过，等到 P1 需要上传图片时再配。
 
 ### 6.1 Cloudflare R2（图片/视频存储）
 
@@ -456,18 +442,18 @@ Claude 会帮你创建所有文件。完成后运行 `pnpm dev` 查看效果。
 // 示例：添加一些标签
 await prisma.tag.createMany({
   data: [
-    { name: "粤语", slug: "cantonese", tagGroup: "language" },
-    { name: "普通话", slug: "mandarin", tagGroup: "language" },
-    { name: "香港", slug: "hong-kong", tagGroup: "region" },
-    { name: "射雕英雄传", slug: "legend-of-condor-heroes", tagGroup: "work" },
+    { name: '粤语', slug: 'cantonese', tagGroup: 'language' },
+    { name: '普通话', slug: 'mandarin', tagGroup: 'language' },
+    { name: '香港', slug: 'hong-kong', tagGroup: 'region' },
+    { name: '射雕英雄传', slug: 'legend-of-condor-heroes', tagGroup: 'work' },
   ],
 });
 
 // 示例：添加栏目
 await prisma.category.createMany({
   data: [
-    { name: "动态", slug: "updates", path: "/updates", level: 1, sortOrder: 1 },
-    { name: "影视", slug: "screens", path: "/screens", level: 1, sortOrder: 2 },
+    { name: '动态', slug: 'updates', path: '/updates', level: 1, sortOrder: 1 },
+    { name: '影视', slug: 'screens', path: '/screens', level: 1, sortOrder: 2 },
     // ...
   ],
 });
@@ -475,9 +461,9 @@ await prisma.category.createMany({
 // 示例：添加一条时间线事件
 await prisma.timelineEvent.create({
   data: {
-    date: new Date("2025-01-01"),
-    title: "披荆斩棘 2025 开播",
-    description: "张智霖参加芒果TV综艺《披荆斩棘》第四季",
+    date: new Date('2025-01-01'),
+    title: '披荆斩棘 2025 开播',
+    description: '张智霖参加芒果TV综艺《披荆斩棘》第四季',
   },
 });
 ```
@@ -517,6 +503,7 @@ await prisma.timelineEvent.create({
 ```
 
 开发顺序建议：
+
 1. 先做静态版本（写死数据，确认布局效果）
 2. 再改成从数据库读取（接入 Prisma）
 
@@ -562,12 +549,12 @@ src/app/api/
 
 ```typescript
 // src/app/api/social-posts/route.ts
-import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import { prisma } from '@/lib/prisma';
+import { NextResponse } from 'next/server';
 
 export async function GET() {
   const posts = await prisma.socialPost.findMany({
-    orderBy: { publishedAt: "desc" },
+    orderBy: { publishedAt: 'desc' },
     take: 20,
   });
   return NextResponse.json(posts);
@@ -638,18 +625,18 @@ git show 提交ID:文件名     # 查看某个版本的内容
 
 ### 必读（遇到不懂再看）
 
-| 主题 | 资源 | 说明 |
-|------|------|------|
-| Next.js 基础 | https://nextjs.org/learn | 官方教程，中文也有 |
-| Tailwind CSS | https://tailwindcss.com/docs | 样式类名查手册就行，不需要背 |
-| Prisma 基础 | https://www.prisma.io/docs/getting-started | 数据库操作查这个 |
+| 主题         | 资源                                       | 说明                         |
+| ------------ | ------------------------------------------ | ---------------------------- |
+| Next.js 基础 | https://nextjs.org/learn                   | 官方教程，中文也有           |
+| Tailwind CSS | https://tailwindcss.com/docs               | 样式类名查手册就行，不需要背 |
+| Prisma 基础  | https://www.prisma.io/docs/getting-started | 数据库操作查这个             |
 
 ### 选读（想深入了解）
 
-| 主题 | 资源 | 说明 |
-|------|------|------|
-| TypeScript | https://www.typescriptlang.org/docs/handbook/ | 类型系统基础 |
-| React 基础 | https://react.dev/learn | 组件、状态、事件 |
+| 主题       | 资源                                          | 说明             |
+| ---------- | --------------------------------------------- | ---------------- |
+| TypeScript | https://www.typescriptlang.org/docs/handbook/ | 类型系统基础     |
+| React 基础 | https://react.dev/learn                       | 组件、状态、事件 |
 
 ### 最有效的学习方式
 
@@ -701,20 +688,22 @@ git show 提交ID:文件名     # 查看某个版本的内容
 
 ## 阶段完成检查清单
 
-### P0 完成标志（你现在在这里）
-- [x] P0.1 技术环境搭建
-- [x] P0.2 数据库 Schema 设计
-- [ ] P0.3 Supabase 数据库配置 + 迁移 ← **你的下一步**
-- [ ] P0.4 项目骨架（导航栏、页脚、空页面）
-- [ ] P0.5 基础服务配置（R2、Vercel）
+### P0 完成标志 ✅
 
-### P1 完成标志
+- [x] P0.1 技术环境搭建
+- [x] P0.2 数据库 Schema 设计 + Supabase 配置 + 迁移
+- [x] P0.3 项目骨架（深色主题 + 组件库 + 路由）
+- [ ] 基础服务配置（R2、Vercel）— 可选，P1 时再配
+
+### P1 完成标志 ← 你的下一步
+
 - [ ] 首页有时间线、大图、一句话
 - [ ] /updates 能看到动态列表
 - [ ] 能按平台/类型筛选动态
 - [ ] 有测试数据可以看效果
 
 ### P2 完成标志
+
 - [ ] /screens 能看到影视列表，可按电影/电视剧/综艺筛选
 - [ ] /performances 能看到演出列表
 - [ ] 详情页能看到完整信息
