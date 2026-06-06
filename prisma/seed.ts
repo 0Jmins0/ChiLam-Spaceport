@@ -1,7 +1,22 @@
+import { config } from 'dotenv';
+config({ path: '.env.local' });
+
 import { PrismaClient } from '../src/generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
+import bcrypt from 'bcryptjs';
 
-const adapter = new PrismaPg(process.env.DATABASE_URL!);
+const rawUrl = process.env.DATABASE_URL;
+if (!rawUrl) {
+  throw new Error('DATABASE_URL is not set');
+}
+// 去除可能由 dotenvx 保留的引号
+const connectionString = rawUrl.replace(/^["']|["']$/g, '');
+console.log('Connecting to:', connectionString.replace(/\/\/.*@/, '//***@'));
+
+const adapter = new PrismaPg({
+  connectionString,
+  max: 5,
+});
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
@@ -12,6 +27,10 @@ async function main() {
   // ─────────────────────────────────────────────
   console.log('Clearing existing data...');
 
+  await prisma.admin.deleteMany();
+  await prisma.announcement.deleteMany();
+  await prisma.comment.deleteMany();
+  await prisma.guestbook.deleteMany();
   await prisma.fanShot.deleteMany();
   await prisma.performanceMedia.deleteMany();
   await prisma.performance.deleteMany();
@@ -26,6 +45,20 @@ async function main() {
   await prisma.timelineEvent.deleteMany();
   await prisma.media.deleteMany();
   await prisma.tag.deleteMany();
+
+  // ─────────────────────────────────────────────
+  // 0. 管理员账号
+  // ─────────────────────────────────────────────
+  console.log('Creating admin account...');
+
+  const hashedPassword = await bcrypt.hash('admin123456', 12);
+  await prisma.admin.create({
+    data: {
+      email: 'admin@chilamishere.com',
+      password: hashedPassword,
+      name: '站长',
+    },
+  });
 
   // ─────────────────────────────────────────────
   // 1. Tags（17 个）
@@ -1286,6 +1319,153 @@ async function main() {
   }
 
   // ─────────────────────────────────────────────
+  // 10. Announcement（8 条公告数据）
+  // ─────────────────────────────────────────────
+  console.log('Creating announcements...');
+
+  const announcements = [
+    // NOTICE x3
+    {
+      type: 'NOTICE' as const,
+      title: '「Chilam Is Here」网站正式上线公告',
+      content: '各位霖迷大家好！经过数月筹备，「Chilam Is Here」网站正式上线啦！本站致力于汇集张智霖各平台、各阶段、各渠道的资讯，打造一个全面、专业的综合性粉丝资讯平台。感谢大家一直以来的支持与等待，希望大家在这里找到更多关于Chilam的精彩内容。如有任何建议或反馈，欢迎通过留言板与我们联系。',
+      isPinned: true,
+      publishDate: new Date('2026-01-15'),
+    },
+    {
+      type: 'NOTICE' as const,
+      title: '隐私政策更新通知',
+      content: '为了更好地保护用户隐私，我们对网站隐私政策进行了更新。主要变更内容：1. 明确了数据收集范围，仅收集必要的浏览数据用于改善服务；2. 增加了用户数据删除请求流程说明；3. 更新了第三方服务使用说明。详细政策请查看网站底部「隐私政策」链接。',
+      isPinned: false,
+      publishDate: new Date('2026-02-10'),
+    },
+    {
+      type: 'NOTICE' as const,
+      title: '内容版权声明',
+      content: '本站所有内容（包括但不限于文字、图片、视频资料）均来源于公开渠道或粉丝投稿。所有媒体素材版权归原作者及相关权利人所有。如有侵权请联系管理员处理，我们将在确认后及时删除相关内容。未经授权，禁止转载本站原创整理内容。',
+      isPinned: false,
+      publishDate: new Date('2026-01-20'),
+    },
+    // RULE x2
+    {
+      type: 'RULE' as const,
+      title: '社区规则',
+      content: '为维护友好的交流氛围，请遵守以下社区规则：\n1. 尊重他人，禁止人身攻击、恶意诋毁；\n2. 禁止发布虚假信息或未经证实的谣言；\n3. 禁止发布广告、垃圾信息或与主题无关的内容；\n4. 禁止泄露艺人及其家人的私人信息（住址、行程等）；\n5. 转载内容请注明出处，尊重原创者权益；\n6. 违反规则者将视情节给予警告或封禁处理。\n\n让我们共同维护一个温馨有爱的粉丝社区！',
+      isPinned: true,
+      publishDate: new Date('2026-01-16'),
+    },
+    {
+      type: 'RULE' as const,
+      title: '投稿规范',
+      content: '欢迎大家向本站投稿！投稿须知：\n1. 路透投稿：请附上拍摄时间、地点，如涉及工作行程请确认已公开；\n2. 图片投稿：请提供原图或高清图，注明拍摄者/来源；\n3. 资讯投稿：请附上原始链接或可靠信源；\n4. 审核周期：投稿将在1-3个工作日内审核发布；\n5. 所有投稿一经采用，将标注投稿者昵称（可匿名）。\n\n投稿请通过留言板「建议反馈」分类提交。',
+      isPinned: false,
+      publishDate: new Date('2026-01-18'),
+    },
+    // UPDATE x3
+    {
+      type: 'UPDATE' as const,
+      title: 'v1.0 正式发布',
+      content: '网站 v1.0 版本正式发布！本次上线包含以下核心功能：\n- 首页时间线：展示Chilam近期重要事件\n- 动态模块：汇集各社交平台动态、新闻报道、粉丝路透\n- 影视模块：完整影视作品库，含电影、电视剧、综艺\n- 演出模块：演唱会、舞台剧、音乐剧信息\n- 活动模块：代言活动与访谈\n- 资料库：专辑与杂志收录\n\n感谢所有参与测试的小伙伴们！',
+      isPinned: false,
+      publishDate: new Date('2026-01-15'),
+    },
+    {
+      type: 'UPDATE' as const,
+      title: '新增留言板功能',
+      content: '应大家要求，我们上线了留言板功能！现在你可以：\n- 在「我想对你说」分类中写下想对Chilam说的话；\n- 在「故事分享」中分享你与Chilam的故事和回忆；\n- 在「建议反馈」中向管理团队提出网站改进建议。\n\n每条留言都支持评论互动，快来参与吧！',
+      isPinned: false,
+      publishDate: new Date('2026-03-01'),
+    },
+    {
+      type: 'UPDATE' as const,
+      title: '资料库上线 — 专辑与杂志收录',
+      content: '资料库模块正式上线！目前已收录：\n- 专辑：涵盖Chilam出道至今发行的音乐专辑，包含曲目列表和收听链接；\n- 杂志：收录历年杂志封面及内页扫描。\n\n后续将持续补充更多资料，欢迎大家提供线索和素材。如发现信息有误，请通过留言板反馈。',
+      isPinned: false,
+      publishDate: new Date('2026-04-15'),
+    },
+  ];
+
+  for (const a of announcements) {
+    await prisma.announcement.create({ data: a });
+  }
+
+  // ────────────────────────────────────��────────
+  // 12. Guestbook — 留言板数据
+  // ─────────────────────────────────────────────
+  console.log('Creating guestbook entries...');
+
+  const guestbookMessages = [
+    { nickname: '霖霖的小太阳', content: 'Chilam永远是最帅的！从小就喜欢你，希望你一直开心健康。' },
+    { nickname: '粤语歌迷', content: '每次听到《岁月如歌》都会想起你，歌声真的太好听了，感谢你带给我们这么多好作品。' },
+    { nickname: '路过的港剧粉', content: '刚看完《使徒行者》又想重温一遍，卓sir太帅了！' },
+    { nickname: '老粉丝2003', content: '追星二十年，Chilam一直是我的偶像。谢谢你陪伴了我的青春。' },
+    { nickname: '新入坑的00后', content: '最近被安利了Chilam，真的好帅好有魅力！' },
+  ];
+
+  const guestbookStories = [
+    { nickname: '追星老阿姨', content: '2011年第一次看Chilam演唱会，在红馆。那天下着大雨，我从深圳赶过去，全身湿透了但是听到第一首歌的时候所有疲惫都消失了。那是我人生中最难忘的夜晚之一，Chilam站在舞台上唱《现代爱情故事》的时候，全场都在跟着唱。那一刻我觉得，追星是值得的。', storyTags: ['追星经历', '音乐记忆'], relatedYear: 2011 },
+    { nickname: '90后TVB迷', content: '小时候每天放学回家第一件事就是打开电视看TVB，《天地豪情》《十月初五的月光》都是陪伴我长大的剧。Chilam演的每个角色都让我印象深刻，尤其是《冲上云霄》里的Captain Cool，让我立志要当飞行员（虽然最后没实现哈哈）。', storyTags: ['影视回忆'], relatedYear: 2003 },
+    { nickname: '音乐发烧友', content: '收藏了Chilam从第一张专辑到现在的所有实体碟，粤语歌坛真的不能没有他。每张专辑都有不同的惊喜，从早期的偶像路线到后来越来越成熟的音乐风格，见证了一个歌手的成长。', storyTags: ['音乐记忆', '追星经历'], relatedYear: 1995 },
+    { nickname: '冷知识达人', content: '你们知道吗？Chilam其实是混血儿，中德混血。难怪轮廓这么深邃！而且他年轻时候还当过模特，后来才进入演艺圈的。', storyTags: ['冷知识'], relatedYear: null },
+    { nickname: '马来西亚粉丝', content: '2014年Chilam来马来西亚开演唱会，那是我第一次现场看到他。我从槟城飞到吉隆坡，整个过程虽然折腾但是超值得。他在台上说了一句马来语，全场都沸腾了！希望他能多来东南亚。', storyTags: ['追星经历'], relatedYear: 2014 },
+  ];
+
+  const guestbookFeedback = [
+    { nickname: '设计师小王', content: '网站设计很有质感，深色主题配金色很高级。建议可以加一个搜索功能，方便找特定的影视作品或歌曲。' },
+    { nickname: '资深网民', content: '希望能增加一个作品时间线功能，按年份展示Chilam所有的影视、音乐、演唱会作品，这样可以更直观地看到他的演艺历程。' },
+    { nickname: '手机用户', content: '手机端的浏览体验很好，加载速度也快。如果能有个暗色/亮色主题切换就更好了。' },
+  ];
+
+  const createdGuestbooks: string[] = [];
+
+  for (const msg of guestbookMessages) {
+    const entry = await prisma.guestbook.create({
+      data: { nickname: msg.nickname, content: msg.content, tab: 'MESSAGE', status: 'APPROVED' },
+    });
+    createdGuestbooks.push(entry.id);
+  }
+
+  for (const story of guestbookStories) {
+    const entry = await prisma.guestbook.create({
+      data: {
+        nickname: story.nickname,
+        content: story.content,
+        tab: 'STORY',
+        storyTags: story.storyTags,
+        relatedYear: story.relatedYear,
+        status: 'APPROVED',
+      },
+    });
+    createdGuestbooks.push(entry.id);
+  }
+
+  for (const fb of guestbookFeedback) {
+    const entry = await prisma.guestbook.create({
+      data: { nickname: fb.nickname, content: fb.content, tab: 'FEEDBACK', status: 'APPROVED' },
+    });
+    createdGuestbooks.push(entry.id);
+  }
+
+  // 评论数据
+  console.log('Creating comments...');
+
+  const seedComments = [
+    { targetId: createdGuestbooks[0], nickname: '同感+1', content: '我也是从小就喜欢Chilam！' },
+    { targetId: createdGuestbooks[0], nickname: '路人甲', content: '确实帅了几十年' },
+    { targetId: createdGuestbooks[5], nickname: '我也在', content: '我也去了那场演唱会！太震撼了' },
+    { targetId: createdGuestbooks[6], nickname: '同龄人', content: '冲上云霄真的是神剧' },
+    { targetId: createdGuestbooks[10], nickname: '站长', content: '感谢建议！搜索功能已在规划中' },
+  ];
+
+  for (const c of seedComments) {
+    await prisma.comment.create({
+      data: { targetType: 'guestbook', targetId: c.targetId, nickname: c.nickname, content: c.content },
+    });
+  }
+
+  const guestbookCount = guestbookMessages.length + guestbookStories.length + guestbookFeedback.length;
+
+  // ─────────────────────────────────────────────
   // 统计
   // ─────────────────────────────────────────────
   const tvCount = tvbSeries.length + mainlandSeries.length + webSeries.length + otherSeries.length;
@@ -1305,6 +1485,8 @@ async function main() {
   console.log(`  - ${interviews.length} interviews`);
   console.log(`  - ${albums.length} albums`);
   console.log(`  - ${magazines.length} magazines`);
+  console.log(`  - ${announcements.length} announcements`);
+  console.log(`  - ${guestbookCount} guestbook entries + ${seedComments.length} comments`);
 }
 
 main()

@@ -4,9 +4,9 @@
 一个集合张智霖各平台、各阶段、各渠道资讯的综合性粉丝网站。
 
 ## 当前进度
-- **阶段**: P3 - 活动与资料（已完成）
-- **已完成**: P0 全部、P1 全部（首页+动态模块+API）、P2 全部（影视+演出模块）、P3 全部（活动+资料库模块）
-- **下一步**: P4.1 留言板模块开发
+- **阶段**: P4 - 互动与管理（已完成）
+- **已完成**: P0 全部、P1 全部（首页+动态模块+API）、P2 全部（影视+演出模块）、P3 全部（活动+资料库模块）、P4 全部（留言板+公告+管理审核API）
+- **下一步**: P5 优化上线（SEO、性能、部署）
 - **详细进度**: 查看 `/docs/PROGRESS.md`
 
 ## 技术栈
@@ -43,6 +43,9 @@
 │   │   ├── api/performances/                        # 演出 CRUD API
 │   │   ├── api/activities/                          # 活动 CRUD API（代言+访谈）
 │   │   ├── api/archives/                            # 资料库 CRUD API（专辑+杂志）
+│   │   ├── api/messages/                            # 留言板 CRUD + 点赞 + 评论 API
+│   │   ├── api/announcements/                       # 公告 CRUD API
+│   │   ├── api/admin/                               # 管理后台 API（登录+审核）
 │   │   └── ...                                      # 其他栏目路由
 │   ├── components/
 │   │   ├── layout/                                  # 布局组件（Header, Footer, MobileNav 等）
@@ -52,12 +55,14 @@
 │   │   ├── performances/                            # 演出组件（PerformanceCard, PerformancesFilterBar）
 │   │   ├── activities/                              # 活动组件（EndorsementCard, InterviewCard, ActivitiesFilterBar）
 │   │   ├── archives/                                # 资料库组件（AlbumCard, MagazineCard, ArchivesFilterBar）
+│   │   ├── guestbook/                               # 留言板组件（GuestbookCard, Form, LikeButton, CommentSection 等）
+│   │   ├── announcements/                           # 公告组件（AnnouncementCard, FilterBar）
 │   │   └── decorative/                              # 装饰组件（FilmGrain, YearMarquee）
 │   ├── config/                                      # 站点配置（site.ts, navigation.ts）
 │   ├── lib/                                         # 工具函数
-│   │   ├── cn.ts, fonts.ts, db.ts                   # 基础工具
+│   │   ├── cn.ts, fonts.ts, db.ts, auth.ts          # 基础工具 + 认证中间件
 │   │   ├── types.ts                                 # 数据类型定义
-│   │   └── queries/                                 # 数据查询层（timeline.ts, updates.ts, productions.ts, performances.ts, activities.ts, archives.ts）
+│   │   └── queries/                                 # 数据查询层（timeline.ts, updates.ts, productions.ts, performances.ts, activities.ts, archives.ts, guestbook.ts, announcements.ts）
 │   └── generated/                                   # Prisma 生成的客户端代码
 ├── prisma/
 │   ├── schema.prisma                                # 数据库 Schema（已完成，20 张表）
@@ -102,6 +107,56 @@
 | 资料库 | `/archives` | 杂志、专辑 |
 | 留言 | `/messages` | 我想对你说、故事分享、冷知识、建议反馈 |
 | 公告 | `/announcements` | 网站公告、规则、更新通知 |
+
+## 协作流程（每次开发的标准流程）
+
+Claude 始终作为**主代理（PM）**，不直接写代码，负责规划、调度、验收和文档维护。
+
+### 流程总览
+
+```
+用户提需求 → ① 计划 → ② 确认 → ③ 子代理执行 → ④ 验收 → ⑤ 收尾
+```
+
+### 各阶段详细说明
+
+#### ① 计划阶段
+- 读取 `CLAUDE.md`、`DEVELOPMENT_PLAN.md`、`PROGRESS.md` 了解当前状态
+- 如涉及架构/Schema 变更，先输出**设计文档**（markdown 格式）供用户审阅
+- 制定实施计划：拆分任务、明确每个子代理的职责和输入输出
+- 列出需要创建/修改的文件清单
+
+#### ② 确认阶段
+- 将计划展示给用户，等待明确确认后再执行
+- 用户可以调整优先级、修改方案、增减范围
+- **未经确认不动手**
+
+#### ③ 子代理执行阶段
+- 按计划派出子代理（Agent tool）执行具体编码任务
+- 每个子代理给出完整上下文：现有代码引用、接口签名、设计规范、文件路径
+- 独立任务并行执行，有依赖的按顺序执行
+- 主代理不直接写代码，只在必要时做微调修复
+
+#### ④ 验收阶段
+- 运行 `pnpm build` 确认构建通过
+- 运行 `pnpm lint` 确认代码规范
+- 检查关键文件是否符合预期（读取并审查子代理产出）
+- 如有问题，定位原因后派子代理修复，再次验收
+
+#### ⑤ 收尾阶段（按顺序执行）
+
+| 步骤 | 内容 | 说明 |
+|------|------|------|
+| 5.1 数据库 | Schema 变更 → 迁移 → seed 更新 | 如有 Prisma 变更，运行 `prisma migrate dev` |
+| 5.2 部署检查 | 确认 Vercel 构建兼容性 | `pnpm build` 通过即可 |
+| 5.3 Git 维护 | `git status` → `git diff` → 确认后提交 | 用户明确要求时才提交 |
+| 5.4 文档更新 | 更新 `PROGRESS.md`、`DEVELOPMENT_PLAN.md`、`CLAUDE.md` | 反映最新完成状态 |
+
+### 子代理调度规范
+- **给足上下文**：每个子代理 prompt 必须包含：任务目标、涉及文件路径、现有代码接口、设计约束
+- **明确产出**：告诉子代理需要创建/修改哪些文件，遵循什么命名和代码风格
+- **不重复劳动**：主代理已做的调研不让子代理重做，直接把结论传过去
+- **隔离风险**：涉及 Schema 或关键配置的变更，单独派一个子代理处理
 
 ## 开发规范
 - 组件使用 PascalCase，工具函数使用 camelCase

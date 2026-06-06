@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P3 - 活动与资料 (已完成)
+## 当前阶段: P4 - 互动与管理 (已完成)
 
 ---
 
@@ -16,14 +16,41 @@
 | 演出模块 | ✅ 已完成 | 2026-06-06 |
 | 活动模块 | ✅ 已完成 | 2026-06-07 |
 | 资料库模块 | ✅ 已完成 | 2026-06-07 |
-| 留言板 | 未开始 | - |
-| 公告模块 | 未开始 | - |
-| 后台管理 | 未开始 | - |
+| 留言板 | ✅ 已完成 | 2026-06-07 |
+| 公告模块 | ✅ 已完成 | 2026-06-07 |
+| 后台管理(API) | ✅ 已完成 | 2026-06-07 |
 | 部署上线 | 未开始 | - |
 
 ---
 
 ## 详细记录
+
+### 2026-06-07 - P4 互动与管理模块开发（已完成）
+
+#### P4.1 留言板模块
+- 类型定义扩展（types.ts）：MessageTab, GuestbookItem, GuestbookDetail, CommentItem
+- 查询层（queries/guestbook.ts）：getGuestbookEntries、getGuestbookById、getGuestbookCounts、getCommentsByTarget
+- UI 组件 7 个：GuestbookCard、GuestbookForm、GuestbookFilterBar、LikeButton、FavoriteButton、CommentSection、GuestbookCardSkeleton
+- 留言列表页（/messages）：三 Tab 切换 + 分页 + 留言提交表单
+- 留言详情页（/messages/[id]）：完整内容 + 点赞/收藏 + 评论区
+- API 路由：messages CRUD + like + comments
+- 种子数据：13 条留言（5 MESSAGE + 5 STORY + 3 FEEDBACK）+ 5 条评论
+
+#### P4.2 公告模块
+- 类型定义扩展（types.ts）：AnnouncementTab, AnnouncementItem, AnnouncementDetail
+- 查询层（queries/announcements.ts）：getAnnouncements、getAnnouncementById、getAnnouncementCounts
+- UI 组件 3 个：AnnouncementCard、AnnouncementsFilterBar、AnnouncementCardSkeleton
+- 公告列表页（/announcements）：三分类 Tab + 置顶优先 + 分页
+- 公告详情页（/announcements/[id]）
+- API 路由：announcements CRUD
+- 种子数据：8 条公告（含 2 条置顶）
+
+#### P4.3 后台管理 API
+- 认证中间件（lib/auth.ts）：JWT 验证（jose 库）
+- 管理员登录 API（/api/admin/login）：bcryptjs 密码验证 + JWT 签发
+- 留言审核 API（/api/admin/messages）：批量/单条 approve/reject
+- 管理员种子账号：admin@chilamishere.com
+- 新增依赖：bcryptjs、jose
 
 ### 2026-06-07 - 全站渲染策略优化
 
@@ -342,7 +369,64 @@
 - [x] GET/POST /api/archives/magazines
 - [x] GET/PUT/DELETE /api/archives/magazines/[slug]
 
-## 下一步: P4.1 留言板模块开发
+## P4.1 完成清单
+
+### 数据层
+- [x] MessageTab, GuestbookItem, GuestbookDetail, CommentItem 类型定义
+- [x] 查询层 (queries/guestbook.ts)
+- [x] 种子数据 (13 条留言 + 5 条评论)
+
+### UI 组件
+- [x] GuestbookCard 留言卡片
+- [x] GuestbookForm 留言提交表单
+- [x] GuestbookFilterBar 筛选栏
+- [x] LikeButton 点赞按钮
+- [x] FavoriteButton 收藏按钮
+- [x] CommentSection 评论区
+- [x] GuestbookCardSkeleton 骨架屏
+
+### 页面
+- [x] 留言板列表页 (/messages)
+- [x] 留言详情页 (/messages/[id])
+- [x] 加载状态 (loading.tsx)
+
+### API
+- [x] GET/POST /api/messages
+- [x] GET/PUT/DELETE /api/messages/[id]
+- [x] POST /api/messages/[id]/like
+- [x] GET/POST /api/messages/[id]/comments
+
+## P4.2 完成清单
+
+### 数据层
+- [x] AnnouncementTab, AnnouncementItem, AnnouncementDetail 类型定义
+- [x] 查询层 (queries/announcements.ts)
+- [x] 种子数据 (8 条公告)
+
+### UI 组件
+- [x] AnnouncementCard 公告卡片
+- [x] AnnouncementsFilterBar 筛选栏
+- [x] AnnouncementCardSkeleton 骨架屏
+
+### 页面
+- [x] 公告列表页 (/announcements)
+- [x] 公告详情页 (/announcements/[id])
+- [x] 加载状态 (loading.tsx)
+
+### API
+- [x] GET/POST /api/announcements
+- [x] GET/PUT/DELETE /api/announcements/[id]
+
+## P4.3 完成清单
+
+### 后台管理 API
+- [x] 认证中间件 (lib/auth.ts)
+- [x] POST /api/admin/login
+- [x] GET/PUT /api/admin/messages (批量审核)
+- [x] PUT/DELETE /api/admin/messages/[id] (单条审核)
+- [x] 管理员种子账号
+
+## 下一步: P5 优化上线
 
 ---
 

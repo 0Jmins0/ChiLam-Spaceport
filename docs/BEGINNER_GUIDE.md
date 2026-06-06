@@ -2,7 +2,7 @@
 
 > 写给第一次做网站开发的你。本文档告诉你怎么修改内容、怎么更新数据库、怎么部署上线。
 >
-> 最后更新：2026-06-06 | 当前进度：P2 已完成，准备进入 P3.1
+> 最后更新：2026-06-07 | 当前进度：P4 已完成，准备进入 P5
 
 ---
 
@@ -177,6 +177,50 @@ curl -X POST http://localhost:3000/api/updates/social \
 | `/api/screens/[slug]` | GET/PUT/DELETE | 影视详情/更新/删除 |
 | `/api/performances` | GET/POST | 演出列表/创建 |
 | `/api/performances/[slug]` | GET/PUT/DELETE | 演出详情/更新/删除 |
+| `/api/activities/endorsements` | GET/POST | 代言列表/创建 |
+| `/api/activities/endorsements/[slug]` | GET/PUT/DELETE | 代言详情/更新/删除 |
+| `/api/activities/interviews` | GET/POST | 访谈列表/创建 |
+| `/api/activities/interviews/[slug]` | GET/PUT/DELETE | 访谈详情/更新/删除 |
+| `/api/archives/albums` | GET/POST | 专辑列表/创建 |
+| `/api/archives/albums/[slug]` | GET/PUT/DELETE | 专辑详情/更新/删除 |
+| `/api/archives/magazines` | GET/POST | 杂志列表/创建 |
+| `/api/archives/magazines/[slug]` | GET/PUT/DELETE | 杂志详情/更新/删除 |
+| `/api/messages` | GET/POST | 留言列表/提交留言 |
+| `/api/messages/[id]` | GET/PUT/DELETE | 留言详情/更新/删除 |
+| `/api/messages/[id]/like` | POST | 点赞 |
+| `/api/messages/[id]/comments` | GET/POST | 评论列表/发评论 |
+| `/api/announcements` | GET/POST | 公告列表/创建 |
+| `/api/announcements/[id]` | GET/PUT/DELETE | 公告详情/更新/删除 |
+
+### 管理后台 API（需要登录认证）
+
+管理员通过 JWT token 认证，以下 API 需要在请求头带 `Authorization: Bearer <token>`：
+
+| API | 方法 | 说明 |
+|-----|------|------|
+| `/api/admin/login` | POST | 管理员登录，返回 token |
+| `/api/admin/messages` | GET | 获取待审核留言列表 |
+| `/api/admin/messages` | PUT | 批量审核 `{ids, action}` |
+| `/api/admin/messages/[id]` | PUT | 单条审核 `{action}` |
+| `/api/admin/messages/[id]` | DELETE | 删除留言 |
+
+**管理员登录流程：**
+
+```bash
+# 1. 登录（测试账号: admin@chilamishere.com / admin123456）
+curl -X POST http://localhost:3000/api/admin/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@chilamishere.com","password":"admin123456"}'
+# 返回 token
+
+# 2. 用 token 调用管理接口
+curl -X PUT http://localhost:3000/api/admin/messages \
+  -H "Authorization: Bearer 上面返回的token" \
+  -H "Content-Type: application/json" \
+  -d '{"ids":["留言ID1","留言ID2"],"action":"approve"}'
+```
+
+**环境变量要求：** `.env.local` 中需要 `ADMIN_JWT_SECRET`（JWT 签名密钥，已配置）
 
 ### 修改数据库表结构
 

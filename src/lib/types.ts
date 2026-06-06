@@ -225,3 +225,46 @@ export interface MagazineItem {
 export interface MagazineDetail extends MagazineItem {
   scans: { url: string; alt: string | null }[];
 }
+
+// ═══════ 留言板 (Guestbook) ═══════
+export type MessageTab = 'message' | 'story' | 'feedback';
+
+export interface GuestbookItem {
+  id: string;
+  tab: MessageTab;
+  nickname: string;
+  content: string;
+  storyTags: string[];
+  relatedYear: number | null;
+  likesCount: number;
+  commentsCount: number;
+  createdAt: string;
+}
+
+export interface GuestbookDetail extends GuestbookItem {
+  images: { url: string; alt: string | null }[];
+}
+
+export interface CommentItem {
+  id: string;
+  nickname: string;
+  content: string;
+  createdAt: string;
+}
+
+// ═══════ 公告 (Announcements) ═══════
+export type AnnouncementTab = 'notice' | 'rule' | 'update';
+
+export interface AnnouncementItem {
+  id: string;
+  type: AnnouncementTab;
+  title: string;
+  content: string;
+  isPinned: boolean;
+  publishDate: string;
+}
+
+export interface AnnouncementDetail extends AnnouncementItem {
+  createdAt: string;
+  updatedAt: string;
+}
