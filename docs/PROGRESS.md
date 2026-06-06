@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P0 - 项目初始化 (已完成)
+## 当前阶段: P1 - 核心页面 (已完成)
 
 ---
 
@@ -10,8 +10,8 @@
 |------|------|----------|
 | 项目初始化 | ✅ 已完成 | 2026-06-06 |
 | 数据库设计 | ✅ 已完成 | 2026-06-06 |
-| 首页 | 未开始 | - |
-| 动态模块 | 未开始 | - |
+| 首页 | ✅ 已完成 | 2026-06-06 |
+| 动态模块 | ✅ 已完成 | 2026-06-06 |
 | 影视模块 | 未开始 | - |
 | 演出模块 | 未开始 | - |
 | 活动模块 | 未开始 | - |
@@ -24,6 +24,30 @@
 ---
 
 ## 详细记录
+
+### 2026-06-06 - P1 核心页面开发（已完成）
+
+#### P1 基础设施
+- Prisma Client 单例配置（db.ts + @prisma/adapter-pg）
+- next/image 外部图片域配置（sinaimg.cn, picsum.photos, supabase.co, unsplash）
+- 种子数据脚本（prisma/seed.ts）：8 标签 + 30 社交帖 + 15 新闻 + 10 路透 + 20 时间线事件
+- 数据类型定义（src/lib/types.ts）+ 查询层（src/lib/queries/）
+
+#### P1.1 首页
+- Timeline 组件：Server Component，按年份分组，桌面端左右交替布局
+- TimelineNode 组件：金色圆点 + 卡片，支持关联内容链接
+- 首页数据化升级：硬编码时间线替换为数据库驱动
+
+#### P1.2 动态模块
+- 6 个 UI 组件：SocialPostCard、NewsArticleCard、SightingCard、UpdateCardSkeleton、MasonryGrid、UpdatesFilterBar
+- 动态列表页（/updates）：三 Tab 切换 + 平台/类型标签筛选 + URL 分页
+- 分页组件（Pagination）+ 加载骨架屏（loading.tsx）
+- 三个详情页路由：/updates/social/[id]、/updates/news/[slug]、/updates/sightings/[slug]
+
+#### P1.3 API
+- CRUD API 路由：/api/updates/social、/api/updates/news、/api/updates/sightings
+- 通用详情 API：/api/updates/[id]（GET/PUT/DELETE）
+- 统一响应格式 + 输入验证 + 错误处理
 
 ### 2026-06-06 - P0.3 项目骨架搭建 (已完成)
 - 设计令牌系统：基于参考图建立全站深色主题（深靛蓝 #1A1A2E + 琥珀金 #C49B63）
@@ -102,7 +126,7 @@
 - [x] 配置 Supabase 连接（Session pooler）
 - [x] 创建数据库迁移文件 `20260605164411_init`
 - [x] 生成 Prisma Client
-- [ ] 编写 Seed 数据 (测试用)
+- [x] 编写 Seed 数据 (测试用) — 在 P1 阶段完成
 
 ## P0.3 完成清单
 
@@ -111,11 +135,42 @@
 - [x] 设计全局样式 (颜色、字体、间距)
 - [x] 创建通用组件 (Card、Tag、ImageGallery、Timeline)
 
-## 下一步: P1.1 首页开发
+## P1 完成清单
 
-- [ ] 首页大图/Banner 展示区
-- [ ] 时间线组件（数据对接 TimelineEvent 表）
-- [ ] 首页动态内容加载
+### 基础设施
+- [x] Prisma Client 单例配置 (db.ts)
+- [x] 种子数据脚本 (seed.ts)
+- [x] 数据类型定义 (types.ts)
+- [x] 数据查询层 (queries/timeline.ts, queries/updates.ts)
+- [x] next/image 外部图片域配置
+
+### P1.1 首页
+- [x] Timeline 时间线组件（数据库驱动）
+- [x] TimelineNode 节点组件
+- [x] 首页 page.tsx 数据化升级
+
+### P1.2 动态模块
+- [x] SocialPostCard 社交帖卡片
+- [x] NewsArticleCard 新闻卡片
+- [x] SightingCard 路透卡片
+- [x] UpdateCardSkeleton 骨架屏
+- [x] MasonryGrid 瀑布流布局
+- [x] UpdatesFilterBar 筛选栏
+- [x] Pagination 分页组件
+- [x] 动态列表页 (/updates)
+- [x] 加载状态 (loading.tsx)
+- [x] 社交帖详情页 (/updates/social/[id])
+- [x] 新闻详情页 (/updates/news/[slug])
+- [x] 路透详情页 (/updates/sightings/[slug])
+
+### P1.3 API
+- [x] GET/POST /api/updates/social
+- [x] GET/POST /api/updates/news
+- [x] GET/POST /api/updates/sightings
+- [x] GET/PUT/DELETE /api/updates/[id]
+- [ ] 图片上传接口 (推迟到 Phase 2)
+
+## 下一步: P2.1 影视模块开发
 
 ---
 

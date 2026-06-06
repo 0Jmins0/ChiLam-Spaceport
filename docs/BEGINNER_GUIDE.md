@@ -2,7 +2,7 @@
 
 > 写给第一次做网站开发的你。本文档基于当前项目进度，一步步告诉你接下来该做什么、怎么做。
 >
-> 最后更新：2026-06-06 | 当前进度：P0 全部完成，准备进入 P1
+> 最后更新：2026-06-06 | 当前进度：P1 全部完成，准备进入 P2
 
 ---
 
@@ -29,6 +29,9 @@
 | P0.1 技术环境搭建               | ✅   | Next.js 16 + TypeScript + Tailwind CSS v4 + Prisma 7 |
 | P0.2 数据库设计 + Supabase 配置 | ✅   | 20 张表 Schema + Supabase 迁移完成                   |
 | P0.3 项目骨架搭建               | ✅   | 深色主题设计系统 + 16 个页面路由 + 14 个组件         |
+| P1.1 首页开发                   | ✅   | 数据库驱动的时间线 + Hero 大图 + 一句话              |
+| P1.2 动态模块                   | ✅   | 动态列表页 + 三种详情页 + 筛选/分页                  |
+| P1.3 API 开发                   | ✅   | CRUD API + 分页筛选 + 统一响应格式                   |
 
 ### 当前项目文件结构
 
@@ -45,15 +48,27 @@ Chilam_Is_Here/
 │
 ├── prisma/
 │   ├── schema.prisma              # 数据库表结构（20 张表）
+│   ├── seed.ts                    # 种子数据脚本（P1 新增）
 │   └── migrations/                # 数据库迁移记录
 │
 ├── src/
 │   ├── app/                       # 页面路由
 │   │   ├── layout.tsx             # 全局布局（Header + Footer + FilmGrain）
-│   │   ├── page.tsx               # 首页（Hero + 时间线占位 + 栏目入口）
+│   │   ├── page.tsx               # 首页（Hero + 时间线 + 栏目入口，数据库驱动）
 │   │   ├── not-found.tsx          # 404 页面
 │   │   ├── globals.css            # 全局样式 + 设计令牌
-│   │   ├── updates/               # 动态栏目
+│   │   ├── updates/               # 动态栏目（P1 完成）
+│   │   │   ├── page.tsx           # 动态列表页（三 Tab + 筛选 + 分页）
+│   │   │   ├── loading.tsx        # 加载骨架屏
+│   │   │   ├── social/[id]/       # 社交帖详情页
+│   │   │   ├── news/[slug]/       # 新闻详情页
+│   │   │   └── sightings/[slug]/  # 路透详情页
+│   │   ├── api/                   # API 路由（P1 新增）
+│   │   │   └── updates/           # 动态 CRUD API
+│   │   │       ├── social/        # GET/POST 社交帖
+│   │   │       ├── news/          # GET/POST 新闻
+│   │   │       ├── sightings/     # GET/POST 路透
+│   │   │       └── [id]/          # GET/PUT/DELETE 通用详情
 │   │   ├── screens/               # 影视综栏目
 │   │   ├── performances/          # 演出栏目
 │   │   ├── activities/            # 活动栏目
@@ -63,7 +78,9 @@ Chilam_Is_Here/
 │   │
 │   ├── components/                # 可复用组件
 │   │   ├── layout/                # 布局（Header, Footer, MobileNav, PageContainer, PageHeader）
-│   │   ├── ui/                    # 通用 UI（Button, Card, Tag, TabBar, GoldDivider, GlassOverlay, UnderConstruction）
+│   │   ├── ui/                    # 通用 UI（Button, Card, Tag, TabBar, GoldDivider, GlassOverlay, UnderConstruction,
+│   │   │                          #   Pagination, SocialPostCard, NewsArticleCard, SightingCard,
+│   │   │                          #   UpdateCardSkeleton, MasonryGrid, UpdatesFilterBar）
 │   │   └── decorative/            # 装饰（FilmGrain, YearMarquee）
 │   │
 │   ├── config/                    # 配置文件
@@ -73,7 +90,11 @@ Chilam_Is_Here/
 │   ├── lib/                       # 工具函数
 │   │   ├── cn.ts                  # 样式类名合并工具
 │   │   ├── fonts.ts               # 字体配置（5 款 Google Fonts）
-│   │   └── db.ts                  # 数据库连接（P1 配置）
+│   │   ├── db.ts                  # 数据库连接（Prisma 单例 + adapter-pg）
+│   │   ├── types.ts               # 数据类型定义（P1 新增）
+│   │   └── queries/               # 数据查询层（P1 新增）
+│   │       ├── timeline.ts        # 时间线查询
+│   │       └── updates.ts         # 动态查询（社交帖/新闻/路透）
 │   │
 │   └── generated/                 # Prisma 生成的代码（自动生成，不要手动修改）
 │
@@ -421,145 +442,105 @@ export const NAV_ITEMS = [
 
 **什么时候需要？** 当你想让别人能访问你的网站时（P5 阶段，但建议早点配好方便预览）。
 
-1. 注册 https://vercel.com（用 GitHub 账号）
+1. 注册 https://vercel.com  （用 GitHub 账号）
 2. 导入你的 Git 仓库
 3. Vercel 会自动检测 Next.js 项目并部署
 4. 每次你 `git push`，Vercel 会自动更新网站
 
 ---
 
-## 7. 进入 P1：首页与动态模块
+## 7. 已完成：P1 首页与动态模块
 
-> 这是真正开始做"看得见"的东西了。
+> ✅ 此步骤已完成。以下内容描述了 P1 创建的文件、关键概念和实现细节。
 
-### 7.1 Seed 数据（填充测试数据）
+### 7.1 P1 创建的新文件
 
-在开发页面之前，数据库里需要有一些测试数据，否则页面是空的。
+| 文件 | 作用 |
+|------|------|
+| `prisma/seed.ts` | 种子数据脚本：8 标签 + 30 社交帖 + 15 新闻 + 10 路透 + 20 时间线事件 |
+| `src/lib/types.ts` | 数据类型定义（TimelineEvent, SocialPost, NewsArticle, Sighting 等） |
+| `src/lib/queries/timeline.ts` | 时间线数据查询（按年份分组、排序） |
+| `src/lib/queries/updates.ts` | 动态数据查询（分页、筛选、搜索） |
+| `src/components/ui/SocialPostCard.tsx` | 社交帖卡片组件 |
+| `src/components/ui/NewsArticleCard.tsx` | 新闻卡片组件 |
+| `src/components/ui/SightingCard.tsx` | 路透卡片组件 |
+| `src/components/ui/UpdateCardSkeleton.tsx` | 加载骨架屏组件 |
+| `src/components/ui/MasonryGrid.tsx` | 瀑布流布局组件 |
+| `src/components/ui/UpdatesFilterBar.tsx` | 筛选栏组件 |
+| `src/components/ui/Pagination.tsx` | 分页组件 |
+| `src/app/updates/page.tsx` | 动态列表页（三 Tab + 筛选 + 分页） |
+| `src/app/updates/loading.tsx` | 动态页加载骨架屏 |
+| `src/app/updates/social/[id]/page.tsx` | 社交帖详情页 |
+| `src/app/updates/news/[slug]/page.tsx` | 新闻详情页 |
+| `src/app/updates/sightings/[slug]/page.tsx` | 路透详情页 |
+| `src/app/api/updates/social/route.ts` | 社交帖 CRUD API |
+| `src/app/api/updates/news/route.ts` | 新闻 CRUD API |
+| `src/app/api/updates/sightings/route.ts` | 路透 CRUD API |
+| `src/app/api/updates/[id]/route.ts` | 通用详情 API（GET/PUT/DELETE） |
 
-创建 `prisma/seed.ts`，填入一些张智霖的真实数据，例如：
+### 7.2 关键概念：Server Components 数据获取
 
-```typescript
-// 示例：添加一些标签
-await prisma.tag.createMany({
-  data: [
-    { name: '粤语', slug: 'cantonese', tagGroup: 'language' },
-    { name: '普通话', slug: 'mandarin', tagGroup: 'language' },
-    { name: '香港', slug: 'hong-kong', tagGroup: 'region' },
-    { name: '射雕英雄传', slug: 'legend-of-condor-heroes', tagGroup: 'work' },
-  ],
-});
-
-// 示例：添加栏目
-await prisma.category.createMany({
-  data: [
-    { name: '动态', slug: 'updates', path: '/updates', level: 1, sortOrder: 1 },
-    { name: '影视', slug: 'screens', path: '/screens', level: 1, sortOrder: 2 },
-    // ...
-  ],
-});
-
-// 示例：添加一条时间线事件
-await prisma.timelineEvent.create({
-  data: {
-    date: new Date('2025-01-01'),
-    title: '披荆斩棘 2025 开播',
-    description: '张智霖参加芒果TV综艺《披荆斩棘》第四季',
-  },
-});
-```
-
-运行：`npx prisma db seed`
-
-> 你可以让 Claude 帮你写完整的 seed 文件："请帮我写 prisma/seed.ts，填入张智霖的基本数据，包括栏目、标签、几条时间线事件、几部代表作品。"
-
-### 7.2 首页开发
-
-首页三大区域：
-
-```
-┌─────────────────────────────────────┐
-│           导航栏 (Header)            │
-├─────────────────────────────────────┤
-│                                     │
-│  📸 大图展示区                       │
-│  （张智霖精选照片轮播）                │
-│                                     │
-├─────────────────────────────────────┤
-│                                     │
-│  💬 一句话展示                       │
-│  "做人最紧要开心"                    │
-│                                     │
-├─────────────────────────────────────┤
-│                                     │
-│  📅 时间线                           │
-│  ├ 2025.06 - 新综艺开播              │
-│  ├ 2025.03 - 演唱会香港站            │
-│  ├ 2024.12 - 新歌发布                │
-│  └ ...                              │
-│                                     │
-├─────────────────────────────────────┤
-│           页脚 (Footer)              │
-└─────────────────────────────────────┘
-```
-
-开发顺序建议：
-
-1. 先做静态版本（写死数据，确认布局效果）
-2. 再改成从数据库读取（接入 Prisma）
-
-### 7.3 动态模块开发
-
-路由结构：
-
-```
-/updates                → 动态总览页
-/updates/social         → 社交媒体子页
-/updates/news           → 新闻报道子页
-/updates/sightings      → 路透子页
-```
-
-对应文件：
-
-```
-src/app/updates/
-├── page.tsx            → /updates
-├── social/
-│   └── page.tsx        → /updates/social
-├── news/
-│   └── page.tsx        → /updates/news
-└── sightings/
-    └── page.tsx        → /updates/sightings
-```
-
-### 7.4 API 开发
-
-API 文件放在 `src/app/api/` 下：
-
-```
-src/app/api/
-├── social-posts/
-│   └── route.ts        → GET /api/social-posts (获取列表)
-├── news/
-│   └── route.ts        → GET /api/news
-└── sightings/
-    └── route.ts        → GET /api/sightings
-```
-
-一个最简单的 API 长这样：
+P1 的页面使用了 Next.js Server Components 直接在服务端获取数据，不需要写单独的 API 调用：
 
 ```typescript
-// src/app/api/social-posts/route.ts
-import { prisma } from '@/lib/prisma';
-import { NextResponse } from 'next/server';
+// src/app/page.tsx（首页）— 这是一个 Server Component
+// 可以直接 await 查询数据库，不需要 useEffect 或 fetch
+import { getTimelineEvents } from '@/lib/queries/timeline';
 
-export async function GET() {
-  const posts = await prisma.socialPost.findMany({
-    orderBy: { publishedAt: 'desc' },
-    take: 20,
-  });
-  return NextResponse.json(posts);
+export default async function HomePage() {
+  const events = await getTimelineEvents(); // 直接在服务端查数据库
+  return <Timeline events={events} />;
 }
 ```
+
+**Server Component vs Client Component 的区别**：
+
+| 特性 | Server Component（默认） | Client Component（加 'use client'） |
+|------|--------------------------|--------------------------------------|
+| 运行位置 | 服务器上 | 浏览器中 |
+| 可以直接查数据库 | 是 | 否 |
+| 可以用 useState/useEffect | 否 | 是 |
+| 可以处理用户交互（点击等） | 否 | 是 |
+| 何时使用 | 展示数据、页面内容 | 表单、筛选器、交互功能 |
+
+### 7.3 关键概念：URL 分页
+
+动态列表页使用 URL 参数进行分页和筛选，而不是组件内部状态：
+
+```
+/updates?tab=social&platform=weibo&page=2
+```
+
+好处是：
+- 用户可以分享带筛选条件的链接
+- 浏览器后退按钮可以正常工作
+- 搜索引擎可以索引不同页面
+
+### 7.4 关键概念：瀑布流布局
+
+动态页面使用 MasonryGrid 组件实现瀑布流布局（类似小红书/Pinterest），让不同高度的卡片紧凑排列，避免出现大量空白。
+
+### 7.5 API 路由结构
+
+```
+src/app/api/updates/
+├── social/route.ts       → GET（列表+分页）/ POST（创建）
+├── news/route.ts         → GET（列表+分页）/ POST（创建）
+├── sightings/route.ts    → GET（列表+分页）/ POST（创建）
+└── [id]/route.ts         → GET（详情）/ PUT（更新）/ DELETE（删除）
+```
+
+所有 API 返回统一格式：
+```json
+{
+  "data": [...],
+  "pagination": { "page": 1, "pageSize": 20, "total": 100, "totalPages": 5 }
+}
+```
+
+### 7.6 下一步：P2 影视模块
+
+P2 将开发影视（`/screens`）和演出（`/performances`）模块，结构类似动态模块：列表页 + 详情页 + API
 
 ---
 
@@ -695,14 +676,14 @@ git show 提交ID:文件名     # 查看某个版本的内容
 - [x] P0.3 项目骨架（深色主题 + 组件库 + 路由）
 - [ ] 基础服务配置（R2、Vercel）— 可选，P1 时再配
 
-### P1 完成标志 ← 你的下一步
+### P1 完成标志 ✅
 
-- [ ] 首页有时间线、大图、一句话
-- [ ] /updates 能看到动态列表
-- [ ] 能按平台/类型筛选动态
-- [ ] 有测试数据可以看效果
+- [x] 首页有时间线、大图、一句话
+- [x] /updates 能看到动态列表
+- [x] 能按平台/类型筛选动态
+- [x] 有测试数据可以看效果
 
-### P2 完成标志
+### P2 完成标志 ← 你的下一步
 
 - [ ] /screens 能看到影视列表，可按电影/电视剧/综艺筛选
 - [ ] /performances 能看到演出列表

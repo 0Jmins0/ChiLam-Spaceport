@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { siteConfig } from '@/config/site';
 import { NAV_ITEMS } from '@/config/navigation';
+import { Timeline } from '@/components/home/Timeline';
 
-export default function HomePage() {
+export default async function HomePage() {
   return (
     <>
       {/* Hero Section - 全屏首屏 */}
@@ -45,7 +46,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Timeline Section - 时间线占位区 */}
+      {/* Timeline Section */}
       <section className="bg-bg-dark py-20">
         <div className="mx-auto max-w-[var(--width-page)] px-6">
           <div className="mb-12 text-center">
@@ -57,19 +58,7 @@ export default function HomePage() {
               <div className="gold-line" />
             </div>
           </div>
-
-          {/* 时间线占位 */}
-          <div className="flex flex-col items-center gap-8 py-12">
-            {[2025, 2022, 2014, 1994].map((year) => (
-              <div key={year} className="flex items-center gap-6">
-                <span className="font-display text-3xl italic text-accent/30">{year}</span>
-                <div className="h-[1px] w-8 bg-accent/20" />
-                <div className="rounded-[var(--radius-card)] border border-border-gold bg-bg-dark/50 px-6 py-3">
-                  <p className="text-sm text-text-muted">时间线节点（建设中）</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <Timeline />
         </div>
       </section>
 

@@ -4,9 +4,9 @@
 一个集合张智霖各平台、各阶段、各渠道资讯的综合性粉丝网站。
 
 ## 当前进度
-- **阶段**: P0 - 项目初始化（已完成）
-- **已完成**: P0.1 技术环境搭建、P0.2 数据库设计 + Supabase 配置 + 迁移、P0.3 项目骨架搭建
-- **下一步**: P1.1 首页开发
+- **阶段**: P1 - 核心页面（已完成）
+- **已完成**: P0.1 技术环境搭建、P0.2 数据库设计 + Supabase 配置 + 迁移、P0.3 项目骨架搭建、P1.1 首页、P1.2 动态模块、P1.3 API
+- **下一步**: P2.1 影视模块开发
 - **详细进度**: 查看 `/docs/PROGRESS.md`
 
 ## 技术栈
@@ -31,16 +31,26 @@
 │   ├── BEGINNER_GUIDE.md                            # 零基础开发指南
 │   └── chilam-website-design.md                     # 网站业务设计文档
 ├── src/
-│   ├── app/                                         # Next.js App Router 页面（已创建 8 栏目路由）
+│   ├── app/                                         # Next.js App Router 页面
+│   │   ├── page.tsx                                 # 首页（数据库驱动时间线）
+│   │   ├── updates/                                 # 动态模块（列表 + 三种详情页）
+│   │   ├── api/updates/                             # 动态 CRUD API
+│   │   └── ...                                      # 其他栏目路由
 │   ├── components/
 │   │   ├── layout/                                  # 布局组件（Header, Footer, MobileNav 等）
-│   │   ├── ui/                                      # 通用 UI 组件（Button, Card, Tag 等）
+│   │   ├── ui/                                      # 通用 UI 组件（Button, Card, Tag, Pagination,
+│   │   │                                            #   SocialPostCard, NewsArticleCard, SightingCard,
+│   │   │                                            #   MasonryGrid, UpdatesFilterBar 等）
 │   │   └── decorative/                              # 装饰组件（FilmGrain, YearMarquee）
 │   ├── config/                                      # 站点配置（site.ts, navigation.ts）
-│   ├── lib/                                         # 工具函数（cn.ts, fonts.ts, db.ts）
+│   ├── lib/                                         # 工具函数
+│   │   ├── cn.ts, fonts.ts, db.ts                   # 基础工具
+│   │   ├── types.ts                                 # 数据类型定义
+│   │   └── queries/                                 # 数据查询层（timeline.ts, updates.ts）
 │   └── generated/                                   # Prisma 生成的客户端代码
 ├── prisma/
-│   └── schema.prisma                                # 数据库 Schema（已完成，20 张表）
+│   ├── schema.prisma                                # 数据库 Schema（已完成，20 张表）
+│   └── seed.ts                                      # 种子数据脚本
 └── public/                                          # 静态资源
 ```
 
@@ -64,6 +74,7 @@
   - 渐进增强模式：链接优先 → 回填完整内容（social_posts / news_articles / sightings）
 
 ## 服务器与数据库
+- **GitHub 仓库**: `git@github.com:0Jmins0/ChiLam-Spaceport.git`（origin）
 - **域名**: 待定
 - **Supabase 项目**: 已配置（Session pooler, ap-northeast-2, 迁移已完成）
 - **Cloudflare R2**: 待创建
