@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P2.1 - 影视模块 (已完成)
+## 当前阶段: P2 - 作品模块 (已完成)
 
 ---
 
@@ -13,7 +13,7 @@
 | 首页 | ✅ 已完成 | 2026-06-06 |
 | 动态模块 | ✅ 已完成 | 2026-06-06 |
 | 影视模块 | ✅ 已完成 | 2026-06-06 |
-| 演出模块 | 未开始 | - |
+| 演出模块 | ✅ 已完成 | 2026-06-06 |
 | 活动模块 | 未开始 | - |
 | 资料库模块 | 未开始 | - |
 | 留言板 | 未开始 | - |
@@ -24,6 +24,27 @@
 ---
 
 ## 详细记录
+
+### 2026-06-06 - P2.2 演出模块开发（已完成）
+
+#### 数据层
+- 类型定义扩展（types.ts）：PerformanceTab, PerformanceItem, OfficialMediaItem, FanShotItem, PerformanceDetail
+- 查询层（queries/performances.ts）：getPerformances、getPerformanceBySlug、getPerformanceCounts
+- 种子数据追加（seed.ts）：11 条演出数据（4 演唱会 + 5 舞台 + 2 音乐剧）+ 2 个新标签
+
+#### UI 组件
+- PerformanceCard：海报卡片（2:3 比例，类型 badge，场馆/城市信息）
+- PerformancesFilterBar：筛选栏（类型 Tab + 演唱会系列筛选）
+- PerformanceCardSkeleton：加载骨架
+
+#### 页面
+- 演出列表页（/performances）：Grid 布局，三 Tab + 系列筛选 + 分页
+- 演出详情页（/performances/[slug]）：双栏布局（海报 + 信息），歌单，官摄区，饭拍区
+- 加载骨架屏（loading.tsx）
+
+#### API
+- GET/POST /api/performances — 列表查询 + 创建演出
+- GET/PUT/DELETE /api/performances/[slug] — 详情 + 更新 + 删除
 
 ### 2026-06-06 - P2.1 影视模块开发（已完成）
 
@@ -191,7 +212,28 @@
 - [x] GET/PUT/DELETE /api/updates/[id]
 - [ ] 图片上传接口 (推迟到 Phase 2)
 
-## 下一步: P2.2 演出模块开发
+## P2.2 完成清单
+
+### 数据层
+- [x] PerformanceTab, PerformanceItem, PerformanceDetail 类型定义
+- [x] 查询层 (queries/performances.ts)
+- [x] 种子数据 (11 条演出 + 2 个新标签)
+
+### UI 组件
+- [x] PerformanceCard 演出卡片
+- [x] PerformancesFilterBar 筛选栏
+- [x] PerformanceCardSkeleton 骨架屏
+
+### 页面
+- [x] 演出列表页 (/performances)
+- [x] 演出详情页 (/performances/[slug])
+- [x] 加载状态 (loading.tsx)
+
+### API
+- [x] GET/POST /api/performances
+- [x] GET/PUT/DELETE /api/performances/[slug]
+
+## 下一步: P3.1 活动模块开发
 
 ---
 

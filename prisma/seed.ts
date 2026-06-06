@@ -12,6 +12,9 @@ async function main() {
   // ─────────────────────────────────────────────
   console.log('Clearing existing data...');
 
+  await prisma.fanShot.deleteMany();
+  await prisma.performanceMedia.deleteMany();
+  await prisma.performance.deleteMany();
   await prisma.production.deleteMany();
   await prisma.sighting.deleteMany();
   await prisma.newsArticle.deleteMany();
@@ -74,6 +77,13 @@ async function main() {
     }),
     prisma.tag.create({
       data: { name: '飞行嘉宾', slug: 'guest', tagGroup: 'variety_role' },
+    }),
+    // performance_type 组
+    prisma.tag.create({
+      data: { name: '演唱会嘉宾', slug: 'concert-guest', tagGroup: 'performance_type' },
+    }),
+    prisma.tag.create({
+      data: { name: '其他', slug: 'stage-other', tagGroup: 'performance_type' },
     }),
   ]);
 
@@ -1265,13 +1275,180 @@ async function main() {
     });
   }
 
+  // ─────────────────────────────────────────────
+  // 7. Performance（11 条演出数据）
+  // ─────────────────────────────────────────────
+  console.log('Creating performances...');
+
+  // 演唱会 4 场
+  const concerts = [
+    {
+      title: '我是外星人演唱会',
+      titleEn: 'I Am An Alien Concert',
+      slug: 'alien-concert-2011',
+      year: 2011,
+      venue: '香港红磡体育馆',
+      city: '香港',
+      series: '我是外星人',
+      setlist: ['现代爱情故事', '祝君好', '我一个人住', '你太善良', '相爱无梦', '岁月如歌', '片片枫叶情', '逗我开心吧'],
+    },
+    {
+      title: 'ChiLam Crazy Hours Live 2014',
+      titleEn: 'Crazy Hours Live',
+      slug: 'crazy-hours-2014',
+      year: 2014,
+      venue: '香港红磡体育馆',
+      city: '香港',
+      series: 'Crazy Hours',
+      setlist: ['相爱无梦', '你太善良', '岁月如歌', '现代爱情故事', '祝君好', '逗我开心吧', '天梯', '我一个人住'],
+    },
+    {
+      title: 'ChiLam In Rock Miniconcert',
+      titleEn: 'ChiLam In Rock Miniconcert',
+      slug: 'in-rock-miniconcert-2016',
+      year: 2016,
+      venue: 'Music Zone@E-Max',
+      city: '香港',
+      series: 'Miniconcert',
+      setlist: ['现代爱情故事', '你太善良', '岁月如歌', '天梯', '祝君好'],
+    },
+    {
+      title: '在 张智霖演唱会',
+      titleEn: 'Here Concert',
+      slug: 'here-concert-2022',
+      year: 2022,
+      venue: '香港红磡体育馆',
+      city: '香港',
+      series: '在',
+      setlist: ['现代爱情故事', '祝君好', '我一个人住', '你太善良', '相爱无梦', '岁月如歌', '天梯', '片片枫叶情', '逗我开心吧', '我们的故事'],
+    },
+  ];
+
+  for (const concert of concerts) {
+    await prisma.performance.create({
+      data: {
+        type: 'CONCERT',
+        slug: concert.slug,
+        title: concert.title,
+        titleEn: concert.titleEn,
+        year: concert.year,
+        venue: concert.venue,
+        city: concert.city,
+        series: concert.series,
+        setlist: concert.setlist,
+      },
+    });
+  }
+
+  // 舞台 5 场
+  interface StageInput {
+    title: string;
+    slug: string;
+    year: number;
+    venue: string;
+    city: string;
+    tagSlug: string;
+  }
+
+  const stages: StageInput[] = [
+    {
+      title: '劲歌金曲颁奖典礼',
+      slug: 'jsga-2010',
+      year: 2010,
+      venue: '香港红磡体育馆',
+      city: '香港',
+      tagSlug: 'stage-other',
+    },
+    {
+      title: '叱咤乐坛流行榜颁奖典礼',
+      slug: 'usma-2012',
+      year: 2012,
+      venue: '香港会议展览中心',
+      city: '香港',
+      tagSlug: 'stage-other',
+    },
+    {
+      title: '张学友演唱会嘉宾',
+      slug: 'jacky-cheung-guest-2015',
+      year: 2015,
+      venue: '香港红磡体育馆',
+      city: '香港',
+      tagSlug: 'concert-guest',
+    },
+    {
+      title: '容祖儿演唱会嘉宾',
+      slug: 'joey-yung-guest-2018',
+      year: 2018,
+      venue: '香港红磡体育馆',
+      city: '香港',
+      tagSlug: 'concert-guest',
+    },
+    {
+      title: '披荆斩棘总决赛舞台',
+      slug: 'call-me-by-fire-finale-2021',
+      year: 2021,
+      venue: '芒果TV演播厅',
+      city: '长沙',
+      tagSlug: 'stage-other',
+    },
+  ];
+
+  for (const stage of stages) {
+    await prisma.performance.create({
+      data: {
+        type: 'STAGE',
+        slug: stage.slug,
+        title: stage.title,
+        year: stage.year,
+        venue: stage.venue,
+        city: stage.city,
+        tags: { connect: [{ id: tagMap[stage.tagSlug] }] },
+      },
+    });
+  }
+
+  // 音乐剧 2 场
+  const musicals = [
+    {
+      title: 'I Love You Because',
+      titleEn: 'I Love You Because',
+      slug: 'i-love-you-because-2009',
+      year: 2009,
+      venue: '香港演艺学院',
+      city: '香港',
+    },
+    {
+      title: '天赐良缘',
+      titleEn: 'Heaven Sent',
+      slug: 'heaven-sent-2012',
+      year: 2012,
+      venue: '理工大学赛马会综艺馆',
+      city: '香港',
+    },
+  ];
+
+  for (const musical of musicals) {
+    await prisma.performance.create({
+      data: {
+        type: 'MUSICAL',
+        slug: musical.slug,
+        title: musical.title,
+        titleEn: musical.titleEn,
+        year: musical.year,
+        venue: musical.venue,
+        city: musical.city,
+      },
+    });
+  }
+
   console.log('Seeding completed successfully!');
-  console.log('  - 15 tags');
+  console.log('  - 17 tags');
   console.log('  - 20 timeline events');
   console.log('  - 30 social posts');
   console.log('  - 15 news articles');
   console.log('  - 10 sightings');
   console.log('  - 38 productions (15 TV + 15 movies + 8 variety)');
+  console.log('  - 11 performances (4 concerts + 5 stages + 2 musicals)');
 }
 
 main()

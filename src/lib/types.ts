@@ -94,3 +94,50 @@ export interface ProductionDetail extends ProductionItem {
   watchLinks: { platform: string; url: string }[] | null;
   gallery: { url: string; alt: string | null }[];
 }
+
+// ─── 演出模块 ───
+
+// 演出 Tab 类型
+export type PerformanceTab = 'concert' | 'stage' | 'musical';
+
+// 演出卡片展示用
+export interface PerformanceItem {
+  id: string;
+  type: string; // PerformanceType enum
+  slug: string;
+  title: string;
+  titleEn: string | null;
+  year: number;
+  startDate: Date | null;
+  endDate: Date | null;
+  venue: string | null;
+  city: string | null;
+  series: string | null;
+  posterUrl: string | null; // 从 poster 关系展平
+  tags: { name: string; slug: string }[];
+}
+
+// 官摄素材项
+export interface OfficialMediaItem {
+  id: string;
+  title: string | null;
+  mediaUrl: string;
+  mediaType: string;
+}
+
+// 饭拍项
+export interface FanShotItem {
+  id: string;
+  title: string | null;
+  summary: string | null;
+  originalUrl: string | null;
+  thumbnailUrl: string | null;
+  authorName: string;
+}
+
+// 演出详情页用
+export interface PerformanceDetail extends PerformanceItem {
+  setlist: string[] | null;
+  officialMedia: OfficialMediaItem[];
+  fanShots: FanShotItem[];
+}
