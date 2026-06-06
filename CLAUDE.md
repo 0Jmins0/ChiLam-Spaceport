@@ -4,9 +4,9 @@
 一个集合张智霖各平台、各阶段、各渠道资讯的综合性粉丝网站。
 
 ## 当前进度
-- **阶段**: P2 - 作品模块（已完成）
-- **已完成**: P0 全部、P1 全部（首页+动态模块+API）、P2 全部（影视+演出模块）
-- **下一步**: P3.1 活动模块开发
+- **阶段**: P3 - 活动与资料（已完成）
+- **已完成**: P0 全部、P1 全部（首页+动态模块+API）、P2 全部（影视+演出模块）、P3 全部（活动+资料库模块）
+- **下一步**: P4.1 留言板模块开发
 - **详细进度**: 查看 `/docs/PROGRESS.md`
 
 ## 技术栈
@@ -15,6 +15,7 @@
 - **数据库**: PostgreSQL (Supabase - 已配置, Session pooler)
 - **存储**: Cloudflare R2 (图片/视频/文件 - 待配置)
 - **部署**: Vercel (前端) + Supabase (数据库) - 待配置
+- **渲染策略**: 全站动态渲染 (SSR)，所有列表页 `force-dynamic`
 - **包管理**: pnpm 11.5
 - **代码规范**: ESLint 9 + Prettier 3.8
 
@@ -35,23 +36,28 @@
 │   │   ├── page.tsx                                 # 首页（数据库驱动时间线）
 │   │   ├── updates/                                 # 动态模块（列表 + 三种详情页）
 │   │   ├── screens/                                 # 影视模块（列表 + 详情页）
+│   │   ├── activities/                              # 活动模块（列表 + 代言详情 + 访谈详情）
+│   │   ├── archives/                                # 资料库模块（列表 + 专辑详情 + 杂志详情）
 │   │   ├── api/updates/                             # 动态 CRUD API
 │   │   ├── api/screens/                             # 影视 CRUD API
 │   │   ├── api/performances/                        # 演出 CRUD API
+│   │   ├── api/activities/                          # 活动 CRUD API（代言+访谈）
+│   │   ├── api/archives/                            # 资料库 CRUD API（专辑+杂志）
 │   │   └── ...                                      # 其他栏目路由
 │   ├── components/
 │   │   ├── layout/                                  # 布局组件（Header, Footer, MobileNav 等）
-│   │   ├── ui/                                      # 通用 UI 组件（Button, Card, Tag, Pagination,
-│   │   │                                            #   SocialPostCard, NewsArticleCard, SightingCard,
-│   │   │                                            #   MasonryGrid, UpdatesFilterBar,
-│   │   │                                            #   ProductionCard, ScreensFilterBar,
-│   │   │                                            #   PerformanceCard, PerformancesFilterBar 等）
+│   │   ├── ui/                                      # 通用 UI 组件（Button, Card, Tag, Pagination 等）
+│   │   ├── updates/                                 # 动态组件（SocialPostCard, NewsArticleCard 等）
+│   │   ├── screens/                                 # 影视组件（ProductionCard, ScreensFilterBar）
+│   │   ├── performances/                            # 演出组件（PerformanceCard, PerformancesFilterBar）
+│   │   ├── activities/                              # 活动组件（EndorsementCard, InterviewCard, ActivitiesFilterBar）
+│   │   ├── archives/                                # 资料库组件（AlbumCard, MagazineCard, ArchivesFilterBar）
 │   │   └── decorative/                              # 装饰组件（FilmGrain, YearMarquee）
 │   ├── config/                                      # 站点配置（site.ts, navigation.ts）
 │   ├── lib/                                         # 工具函数
 │   │   ├── cn.ts, fonts.ts, db.ts                   # 基础工具
 │   │   ├── types.ts                                 # 数据类型定义
-│   │   └── queries/                                 # 数据查询层（timeline.ts, updates.ts, productions.ts, performances.ts）
+│   │   └── queries/                                 # 数据查询层（timeline.ts, updates.ts, productions.ts, performances.ts, activities.ts, archives.ts）
 │   └── generated/                                   # Prisma 生成的客户端代码
 ├── prisma/
 │   ├── schema.prisma                                # 数据库 Schema（已完成，20 张表）

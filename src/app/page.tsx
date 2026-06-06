@@ -3,6 +3,8 @@ import { siteConfig } from '@/config/site';
 import { NAV_ITEMS } from '@/config/navigation';
 import { Timeline } from '@/components/home/Timeline';
 
+export const dynamic = 'force-dynamic';
+
 export default async function HomePage() {
   return (
     <>

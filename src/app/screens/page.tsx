@@ -6,6 +6,7 @@ import { Pagination } from '@/components/updates/Pagination';
 import { getProductions, getProductionCounts } from '@/lib/queries/productions';
 
 export const metadata = { title: '影视综' };
+export const dynamic = 'force-dynamic';
 
 const tabToType: Record<string, string> = {
   movie: 'MOVIE',

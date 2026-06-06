@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P2 - 作品模块 (已完成)
+## 当前阶段: P3 - 活动与资料 (已完成)
 
 ---
 
@@ -14,8 +14,8 @@
 | 动态模块 | ✅ 已完成 | 2026-06-06 |
 | 影视模块 | ✅ 已完成 | 2026-06-06 |
 | 演出模块 | ✅ 已完成 | 2026-06-06 |
-| 活动模块 | 未开始 | - |
-| 资料库模块 | 未开始 | - |
+| 活动模块 | ✅ 已完成 | 2026-06-07 |
+| 资料库模块 | ✅ 已完成 | 2026-06-07 |
 | 留言板 | 未开始 | - |
 | 公告模块 | 未开始 | - |
 | 后台管理 | 未开始 | - |
@@ -24,6 +24,63 @@
 ---
 
 ## 详细记录
+
+### 2026-06-07 - 全站渲染策略优化
+
+- 所有数据库驱动的列表页添加 `export const dynamic = 'force-dynamic'`
+- 涉及 6 个页面：首页、动态、影视综、演出、活动、资料库
+- 解决 build 时因数据库不可达导致预渲染失败的问题
+- `pnpm build` 现已通过，所有路由正确识别（14 静态 + 21 动态）
+
+### 2026-06-07 - P3.2 资料库模块开发（已完成）
+
+#### 数据层
+- 类型定义扩展（types.ts）：ArchiveTab, AlbumItem, AlbumDetail, MagazineItem, MagazineDetail
+- 查询层（queries/archives.ts）：getAlbums、getAlbumBySlug、getMagazines、getMagazineBySlug、getArchiveCounts
+- 种子数据追加（seed.ts）：20 张真实专辑（1991-2022）+ 10 本杂志
+
+#### UI 组件
+- AlbumCard：正方形封面卡片（1:1 比例，语言 badge）
+- MagazineCard：竖版封面卡片（2:3 比例，期号+日期）
+- ArchivesFilterBar：筛选栏（专辑/杂志 Tab + 语言子筛选）
+- ArchiveCardSkeleton：加载骨架
+
+#### 页面
+- 资料库列表页（/archives）：Grid 布局，双 Tab + 语言筛选 + 分页
+- 专辑详情页（/archives/albums/[slug]）：封面 + 曲目列表 + 流媒体链接
+- 杂志详情页（/archives/magazines/[slug]）：封面 + 内页浏览
+- 加载骨架屏（loading.tsx）
+
+#### API
+- GET/POST /api/archives/albums — 列表查询 + 创建
+- GET/PUT/DELETE /api/archives/albums/[slug] — 详情 + 更新 + 删除
+- GET/POST /api/archives/magazines — 列表查询 + 创建
+- GET/PUT/DELETE /api/archives/magazines/[slug] — 详情 + 更新 + 删除
+
+### 2026-06-07 - P3.1 活动模块开发（已完成）
+
+#### 数据层
+- 类型定义扩展（types.ts）：ActivityTab, InterviewMediaFilter, EndorsementItem, EndorsementDetail, InterviewItem, InterviewDetail
+- 查询层（queries/activities.ts）：getEndorsements、getEndorsementBySlug、getInterviews、getInterviewBySlug、getActivityCounts
+- 种子数据追加（seed.ts）：15 条真实代言品牌 + 8 条访谈数据
+
+#### UI 组件
+- EndorsementCard：品牌卡片（4:3 比例，品类 badge，年份范围）
+- InterviewCard：文字卡片（无图片，媒体类型 badge）
+- ActivitiesFilterBar：筛选栏（代言/访谈 Tab + 访谈媒体类型子筛选）
+- ActivityCardSkeleton：加载骨架
+
+#### 页面
+- 活动列表页（/activities）：Grid 布局，双 Tab + 媒体类型筛选 + 分页
+- 代言详情页（/activities/endorsements/[slug]）：品牌信息 + 素材展示
+- 访谈详情页（/activities/interviews/[slug]）：原始媒体 + 粤语/国语文字稿 + 校对状态
+- 加载骨架屏（loading.tsx）
+
+#### API
+- GET/POST /api/activities/endorsements — 列表查询 + 创建
+- GET/PUT/DELETE /api/activities/endorsements/[slug] — 详情 + 更新 + 删除
+- GET/POST /api/activities/interviews — 列表查询 + 创建
+- GET/PUT/DELETE /api/activities/interviews/[slug] — 详情 + 更新 + 删除
 
 ### 2026-06-06 - P2.2 演出模块开发（已完成）
 
@@ -233,7 +290,59 @@
 - [x] GET/POST /api/performances
 - [x] GET/PUT/DELETE /api/performances/[slug]
 
-## 下一步: P3.1 活动模块开发
+## P3.1 完成清单
+
+### 数据层
+- [x] ActivityTab, EndorsementItem, EndorsementDetail 类型定义
+- [x] InterviewItem, InterviewDetail 类型定义
+- [x] 查询层 (queries/activities.ts)
+- [x] 种子数据 (15 条代言 + 8 条访谈)
+
+### UI 组件
+- [x] EndorsementCard 代言卡片
+- [x] InterviewCard 访谈卡片
+- [x] ActivitiesFilterBar 筛选栏
+- [x] ActivityCardSkeleton 骨架屏
+
+### 页面
+- [x] 活动列表页 (/activities)
+- [x] 代言详情页 (/activities/endorsements/[slug])
+- [x] 访谈详情页 (/activities/interviews/[slug])
+- [x] 加载状态 (loading.tsx)
+
+### API
+- [x] GET/POST /api/activities/endorsements
+- [x] GET/PUT/DELETE /api/activities/endorsements/[slug]
+- [x] GET/POST /api/activities/interviews
+- [x] GET/PUT/DELETE /api/activities/interviews/[slug]
+
+## P3.2 完成清单
+
+### 数据层
+- [x] ArchiveTab, AlbumItem, AlbumDetail 类型定义
+- [x] MagazineItem, MagazineDetail 类型定义
+- [x] 查询层 (queries/archives.ts)
+- [x] 种子数据 (20 张专辑 + 10 本杂志)
+
+### UI 组件
+- [x] AlbumCard 专辑卡片
+- [x] MagazineCard 杂志卡片
+- [x] ArchivesFilterBar 筛选栏
+- [x] ArchiveCardSkeleton 骨架屏
+
+### 页面
+- [x] 资料库列表页 (/archives)
+- [x] 专辑详情页 (/archives/albums/[slug])
+- [x] 杂志详情页 (/archives/magazines/[slug])
+- [x] 加载状态 (loading.tsx)
+
+### API
+- [x] GET/POST /api/archives/albums
+- [x] GET/PUT/DELETE /api/archives/albums/[slug]
+- [x] GET/POST /api/archives/magazines
+- [x] GET/PUT/DELETE /api/archives/magazines/[slug]
+
+## 下一步: P4.1 留言板模块开发
 
 ---
 

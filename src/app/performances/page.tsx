@@ -6,6 +6,7 @@ import { Pagination } from '@/components/updates/Pagination';
 import { getPerformances, getPerformanceCounts } from '@/lib/queries/performances';
 
 export const metadata = { title: '演出' };
+export const dynamic = 'force-dynamic';
 
 const tabToType: Record<string, string> = {
   concert: 'CONCERT',

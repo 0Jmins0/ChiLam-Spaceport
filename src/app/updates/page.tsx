@@ -13,6 +13,8 @@ import {
   getUpdateCounts,
 } from '@/lib/queries/updates';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = { title: '动态' };
 
 /**

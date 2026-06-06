@@ -141,3 +141,87 @@ export interface PerformanceDetail extends PerformanceItem {
   officialMedia: OfficialMediaItem[];
   fanShots: FanShotItem[];
 }
+
+// ─── 活动模块 ───
+
+// 活动 Tab 类型
+export type ActivityTab = 'endorsement' | 'interview';
+
+// 访谈媒体类型筛选
+export type InterviewMediaFilter = 'video' | 'audio' | 'text' | 'live';
+
+// 代言卡片展示用
+export interface EndorsementItem {
+  id: string;
+  slug: string;
+  brand: string;
+  role: string | null;
+  category: string | null;
+  description: string | null;
+  startYear: number;
+  endYear: number | null;
+  mediaUrls: { url: string; alt: string | null }[];
+  tags: { name: string; slug: string }[];
+}
+
+// 代言详情页用（当前与列表项相同，后续可扩展）
+export type EndorsementDetail = EndorsementItem;
+
+// 访谈卡片展示用
+export interface InterviewItem {
+  id: string;
+  slug: string;
+  title: string;
+  summary: string | null;
+  source: string | null;
+  date: Date;
+  mediaType: string; // InterviewMediaType enum
+  originalUrl: string | null;
+  tags: { name: string; slug: string }[];
+}
+
+// 访谈详情页用
+export interface InterviewDetail extends InterviewItem {
+  transcriptCantonese: string | null;
+  transcriptMandarin: string | null;
+  proofreadStatus: string;
+  originalMediaUrl: string | null;
+}
+
+// ─── 资料库模块 ───
+
+// 资料库 Tab 类型
+export type ArchiveTab = 'album' | 'magazine';
+
+// 专辑卡片展示用
+export interface AlbumItem {
+  id: string;
+  slug: string;
+  title: string;
+  releaseYear: number;
+  language: string | null;
+  coverUrl: string | null;
+  tags: { name: string; slug: string }[];
+}
+
+// 专辑详情页用
+export interface AlbumDetail extends AlbumItem {
+  tracks: string[] | null;
+  streamingLinks: Record<string, string> | null;
+}
+
+// 杂志卡片展示用
+export interface MagazineItem {
+  id: string;
+  slug: string;
+  title: string;
+  issue: string | null;
+  date: Date;
+  coverUrl: string | null;
+  tags: { name: string; slug: string }[];
+}
+
+// 杂志详情页用
+export interface MagazineDetail extends MagazineItem {
+  scans: { url: string; alt: string | null }[];
+}

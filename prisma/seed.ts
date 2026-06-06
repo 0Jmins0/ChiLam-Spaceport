@@ -16,10 +16,15 @@ async function main() {
   await prisma.performanceMedia.deleteMany();
   await prisma.performance.deleteMany();
   await prisma.production.deleteMany();
+  await prisma.magazine.deleteMany();
+  await prisma.album.deleteMany();
+  await prisma.interview.deleteMany();
+  await prisma.endorsement.deleteMany();
   await prisma.sighting.deleteMany();
   await prisma.newsArticle.deleteMany();
   await prisma.socialPost.deleteMany();
   await prisma.timelineEvent.deleteMany();
+  await prisma.media.deleteMany();
   await prisma.tag.deleteMany();
 
   // ─────────────────────────────────────────────
@@ -1071,6 +1076,216 @@ async function main() {
   }
 
   // ─────────────────────────────────────────────
+  // 8. Endorsement — 代言数据（15 条真实品牌）
+  // ─────────────────────────────────────────────
+  console.log('Creating endorsements...');
+
+  const endorsements = [
+    { brand: '香港美心西饼', slug: 'maxims-cake', role: '代言人', category: '餐饮', startYear: 2013, endYear: null, description: '香港美心西饼及月饼代言人。' },
+    { brand: '香港信贷集团', slug: 'hk-finance-group', role: '代言人', category: '金融', startYear: 2014, endYear: null, description: '香港信贷集团品牌代言人。' },
+    { brand: '香港身份证换领', slug: 'hk-id-replacement', role: '换证大使', category: '政府', startYear: 2018, endYear: 2019, description: '担任香港身份证换领大使。' },
+    { brand: '尊尼获加蓝牌', slug: 'johnnie-walker-blue', role: '大中华区品牌大使', category: '酒类', startYear: 2019, endYear: null, description: '尊尼获加蓝牌威士忌大中华区品牌大使。' },
+    { brand: 'Jing Tea', slug: 'jing-tea', role: '代言人', category: '餐饮', startYear: 2019, endYear: null, description: 'Jing Tea 品牌代言人。' },
+    { brand: '保良局', slug: 'po-leung-kuk', role: '亲善大使', category: '慈善', startYear: 2020, endYear: null, description: '保良局亲善大使，参与多项慈善活动。' },
+    { brand: '露安适', slug: 'luanshi', role: '代言人', category: '母婴', startYear: 2021, endYear: null, description: '露安适品牌代言人。' },
+    { brand: '欧利时&欧品客', slug: 'oris-opk', role: '形象代言人', category: '手表', startYear: 2021, endYear: null, description: '欧利时及欧品客手表形象代言人。' },
+    { brand: '西大门', slug: 'xidamen', role: '全球代言人', category: '家居', startYear: 2021, endYear: null, description: '西大门全球品牌代言人。' },
+    { brand: '美赞臣', slug: 'mead-johnson', role: '代言人', category: '母婴', startYear: 2021, endYear: null, description: '美赞臣品牌代言人。' },
+    { brand: '雪花秀', slug: 'sulwhasoo', role: '品牌大使', category: '护肤', startYear: 2021, endYear: null, description: '雪花秀护肤品牌大使。' },
+    { brand: '德芙', slug: 'dove-chocolate', role: '品牌大使', category: '零食', startYear: 2021, endYear: null, description: '德芙巧克力品牌大使。' },
+    { brand: '法国娇兰', slug: 'guerlain', role: '彩妆挚友', category: '彩妆', startYear: 2021, endYear: null, description: '法国娇兰彩妆挚友。' },
+    { brand: '良品铺子', slug: 'bestore', role: '品牌大使', category: '零食', startYear: 2021, endYear: null, description: '良品铺子品牌大使。' },
+    { brand: '凯迪拉克', slug: 'cadillac', role: '品牌大使', category: '汽车', startYear: 2022, endYear: null, description: '凯迪拉克品牌大使。' },
+  ];
+
+  for (const e of endorsements) {
+    await prisma.endorsement.create({
+      data: {
+        slug: e.slug,
+        brand: e.brand,
+        role: e.role,
+        category: e.category,
+        description: e.description,
+        startYear: e.startYear,
+        endYear: e.endYear,
+      },
+    });
+  }
+
+  // ─────────────────────────────────────────────
+  // 9. Interview — 访谈数据（8 条）
+  // ─────────────────────────────────────────────
+  console.log('Creating interviews...');
+
+  const interviews = [
+    {
+      slug: 'gq-interview-2021',
+      title: 'GQ专访：张智霖的多面人生',
+      summary: '张智霖接受GQ专访，谈及从歌手到演员的转变、与袁咏仪的婚姻生活，以及参加《披荆斩棘的哥哥》的感受。',
+      source: 'GQ中国',
+      date: new Date('2021-10-15'),
+      mediaType: 'VIDEO' as const,
+      originalUrl: 'https://example.com/gq-chilam-2021',
+    },
+    {
+      slug: 'ifeng-interview-2024',
+      title: '凤凰网专访：《误判》中的反派突破',
+      summary: '张智霖谈拍摄《误判》时饰演反派欧柏文的心路历程，表示反派角色更有挑战性。',
+      source: '凤凰网娱乐',
+      date: new Date('2024-12-28'),
+      mediaType: 'VIDEO' as const,
+      originalUrl: 'https://example.com/ifeng-misjudge-2024',
+    },
+    {
+      slug: 'mango-pjzj-interview-2025',
+      title: '芒果TV专访：大湾仔再出发',
+      summary: '《披荆斩棘2025》期间专访，张智霖谈与陈小春、周柏豪、林晓峰组队的趣事。',
+      source: '芒果TV',
+      date: new Date('2025-08-20'),
+      mediaType: 'VIDEO' as const,
+      originalUrl: 'https://example.com/mango-pjzj-2025',
+    },
+    {
+      slug: 'rthk-radio-2022',
+      title: '香港电台访谈：从艺三十年',
+      summary: '张智霖做客香港电台节目，回顾从1991年出道至今的演艺生涯，分享音乐和演戏的不同感受。',
+      source: '香港电台',
+      date: new Date('2022-06-10'),
+      mediaType: 'AUDIO' as const,
+      originalUrl: 'https://example.com/rthk-chilam-2022',
+      transcriptCantonese: '主持人：Chilam，你由91年出道到而家，已经超过30年喇，有咩感受？\n\n张智霖：其实真系好快，好似啱啱先入行咁。最开心系可以一路做自己钟意嘅嘢。',
+      proofreadStatus: 'PROOFREAD' as const,
+    },
+    {
+      slug: 'mingpao-text-2025',
+      title: '明报专访：回巢TVB的初心',
+      summary: '张智霖接受明报专访，谈回巢TVB拍摄《璀璨之城》的原因，以及对香港影视行业发展的看法。',
+      source: '明报',
+      date: new Date('2025-12-20'),
+      mediaType: 'TEXT' as const,
+      originalUrl: 'https://example.com/mingpao-tvb-2025',
+      transcriptCantonese: '记者：点解会选择呢个时候回TVB？\n\n张智霖：其实一直都有同TVB保持联络，呢次剧本好吸引，同埋可以同卓羲再合作，好难得。',
+      transcriptMandarin: '记者：为什么会选择这个时候回TVB？\n\n张智霖：其实一直都有跟TVB保持联系，这次剧本很吸引人，而且可以和卓羲再合作，很难得。',
+      proofreadStatus: 'PROOFREAD' as const,
+    },
+    {
+      slug: 'weibo-live-2025',
+      title: '微博直播：披荆斩棘庆功宴',
+      summary: '张智霖在《披荆斩棘2025》获得年度滚烫X-Fire后进行微博直播，与粉丝互动庆祝。',
+      source: '微博',
+      date: new Date('2025-10-25'),
+      mediaType: 'LIVE' as const,
+      originalUrl: 'https://example.com/weibo-live-xfire',
+    },
+    {
+      slug: 'apple-daily-2019',
+      title: '苹果日报专访：尊尼获加蓝牌代言',
+      summary: '张智霖接受专访谈担任尊尼获加蓝牌大中华区品牌大使的感受，分享品味生活态度。',
+      source: '苹果日报',
+      date: new Date('2019-05-10'),
+      mediaType: 'TEXT' as const,
+      originalUrl: 'https://example.com/apple-jw-2019',
+    },
+    {
+      slug: 'tvb-jade-2013',
+      title: 'TVB翡翠台专访：冲上云霄II幕后',
+      summary: '张智霖谈饰演Cool魔（顾夏阳）的心得，分享拍摄飞行场景的趣事。',
+      source: 'TVB翡翠台',
+      date: new Date('2013-07-15'),
+      mediaType: 'VIDEO' as const,
+      originalUrl: 'https://example.com/tvb-cool-mo-2013',
+    },
+  ];
+
+  for (const iv of interviews) {
+    await prisma.interview.create({
+      data: {
+        slug: iv.slug,
+        title: iv.title,
+        summary: iv.summary,
+        source: iv.source,
+        date: iv.date,
+        mediaType: iv.mediaType,
+        originalUrl: iv.originalUrl,
+        transcriptCantonese: (iv as Record<string, unknown>).transcriptCantonese as string | undefined,
+        transcriptMandarin: (iv as Record<string, unknown>).transcriptMandarin as string | undefined,
+        proofreadStatus: ((iv as Record<string, unknown>).proofreadStatus as 'PENDING' | 'PROOFREAD') ?? 'PENDING',
+      },
+    });
+  }
+
+  // ─────────────────────────────────────────────
+  // 10. Album — 专辑数据（20 张真实专辑）
+  // ─────────────────────────────────────────────
+  console.log('Creating albums...');
+
+  const albums = [
+    { title: '现代爱情故事', slug: 'modern-love-story-1991', releaseYear: 1991, language: '粤语', tracks: ['现代爱情故事', '不一样的她', '留恋', '片片枫叶情'] },
+    { title: '我不够爱你', slug: 'not-enough-love-1992', releaseYear: 1992, language: '粤语', tracks: ['我不够爱你', '情人节', '天真的因为你'] },
+    { title: '天变地变情不变', slug: 'love-unchanged-1993', releaseYear: 1993, language: '粤语', tracks: ['天变地变情不变', '绝世绝招'] },
+    { title: '逗我开心吧', slug: 'make-me-happy-1993', releaseYear: 1993, language: '粤语', tracks: ['逗我开心吧', '爱是胡涂'] },
+    { title: '我真的可以为所欲为', slug: 'whatever-i-want-1993', releaseYear: 1993, language: '国语', tracks: ['我真的可以为所欲为', '等你到今生'] },
+    { title: '一一道来', slug: 'tell-it-all-1994', releaseYear: 1994, language: '粤语', tracks: ['你太善良', '一一道来'] },
+    { title: '等', slug: 'wait-1995', releaseYear: 1995, language: '粤语', tracks: ['等', '相爱无梦'] },
+    { title: '如果这是情', slug: 'if-this-is-love-1996', releaseYear: 1996, language: '粤语', tracks: ['如果这是情', '天地男儿'] },
+    { title: '原来', slug: 'turns-out-1996', releaseYear: 1996, language: '国语', tracks: ['原来', '你的温柔'] },
+    { title: '怎么舍得你', slug: 'how-to-let-go-1997', releaseYear: 1997, language: '粤语', tracks: ['怎么舍得你', '十指紧扣'] },
+    { title: '认真', slug: 'serious-1997', releaseYear: 1997, language: '国语', tracks: ['认真', '爱你的心'] },
+    { title: '祝君好', slug: 'wish-you-well-1998', releaseYear: 1998, language: '粤语', tracks: ['祝君好', '最爱一刻'] },
+    { title: 'ChiLam 新歌+精选', slug: 'chilam-best-2000', releaseYear: 2000, language: '粤语', tracks: ['十月初五的月光', '我一个人住'] },
+    { title: 'I AM CHILAM', slug: 'i-am-chilam-2009', releaseYear: 2009, language: '粤语', tracks: ['I AM CHILAM', '岁月如歌', '天梯'] },
+    { title: 'ChiLam Crazy Hours', slug: 'crazy-hours-album-2014', releaseYear: 2014, language: '粤语', tracks: ['你是如此难以忘记', '相爱无梦', '岁月如歌'] },
+    { title: 'Ladies & Gentlemen', slug: 'ladies-gentlemen-2015', releaseYear: 2015, language: '粤语', tracks: ['Ladies & Gentlemen', '你太善良'] },
+    { title: 'The Apostle', slug: 'the-apostle-2017', releaseYear: 2017, language: '粤语', tracks: ['觉醒', '先赌为快'] },
+    { title: '17', slug: 'seventeen-2021', releaseYear: 2021, language: '粤语', tracks: ['17岁 (改编)', '烈火战马', '披荆斩棘'] },
+    { title: 'Hip Hop Chilam', slug: 'hiphop-chilam-2022', releaseYear: 2022, language: '粤语', tracks: ['Hip Hop Style', '大湾区'] },
+    { title: '我们的故事', slug: 'our-story-single-2022', releaseYear: 2022, language: '粤语', tracks: ['我们的故事'] },
+  ];
+
+  for (let i = 0; i < albums.length; i++) {
+    const a = albums[i];
+    await prisma.album.create({
+      data: {
+        slug: a.slug,
+        title: a.title,
+        releaseYear: a.releaseYear,
+        language: a.language,
+        tracks: a.tracks,
+        sortOrder: i,
+      },
+    });
+  }
+
+  // ─────────────────────────────────────────────
+  // 11. Magazine — 杂志数据（10 条）
+  // ─────────────────────────────────────────────
+  console.log('Creating magazines...');
+
+  const magazines = [
+    { title: 'GQ中国', slug: 'gq-china-2021-10', issue: '2021年10月刊', date: new Date('2021-10-01') },
+    { title: 'Esquire君子', slug: 'esquire-2019-05', issue: '2019年5月刊', date: new Date('2019-05-01') },
+    { title: 'Harper\'s Bazaar 时尚芭莎', slug: 'bazaar-2021-08', issue: '2021年8月刊', date: new Date('2021-08-01') },
+    { title: 'Elle Men', slug: 'elle-men-2022-01', issue: '2022年1月刊', date: new Date('2022-01-01') },
+    { title: 'Cosmopolitan 时尚COSMO', slug: 'cosmo-2021-12', issue: '2021年12月刊', date: new Date('2021-12-01') },
+    { title: '南都娱乐周刊', slug: 'nandu-2025-09', issue: '2025年9月刊', date: new Date('2025-09-01') },
+    { title: 'Ming Pao Weekly 明报周刊', slug: 'mingpao-weekly-2013-07', issue: '2013年7月刊', date: new Date('2013-07-01') },
+    { title: 'TVB周刊', slug: 'tvb-weekly-2000-11', issue: '2000年11月刊', date: new Date('2000-11-01') },
+    { title: 'Madame Figaro 费加罗', slug: 'figaro-2022-03', issue: '2022年3月刊', date: new Date('2022-03-01') },
+    { title: 'Men\'s Uno', slug: 'mens-uno-2014-12', issue: '2014年12月刊', date: new Date('2014-12-01') },
+  ];
+
+  for (const m of magazines) {
+    await prisma.magazine.create({
+      data: {
+        slug: m.slug,
+        title: m.title,
+        issue: m.issue,
+        date: m.date,
+      },
+    });
+  }
+
+  // ─────────────────────────────────────────────
   // 统计
   // ─────────────────────────────────────────────
   const tvCount = tvbSeries.length + mainlandSeries.length + webSeries.length + otherSeries.length;
@@ -1086,6 +1301,10 @@ async function main() {
   console.log(`  - ${sightings.length} sightings`);
   console.log(`  - ${tvCount + movieCount + varietyCount} productions (${tvCount} TV + ${movieCount} movies + ${varietyCount} variety)`);
   console.log(`  - ${perfCount} performances (${concerts.length} concerts + ${stages.length} stages + ${musicals.length} musicals)`);
+  console.log(`  - ${endorsements.length} endorsements`);
+  console.log(`  - ${interviews.length} interviews`);
+  console.log(`  - ${albums.length} albums`);
+  console.log(`  - ${magazines.length} magazines`);
 }
 
 main()
