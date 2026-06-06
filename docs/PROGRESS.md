@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P1 - 核心页面 (已完成)
+## 当前阶段: P2.1 - 影视模块 (已完成)
 
 ---
 
@@ -12,7 +12,7 @@
 | 数据库设计 | ✅ 已完成 | 2026-06-06 |
 | 首页 | ✅ 已完成 | 2026-06-06 |
 | 动态模块 | ✅ 已完成 | 2026-06-06 |
-| 影视模块 | 未开始 | - |
+| 影视模块 | ✅ 已完成 | 2026-06-06 |
 | 演出模块 | 未开始 | - |
 | 活动模块 | 未开始 | - |
 | 资料库模块 | 未开始 | - |
@@ -24,6 +24,27 @@
 ---
 
 ## 详细记录
+
+### 2026-06-06 - P2.1 影视模块开发（已完成）
+
+#### 数据层
+- 类型定义扩展（types.ts）：ScreenTab, DecadeFilter, ProductionItem, ProductionDetail
+- 查询层（queries/productions.ts）：getProductions、getProductionBySlug、getProductionCounts
+- 种子数据追加（seed.ts）：38 条影视数据（15 电视剧 + 15 电影 + 8 综艺）+ 7 个新标签
+
+#### UI 组件
+- ProductionCard：海报卡片（2:3 比例，类型 badge，Link 跳转）
+- ScreensFilterBar：三维筛选栏（类型 Tab + 年代 + 综艺地区）
+- ProductionCardSkeleton：加载骨架
+
+#### 页面
+- 影视列表页（/screens）：Grid 布局，三 Tab + 年代筛选 + 综艺地区筛选 + 分页
+- 影视详情页（/screens/[slug]）：双栏布局（海报 + 信息），播放平台链接，图册，相关资讯占位
+- 加载骨架屏（loading.tsx）
+
+#### API
+- GET/POST /api/screens — 列表查询 + 创建作品
+- GET/PUT/DELETE /api/screens/[slug] — 详情 + 更新 + 删除
 
 ### 2026-06-06 - P1 核心页面开发（已完成）
 
@@ -170,7 +191,7 @@
 - [x] GET/PUT/DELETE /api/updates/[id]
 - [ ] 图片上传接口 (推迟到 Phase 2)
 
-## 下一步: P2.1 影视模块开发
+## 下一步: P2.2 演出模块开发
 
 ---
 

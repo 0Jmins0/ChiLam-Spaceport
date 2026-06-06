@@ -4,9 +4,9 @@
 一个集合张智霖各平台、各阶段、各渠道资讯的综合性粉丝网站。
 
 ## 当前进度
-- **阶段**: P1 - 核心页面（已完成）
-- **已完成**: P0.1 技术环境搭建、P0.2 数据库设计 + Supabase 配置 + 迁移、P0.3 项目骨架搭建、P1.1 首页、P1.2 动态模块、P1.3 API
-- **下一步**: P2.1 影视模块开发
+- **阶段**: P2.1 - 影视模块（已完成）
+- **已完成**: P0 全部、P1 全部（首页+动态模块+API）、P2.1 影视模块
+- **下一步**: P2.2 演出模块开发
 - **详细进度**: 查看 `/docs/PROGRESS.md`
 
 ## 技术栈
@@ -34,19 +34,22 @@
 │   ├── app/                                         # Next.js App Router 页面
 │   │   ├── page.tsx                                 # 首页（数据库驱动时间线）
 │   │   ├── updates/                                 # 动态模块（列表 + 三种详情页）
+│   │   ├── screens/                                 # 影视模块（列表 + 详情页）
 │   │   ├── api/updates/                             # 动态 CRUD API
+│   │   ├── api/screens/                             # 影视 CRUD API
 │   │   └── ...                                      # 其他栏目路由
 │   ├── components/
 │   │   ├── layout/                                  # 布局组件（Header, Footer, MobileNav 等）
 │   │   ├── ui/                                      # 通用 UI 组件（Button, Card, Tag, Pagination,
 │   │   │                                            #   SocialPostCard, NewsArticleCard, SightingCard,
-│   │   │                                            #   MasonryGrid, UpdatesFilterBar 等）
+│   │   │                                            #   MasonryGrid, UpdatesFilterBar,
+│   │   │                                            #   ProductionCard, ScreensFilterBar 等）
 │   │   └── decorative/                              # 装饰组件（FilmGrain, YearMarquee）
 │   ├── config/                                      # 站点配置（site.ts, navigation.ts）
 │   ├── lib/                                         # 工具函数
 │   │   ├── cn.ts, fonts.ts, db.ts                   # 基础工具
 │   │   ├── types.ts                                 # 数据类型定义
-│   │   └── queries/                                 # 数据查询层（timeline.ts, updates.ts）
+│   │   └── queries/                                 # 数据查询层（timeline.ts, updates.ts, productions.ts）
 │   └── generated/                                   # Prisma 生成的客户端代码
 ├── prisma/
 │   ├── schema.prisma                                # 数据库 Schema（已完成，20 张表）

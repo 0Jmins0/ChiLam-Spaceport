@@ -12,6 +12,7 @@ async function main() {
   // ─────────────────────────────────────────────
   console.log('Clearing existing data...');
 
+  await prisma.production.deleteMany();
   await prisma.sighting.deleteMany();
   await prisma.newsArticle.deleteMany();
   await prisma.socialPost.deleteMany();
@@ -49,6 +50,30 @@ async function main() {
     }),
     prisma.tag.create({
       data: { name: '偶遇', slug: 'encounter', tagGroup: 'sighting_type' },
+    }),
+    // language 组
+    prisma.tag.create({
+      data: { name: '粤语', slug: 'cantonese', tagGroup: 'language' },
+    }),
+    prisma.tag.create({
+      data: { name: '普通话', slug: 'mandarin', tagGroup: 'language' },
+    }),
+    // variety_region 组
+    prisma.tag.create({
+      data: { name: '内地', slug: 'mainland', tagGroup: 'variety_region' },
+    }),
+    prisma.tag.create({
+      data: { name: '香港', slug: 'hongkong', tagGroup: 'variety_region' },
+    }),
+    prisma.tag.create({
+      data: { name: '台湾', slug: 'taiwan', tagGroup: 'variety_region' },
+    }),
+    // variety_role 组
+    prisma.tag.create({
+      data: { name: '常驻', slug: 'resident', tagGroup: 'variety_role' },
+    }),
+    prisma.tag.create({
+      data: { name: '飞行嘉宾', slug: 'guest', tagGroup: 'variety_role' },
     }),
   ]);
 
@@ -828,12 +853,425 @@ async function main() {
     });
   }
 
+  // ─────────────────────────────────────────────
+  // 6. Production（38 条影视综数据）
+  // ─────────────────────────────────────────────
+  console.log('Creating productions...');
+
+  // 电视剧 15 部
+  const tvSeries = [
+    {
+      title: '冲天小子',
+      slug: 'chongtian-xiaozi-1992',
+      year: 1992,
+      role: '张培俊',
+      synopsis: '出道作品',
+      language: '粤语',
+    },
+    {
+      title: '射雕英雄传',
+      slug: 'she-diao-1994',
+      year: 1994,
+      role: '郭靖',
+      synopsis:
+        '在经典武侠剧中饰演男主角郭靖，与朱茵合演，演唱主题曲《绝世绝招》，人气急升。',
+      language: '粤语',
+    },
+    {
+      title: '天地男儿',
+      slug: 'tiandi-naner-1996',
+      year: 1996,
+      role: '罗子健',
+      synopsis: '演唱主题曲。',
+      language: '粤语',
+    },
+    {
+      title: '十月初五的月光',
+      slug: 'october-moonlight-2000',
+      year: 2000,
+      role: '文初',
+      synopsis:
+        '经典代表作，最高收视46点，获亚太电视大奖最佳连续剧。',
+      language: '粤语',
+    },
+    {
+      title: '谈判专家',
+      slug: 'negotiator-2002',
+      year: 2002,
+      role: '杨光',
+      synopsis: '获"我最喜爱的电视角色"奖。',
+      language: '粤语',
+    },
+    {
+      title: '冲上云霄II',
+      slug: 'triumph-skies-2-2013',
+      year: 2013,
+      role: '顾夏阳 (Cool魔)',
+      synopsis: '男主角，航空题材，人气极高。',
+      language: '粤语',
+    },
+    {
+      title: '逆水寒',
+      slug: 'ni-shui-han-2004',
+      year: 2004,
+      role: '戚少商',
+      synopsis: '古装武侠。',
+      language: '普通话',
+    },
+    {
+      title: '飞刀又见飞刀',
+      slug: 'feidao-2003',
+      year: 2003,
+      role: '李坏',
+      synopsis: '男主角，古龙小说改编。',
+      language: '普通话',
+    },
+    {
+      title: '陆小凤传奇',
+      slug: 'lu-xiaofeng-2007',
+      year: 2007,
+      role: '陆小凤',
+      synopsis:
+        '系列电视电影，获第7届数字电影百合奖最佳男演员。',
+      language: '普通话',
+    },
+    {
+      title: '蚀日风暴',
+      slug: 'shadow-of-justice-2018',
+      year: 2018,
+      role: '凌风',
+      synopsis: '犯罪动作，与薛凯琪合演。',
+      language: '粤语',
+    },
+    {
+      title: '家族荣耀',
+      slug: 'family-glory-2022',
+      year: 2022,
+      role: '马展鸿',
+      synopsis: '香港家族题材。',
+      language: '粤语',
+    },
+    {
+      title: '赴山海',
+      slug: 'fu-shanhai-2025',
+      year: 2025,
+      role: '燕狂徒',
+      synopsis: '最新作品。',
+      language: '普通话',
+    },
+    {
+      title: '白发魔女',
+      slug: 'white-hair-1999',
+      year: 1999,
+      role: '卓一航',
+      synopsis: '古装武侠。',
+      language: '普通话',
+    },
+    {
+      title: '西关大少',
+      slug: 'xiguan-dashao-2003',
+      year: 2003,
+      role: '周天赐',
+      synopsis: '演唱主题曲。',
+      language: '粤语',
+    },
+    {
+      title: '鱼跃在花见',
+      slug: 'yueyue-2011',
+      year: 2011,
+      role: '鱼至嬴',
+      synopsis: '大结局收视38点。',
+      language: '粤语',
+    },
+  ];
+
+  for (const tv of tvSeries) {
+    const langTag = tv.language === '粤语' ? 'cantonese' : 'mandarin';
+    await prisma.production.create({
+      data: {
+        type: 'TV_SERIES',
+        slug: tv.slug,
+        title: tv.title,
+        year: tv.year,
+        role: tv.role,
+        synopsis: tv.synopsis,
+        language: tv.language,
+        tags: { connect: [{ id: tagMap[langTag] }] },
+      },
+    });
+  }
+
+  // 电影 15 部
+  const movies = [
+    {
+      title: '一代宗师',
+      slug: 'grandmaster-2013',
+      year: 2013,
+      role: '伶人/宫二未婚夫',
+      synopsis: '王家卫执导。',
+      language: '粤语',
+    },
+    {
+      title: 'S风暴',
+      slug: 's-storm-2016',
+      year: 2016,
+      role: '刘保强',
+      synopsis: '反贪风暴系列，重案组高级督察。',
+      language: '粤语',
+    },
+    {
+      title: 'L风暴',
+      slug: 'l-storm-2018',
+      year: 2018,
+      role: '刘保强',
+      synopsis: '反贪风暴系列。',
+      language: '粤语',
+    },
+    {
+      title: 'P风暴',
+      slug: 'p-storm-2019',
+      year: 2019,
+      role: '刘保强',
+      synopsis: '反贪风暴系列。',
+      language: '粤语',
+    },
+    {
+      title: 'G风暴',
+      slug: 'g-storm-2021',
+      year: 2021,
+      role: '刘保强/廖保强',
+      synopsis: '反贪风暴系列最终章。',
+      language: '粤语',
+    },
+    {
+      title: '冲上云霄',
+      slug: 'triumph-skies-movie-2015',
+      year: 2015,
+      role: '顾夏阳 (Jayden)',
+      synopsis: '全国票房破亿。',
+      language: '粤语',
+    },
+    {
+      title: '十月初五的月光',
+      slug: 'october-moonlight-movie-2015',
+      year: 2015,
+      role: '文初 (初哥哥)',
+      synopsis: '获"真情演绎"及"浪漫爱情"奖。',
+      language: '粤语',
+    },
+    {
+      title: '误判',
+      slug: 'misjudge-2024',
+      year: 2024,
+      role: '欧柏文',
+      synopsis: '甄子丹执导。',
+      language: '粤语',
+    },
+    {
+      title: '暗杀风暴',
+      slug: 'assassination-storm-2023',
+      year: 2023,
+      role: '罗飞',
+      synopsis: '邱礼涛执导，与古天乐、吴镇宇合演。',
+      language: '粤语',
+    },
+    {
+      title: '扫黑行动',
+      slug: 'anti-crime-2022',
+      year: 2022,
+      role: '赵羡鱼',
+      synopsis: '林德禄执导。',
+      language: '粤语',
+    },
+    {
+      title: '天生爱情狂',
+      slug: 'natural-born-lover-2012',
+      year: 2012,
+      role: '张泰林',
+      synopsis: '与刘心悠合演。',
+      language: '粤语',
+    },
+    {
+      title: 'G4特工',
+      slug: 'g4-agent-1997',
+      year: 1997,
+      role: '陈羿',
+      synopsis: '动作片。',
+      language: '粤语',
+    },
+    {
+      title: '飞虎雄心2',
+      slug: 'flying-tiger-2-1996',
+      year: 1996,
+      role: '何志林 (Coolman)',
+      synopsis: '动作片。',
+      language: '粤语',
+    },
+    {
+      title: '边城浪子',
+      slug: 'border-town-1993',
+      year: 1993,
+      role: '路小佳',
+      synopsis: '古龙小说改编。',
+      language: '粤语',
+    },
+    {
+      title: '栋笃特工',
+      slug: 'agent-mr-chan-2018b',
+      year: 2018,
+      role: '张智霖 (本人)',
+      synopsis: '喜剧。',
+      language: '粤语',
+    },
+  ];
+
+  for (const movie of movies) {
+    const langTag = movie.language === '粤语' ? 'cantonese' : 'mandarin';
+    await prisma.production.create({
+      data: {
+        type: 'MOVIE',
+        slug: movie.slug,
+        title: movie.title,
+        year: movie.year,
+        role: movie.role,
+        synopsis: movie.synopsis,
+        language: movie.language,
+        tags: { connect: [{ id: tagMap[langTag] }] },
+      },
+    });
+  }
+
+  // 综艺 8 档
+  const varietyShows = [
+    {
+      title: '披荆斩棘的哥哥',
+      slug: 'pi-jing-2021',
+      year: 2021,
+      role: null,
+      synopsis: '芒果TV，"大湾区"组合。',
+      varietyRegion: '内地',
+      varietyRole: '常驻',
+      language: '普通话',
+      regionSlug: 'mainland',
+      roleSlug: 'resident',
+    },
+    {
+      title: '大湾仔的夜 第一季',
+      slug: 'dawanzai-s1-2022',
+      year: 2022,
+      role: null,
+      synopsis: '芒果TV/湖南卫视，合伙人。',
+      varietyRegion: '内地',
+      varietyRole: '常驻',
+      language: '普通话',
+      regionSlug: 'mainland',
+      roleSlug: 'resident',
+    },
+    {
+      title: '大湾仔的夜 第二季',
+      slug: 'dawanzai-s2-2023',
+      year: 2023,
+      role: null,
+      synopsis: '芒果TV，合伙人。',
+      varietyRegion: '内地',
+      varietyRole: '常驻',
+      language: '普通话',
+      regionSlug: 'mainland',
+      roleSlug: 'resident',
+    },
+    {
+      title: '披荆斩棘 2025',
+      slug: 'pi-jing-2025',
+      year: 2025,
+      role: null,
+      synopsis: '芒果TV，"大湾仔"战队。',
+      varietyRegion: '内地',
+      varietyRole: '常驻',
+      language: '普通话',
+      regionSlug: 'mainland',
+      roleSlug: 'resident',
+    },
+    {
+      title: '妻子的浪漫旅行 第二季',
+      slug: 'wife-travel-s2-2019',
+      year: 2019,
+      role: null,
+      synopsis: '芒果TV，与袁咏仪参加。',
+      varietyRegion: '内地',
+      varietyRole: '常驻',
+      language: '普通话',
+      regionSlug: 'mainland',
+      roleSlug: 'resident',
+    },
+    {
+      title: '一路上有你',
+      slug: 'with-you-2015',
+      year: 2015,
+      role: null,
+      synopsis: '夫妻档真人秀（与袁咏仪）。',
+      varietyRegion: '内地',
+      varietyRole: '常驻',
+      language: '普通话',
+      regionSlug: 'mainland',
+      roleSlug: 'resident',
+    },
+    {
+      title: '会画少年的天空',
+      slug: 'painting-youth-2022',
+      year: 2022,
+      role: null,
+      synopsis: '湖南卫视。',
+      varietyRegion: '内地',
+      varietyRole: '飞行嘉宾',
+      language: '普通话',
+      regionSlug: 'mainland',
+      roleSlug: 'guest',
+    },
+    {
+      title: '奖门人系列',
+      slug: 'super-trio-tvb',
+      year: 2000,
+      role: null,
+      synopsis: 'TVB经典游戏综艺，多次参加。',
+      varietyRegion: '香港',
+      varietyRole: '飞行嘉宾',
+      language: '粤语',
+      regionSlug: 'hongkong',
+      roleSlug: 'guest',
+    },
+  ];
+
+  for (const show of varietyShows) {
+    const langTag = show.language === '粤语' ? 'cantonese' : 'mandarin';
+    await prisma.production.create({
+      data: {
+        type: 'VARIETY_SHOW',
+        slug: show.slug,
+        title: show.title,
+        year: show.year,
+        role: show.role,
+        synopsis: show.synopsis,
+        language: show.language,
+        varietyRegion: show.varietyRegion,
+        varietyRole: show.varietyRole,
+        tags: {
+          connect: [
+            { id: tagMap[langTag] },
+            { id: tagMap[show.regionSlug] },
+            { id: tagMap[show.roleSlug] },
+          ],
+        },
+      },
+    });
+  }
+
   console.log('Seeding completed successfully!');
-  console.log('  - 8 tags');
+  console.log('  - 15 tags');
   console.log('  - 20 timeline events');
   console.log('  - 30 social posts');
   console.log('  - 15 news articles');
   console.log('  - 10 sightings');
+  console.log('  - 38 productions (15 TV + 15 movies + 8 variety)');
 }
 
 main()

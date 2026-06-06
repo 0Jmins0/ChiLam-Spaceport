@@ -63,3 +63,34 @@ export interface SightingItem {
   authorName: string;
   tags: { name: string; slug: string }[];
 }
+
+// ─── 影视模块 ───
+
+// 影视综 Tab 类型
+export type ScreenTab = 'movie' | 'tv_series' | 'variety_show';
+
+// 年代筛选
+export type DecadeFilter = '1990' | '2000' | '2010' | '2020';
+
+// 影视作品卡片展示用
+export interface ProductionItem {
+  id: string;
+  type: string;
+  slug: string;
+  title: string;
+  titleEn: string | null;
+  year: number;
+  role: string | null;
+  synopsis: string | null;
+  posterUrl: string | null;
+  language: string | null;
+  varietyRegion: string | null;
+  varietyRole: string | null;
+  tags: { name: string; slug: string }[];
+}
+
+// 影视作品详情页用（含 gallery + watchLinks）
+export interface ProductionDetail extends ProductionItem {
+  watchLinks: { platform: string; url: string }[] | null;
+  gallery: { url: string; alt: string | null }[];
+}

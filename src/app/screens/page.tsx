@@ -1,14 +1,80 @@
 import { PageContainer } from '@/components/layout/PageContainer';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { UnderConstruction } from '@/components/ui/UnderConstruction';
+import { ScreensFilterBar } from '@/components/screens/ScreensFilterBar';
+import { ProductionCard } from '@/components/screens/ProductionCard';
+import { Pagination } from '@/components/updates/Pagination';
+import { getProductions, getProductionCounts } from '@/lib/queries/productions';
 
 export const metadata = { title: '影视综' };
 
-export default function ScreensPage() {
+const tabToType: Record<string, string> = {
+  movie: 'MOVIE',
+  tv_series: 'TV_SERIES',
+  variety_show: 'VARIETY_SHOW',
+};
+
+function buildBaseUrl(tab: string, decade?: string, region?: string): string {
+  const params = new URLSearchParams();
+  params.set('tab', tab);
+  if (decade) params.set('decade', decade);
+  if (region) params.set('region', region);
+  return `/screens?${params.toString()}`;
+}
+
+export default async function ScreensPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string; decade?: string; region?: string; page?: string }>;
+}) {
+  const params = await searchParams;
+  const tab = params.tab || 'movie';
+  const decade = params.decade;
+  const region = params.region;
+  const page = Number(params.page) || 1;
+
+  const type = tabToType[tab];
+
+  const [counts, data] = await Promise.all([
+    getProductionCounts(),
+    getProductions({ type, decade, page }),
+  ]);
+
+  const baseUrl = buildBaseUrl(tab, decade, region);
+
   return (
     <PageContainer>
       <PageHeader title="影视综" titleEn="Screens" description="电影 · 电视剧 · 综艺" />
-      <UnderConstruction />
+
+      <ScreensFilterBar
+        currentTab={tab}
+        currentDecade={decade}
+        currentRegion={region}
+        counts={counts}
+      />
+
+      {data.items.length > 0 ? (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {data.items.map((item) => (
+            <ProductionCard
+              key={item.id}
+              slug={item.slug}
+              title={item.title}
+              year={item.year}
+              role={item.role ?? undefined}
+              posterUrl={item.posterUrl ?? undefined}
+              type={item.type}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="flex items-center justify-center py-20">
+          <p className="text-text-muted">暂无作品</p>
+        </div>
+      )}
+
+      {data.totalPages > 1 && (
+        <Pagination currentPage={page} totalPages={data.totalPages} baseUrl={baseUrl} />
+      )}
     </PageContainer>
   );
 }
