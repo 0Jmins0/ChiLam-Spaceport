@@ -1,10 +1,8 @@
 import { prisma } from '@/lib/db';
 import { ModerationStatus } from '@/generated/prisma/client';
-import type {
-  SocialPostWhereInput,
-  NewsArticleWhereInput,
-  SightingWhereInput,
-} from '@/generated/prisma/models';
+import type { SocialPostWhereInput } from '@/generated/prisma/models/SocialPost';
+import type { NewsArticleWhereInput } from '@/generated/prisma/models/NewsArticle';
+import type { SightingWhereInput } from '@/generated/prisma/models/Sighting';
 import type { PaginatedResponse, SocialPostItem, NewsArticleItem, SightingItem } from '@/lib/types';
 
 const PAGE_SIZE = 20;

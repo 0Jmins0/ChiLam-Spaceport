@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/db';
 import { ProductionType } from '@/generated/prisma/client';
-import type { ProductionWhereInput } from '@/generated/prisma/models';
+import type { ProductionWhereInput } from '@/generated/prisma/models/Production';
 import type { PaginatedResponse, ProductionItem, ProductionDetail } from '@/lib/types';
 
 const PAGE_SIZE = 20;

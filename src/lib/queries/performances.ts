@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/db';
 import { PerformanceType } from '@/generated/prisma/client';
-import type { PerformanceWhereInput } from '@/generated/prisma/models';
+import type { PerformanceWhereInput } from '@/generated/prisma/models/Performance';
 import type { PaginatedResponse, PerformanceItem, PerformanceDetail } from '@/lib/types';
 
 const PAGE_SIZE = 20;
