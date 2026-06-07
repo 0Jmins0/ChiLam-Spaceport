@@ -147,14 +147,124 @@
 
 ---
 
-## P5 - 优化上线 (框架)
+## P5 - 数据填充与优化上线
 
-- [ ] SEO 优化 (meta tags, sitemap, structured data)
-- [ ] 性能优化 (图片懒加载, ISR/SSG)
-- [ ] 响应式适配 (移动端优先)
-- [ ] 域名绑定与部署
-- [ ] 数据迁移 (将已有内容导入)
-- [ ] 上线测试
+> P5 分两大块：先填充真实数据（P5.1），再优化部署上线（P5.2）
+
+### P5.1 数据爬取与填充
+
+#### P5.1.1 影视作品（优先级最高，结构化数据）
+- [ ] 爬取数据源：豆瓣/维基百科/IMDb
+- [ ] 目标数据：电视剧 ~60 部、电影 ~30 部、综艺 ~20 部
+- [ ] 字段：标题、年份、类型、角色、导演、简介、海报URL、播放平台链接
+- [ ] 脚本：`scripts/crawlers/productions.ts`
+- [ ] 产出：JSON → 通过 `/api/screens` POST 入库
+- [ ] 海报图片：下载后通过 `/api/upload` 上传到 R2
+
+#### P5.1.2 专辑数据
+- [ ] 爬取数据源：QQ音乐/网易云音乐/Apple Music
+- [ ] 目标数据：~30 张专辑 + 每张的曲目列表
+- [ ] 字段：专辑名、发行日期、语言、曲目列表、封面URL、流媒体链接
+- [ ] 脚本：`scripts/crawlers/albums.ts`
+- [ ] 产出：JSON → 通过 `/api/archives/albums` POST 入库
+- [ ] 封面图片：下载后上传到 R2
+
+#### P5.1.3 演出数据
+- [ ] 数据源：维基百科/粉丝站/人工整理
+- [ ] 目标数据：演唱会 ~30 场、舞台/音乐剧 ~20 场
+- [ ] 字段：标题、类型、日期、场馆、城市、歌单、海报URL
+- [ ] 方式：以人工整理为主（数据量不大，且信息分散）
+- [ ] 脚本：`scripts/import/performances.ts`（JSON 导入脚本）
+
+#### P5.1.4 社交媒体动态
+- [ ] 数据源：微博（主阵地）、小红书、Instagram
+- [ ] 目标数据：近 2-3 年精选帖文 ~200 条
+- [ ] 字段：平台、发布时间、文字内容、图片URL列表、原文链接
+- [ ] 脚本：`scripts/crawlers/social.ts`
+- [ ] 图片处理：下载图片 → 上传 R2 → 替换 URL
+- [ ] 后续：可设置定期同步机制
+
+#### P5.1.5 代言与访谈
+- [ ] 数据源：品牌官方/媒体报道/人工整理
+- [ ] 目标数据：代言 ~20 条、访谈 ~15 条
+- [ ] 方式：人工整理 JSON → 批量导入
+- [ ] 脚本：`scripts/import/activities.ts`
+
+#### P5.1.6 杂志资料
+- [ ] 数据源：实物扫描 + 网络收集
+- [ ] 目标数据：~20 本杂志封面 + 信息
+- [ ] 方式：人工录入 + 封面图片上传 R2
+- [ ] 脚本：`scripts/import/magazines.ts`
+
+#### P5.1.7 时间线事件
+- [ ] 数据源：百科/年表/粉丝整理
+- [ ] 目标数据：~80-100 个人生关键节点
+- [ ] 字段：日期、标题、描述、关联内容类型+ID
+- [ ] 方式：人工整理 JSON → 批量导入
+- [ ] 脚本：`scripts/import/timeline.ts`
+
+#### P5.1.8 新闻报道
+- [ ] 数据源：各媒体网站
+- [ ] 目标数据：精选报道 ~50 条
+- [ ] 方式：人工录入为主，按需添加
+
+#### 爬虫基础设施
+- [ ] 创建 `scripts/` 目录结构
+- [ ] 通用爬虫工具：HTTP 请求、HTML 解析、频率控制
+- [ ] 通用导入工具：JSON 读取 → API 调用 → 结果报告
+- [ ] 图片处理流程：下载 → 上传 R2 → 获取公开 URL → 写入数据库
+- [ ] 数据校验：导入前校验必填字段、去重检查
+
+#### scripts 目录规划
+```
+scripts/
+├── crawlers/              # 爬虫脚本（从网站抓取数据）
+│   ├── productions.ts     # 影视作品爬虫
+│   ├── albums.ts          # 专辑爬虫
+│   └── social.ts          # 社交媒体爬虫
+├── import/                # 导入脚本（从 JSON 文件导入）
+│   ├── performances.ts    # 演出导入
+│   ├── activities.ts      # 代言/访谈导入
+│   ├── magazines.ts       # 杂志导入
+│   └── timeline.ts        # 时间线导入
+├── utils/                 # 通用工具
+│   ├── http.ts            # HTTP 请求封装（频率控制）
+│   ├── parser.ts          # HTML 解析工具
+│   ├── uploader.ts        # R2 图片上传工具
+│   └── importer.ts        # API 批量导入工具
+└── data/                  # 人工整理的 JSON 数据文件
+    ├── performances.json
+    ├── endorsements.json
+    ├── interviews.json
+    ├── magazines.json
+    └── timeline.json
+```
+
+### P5.2 优化与部署
+
+#### P5.2.1 SEO 优化
+- [ ] 各页面 metadata（title, description, og:image）
+- [ ] sitemap.xml 自动生成
+- [ ] robots.txt 配置
+- [ ] JSON-LD 结构化数据（Person, Movie, MusicAlbum 等）
+
+#### P5.2.2 性能优化
+- [ ] 图片懒加载 + next/image 优化
+- [ ] 关键 CSS 内联
+- [ ] 字体加载优化（display: swap）
+- [ ] 列表页分页性能
+
+#### P5.2.3 响应式与体验
+- [ ] 移动端布局适配检查
+- [ ] 触控交互优化
+- [ ] 加载状态与骨架屏完善
+
+#### P5.2.4 部署上线
+- [ ] 配置 Vercel 项目
+- [ ] 环境变量同步（DATABASE_URL, R2 密钥, JWT 密钥）
+- [ ] 域名绑定与 SSL
+- [ ] R2 自定义域名绑定（media.域名.com）
+- [ ] 上线测试与验收
 
 ---
 
