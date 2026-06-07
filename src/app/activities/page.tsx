@@ -37,7 +37,12 @@ export default async function ActivitiesPage({
     <PageContainer>
       <PageHeader title="活动" titleEn="Activities" description="广告代言 · 访谈" />
 
-      <ActivitiesFilterBar currentTab={tab} currentMediaType={mediaType} counts={counts} />
+      <ActivitiesFilterBar
+        currentTab={tab}
+        currentMediaType={mediaType}
+        counts={counts}
+        className="mb-8"
+      />
 
       {data.items.length > 0 ? (
         tab === 'endorsement' ? (

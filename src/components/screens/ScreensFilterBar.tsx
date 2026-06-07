@@ -10,7 +10,6 @@ import { Tag } from '@/components/ui/Tag';
 interface ScreensFilterBarProps {
   currentTab: string;
   currentDecade?: string;
-  currentRegion?: string;
   counts?: { movie: number; tv_series: number; variety_show: number };
   className?: string;
 }
@@ -23,17 +22,9 @@ const decadeFilters = [
   { label: '20年代', value: '2020' },
 ];
 
-const regionFilters = [
-  { label: '全部', value: '' },
-  { label: '内地', value: 'mainland' },
-  { label: '香港', value: 'hongkong' },
-  { label: '台湾', value: 'taiwan' },
-];
-
 export function ScreensFilterBar({
   currentTab,
   currentDecade,
-  currentRegion,
   counts,
   className,
 }: ScreensFilterBarProps) {
@@ -74,13 +65,6 @@ export function ScreensFilterBar({
     [router, buildUrl, currentTab],
   );
 
-  const handleRegionChange = useCallback(
-    (region: string) => {
-      router.push(buildUrl({ tab: 'variety_show', region }), { scroll: false });
-    },
-    [router, buildUrl],
-  );
-
   const tabs = [
     {
       label: counts ? `电影 (${counts.movie})` : '电影',
@@ -112,21 +96,6 @@ export function ScreensFilterBar({
           </Tag>
         ))}
       </div>
-
-      {/* Region sub-filters — only for variety_show tab */}
-      {currentTab === 'variety_show' && (
-        <div className="flex flex-wrap gap-2">
-          {regionFilters.map((filter) => (
-            <Tag
-              key={filter.value}
-              active={currentRegion === filter.value || (!currentRegion && filter.value === '')}
-              onClick={() => handleRegionChange(filter.value)}
-            >
-              {filter.label}
-            </Tag>
-          ))}
-        </div>
-      )}
     </div>
   );
 }

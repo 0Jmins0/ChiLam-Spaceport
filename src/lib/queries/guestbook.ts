@@ -33,7 +33,9 @@ export async function getGuestbookEntries(options?: {
   const page = options?.page ?? 1;
   const pageSize = options?.pageSize ?? PAGE_SIZE;
 
-  const where: { status: 'APPROVED'; tab?: GuestbookTab } = { status: 'APPROVED' };
+  const where: { status: { not: 'REJECTED' }; tab?: GuestbookTab } = {
+    status: { not: 'REJECTED' },
+  };
   if (options?.tab && tabMap[options.tab]) {
     where.tab = tabMap[options.tab];
   }
@@ -81,7 +83,7 @@ export async function getGuestbookById(id: string): Promise<GuestbookDetail | nu
     include: { images: { select: { url: true, alt: true } } },
   });
 
-  if (!raw || raw.status !== 'APPROVED') return null;
+  if (!raw || raw.status === 'REJECTED') return null;
 
   const commentsCount = await prisma.comment.count({
     where: { targetType: 'guestbook', targetId: id },
@@ -104,9 +106,9 @@ export async function getGuestbookById(id: string): Promise<GuestbookDetail | nu
 // 各 tab 数量统计
 export async function getGuestbookCounts(): Promise<Record<MessageTab, number>> {
   const [message, story, feedback] = await Promise.all([
-    prisma.guestbook.count({ where: { status: 'APPROVED', tab: 'MESSAGE' } }),
-    prisma.guestbook.count({ where: { status: 'APPROVED', tab: 'STORY' } }),
-    prisma.guestbook.count({ where: { status: 'APPROVED', tab: 'FEEDBACK' } }),
+    prisma.guestbook.count({ where: { status: { not: 'REJECTED' }, tab: 'MESSAGE' } }),
+    prisma.guestbook.count({ where: { status: { not: 'REJECTED' }, tab: 'STORY' } }),
+    prisma.guestbook.count({ where: { status: { not: 'REJECTED' }, tab: 'FEEDBACK' } }),
   ]);
   return { message, story, feedback };
 }

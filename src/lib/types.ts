@@ -5,7 +5,7 @@ export type UpdateTab = 'social' | 'news' | 'sighting';
 export type Platform = 'weibo' | 'xiaohongshu' | 'douyin' | 'instagram' | 'facebook';
 
 // 路透类型筛选
-export type SightingType = '机场' | '片场' | '偶遇';
+export type SightingType = '机场' | '片场' | '偶遇' | '其他';
 
 // 分页响应包装
 export interface PaginatedResponse<T> {

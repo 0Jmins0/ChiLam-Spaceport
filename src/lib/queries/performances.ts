@@ -84,7 +84,7 @@ export async function getPerformanceBySlug(slug: string): Promise<PerformanceDet
         },
       },
       fanShots: {
-        where: { status: 'APPROVED' },
+        where: { status: { not: 'REJECTED' } },
         orderBy: { createdAt: 'desc' },
       },
     },

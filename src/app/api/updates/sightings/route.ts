@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
         isFullCopy: body.isFullCopy || false,
         authorName: body.authorName,
         submitType: body.submitType || 'LINK',
-        status: 'PENDING',
+        status: 'APPROVED',
       },
       include: { tags: { select: { name: true, slug: true } } },
     });

@@ -38,7 +38,12 @@ export default async function ArchivesPage({
     <PageContainer>
       <PageHeader title="资料库" titleEn="Archives" description="专辑 · 杂志" />
 
-      <ArchivesFilterBar currentTab={tab} currentLanguage={language} counts={counts} />
+      <ArchivesFilterBar
+        currentTab={tab}
+        currentLanguage={language}
+        counts={counts}
+        className="mb-8"
+      />
 
       {/* Album grid */}
       {tab === 'album' && albumData && (

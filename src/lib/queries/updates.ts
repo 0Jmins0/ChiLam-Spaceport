@@ -76,7 +76,7 @@ export async function getNewsArticles(options?: {
   };
 }
 
-// 路透列表（只显示 APPROVED，支持类型筛选）
+// 路透列表（排除 REJECTED，支持类型筛选）
 export async function getSightings(options?: {
   sightingType?: string;
   page?: number;
@@ -84,7 +84,7 @@ export async function getSightings(options?: {
 }): Promise<PaginatedResponse<SightingItem>> {
   const page = options?.page ?? 1;
   const pageSize = options?.pageSize ?? PAGE_SIZE;
-  const where: SightingWhereInput = { status: ModerationStatus.APPROVED };
+  const where: SightingWhereInput = { status: { not: ModerationStatus.REJECTED } };
 
   if (options?.sightingType) {
     where.tags = { some: { slug: options.sightingType } };
@@ -117,7 +117,7 @@ export async function getUpdateCounts() {
   const [socialCount, newsCount, sightingCount] = await Promise.all([
     prisma.socialPost.count(),
     prisma.newsArticle.count(),
-    prisma.sighting.count({ where: { status: ModerationStatus.APPROVED } }),
+    prisma.sighting.count({ where: { status: { not: ModerationStatus.REJECTED } } }),
   ]);
   return { social: socialCount, news: newsCount, sighting: sightingCount };
 }

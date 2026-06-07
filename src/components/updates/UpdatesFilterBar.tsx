@@ -29,6 +29,7 @@ const sightingTypeFilters = [
   { label: '机场', value: 'airport' },
   { label: '片场', value: 'set' },
   { label: '偶遇', value: 'encounter' },
+  { label: '其他', value: 'other' },
 ];
 
 export function UpdatesFilterBar({

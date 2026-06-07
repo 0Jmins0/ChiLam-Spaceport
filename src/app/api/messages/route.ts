@@ -71,11 +71,11 @@ export async function POST(request: NextRequest) {
         tab: tabMap[tab],
         storyTags: body.storyTags || [],
         relatedYear: body.relatedYear ? Number(body.relatedYear) : null,
-        status: 'PENDING',
+        status: 'APPROVED',
       },
     });
 
-    return NextResponse.json({ data: { id: guestbook.id, status: 'PENDING' } }, { status: 201 });
+    return NextResponse.json({ data: { id: guestbook.id, status: 'APPROVED' } }, { status: 201 });
   } catch (error) {
     console.error('创建留言失败:', error);
     return NextResponse.json(

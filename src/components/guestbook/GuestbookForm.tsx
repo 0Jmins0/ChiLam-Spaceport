@@ -49,7 +49,7 @@ export function GuestbookForm() {
       });
 
       if (res.ok) {
-        setMessage('留言已提交，等待审核');
+        setMessage('留言已提交成功');
         setNickname('');
         setContent('');
         setStoryTags([]);

@@ -44,7 +44,12 @@ export default async function PerformancesPage({
     <PageContainer>
       <PageHeader title="演出" titleEn="Performances" description="演唱会 · 舞台 · 音乐剧" />
 
-      <PerformancesFilterBar currentTab={tab} currentSeries={series} counts={counts} />
+      <PerformancesFilterBar
+        currentTab={tab}
+        currentSeries={series}
+        counts={counts}
+        className="mb-8"
+      />
 
       {data.items.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

@@ -14,23 +14,21 @@ const tabToType: Record<string, string> = {
   variety_show: 'VARIETY_SHOW',
 };
 
-function buildBaseUrl(tab: string, decade?: string, region?: string): string {
+function buildBaseUrl(tab: string, decade?: string): string {
   const params = new URLSearchParams();
   params.set('tab', tab);
   if (decade) params.set('decade', decade);
-  if (region) params.set('region', region);
   return `/screens?${params.toString()}`;
 }
 
 export default async function ScreensPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tab?: string; decade?: string; region?: string; page?: string }>;
+  searchParams: Promise<{ tab?: string; decade?: string; page?: string }>;
 }) {
   const params = await searchParams;
   const tab = params.tab || 'movie';
   const decade = params.decade;
-  const region = params.region;
   const page = Number(params.page) || 1;
 
   const type = tabToType[tab];
@@ -40,18 +38,13 @@ export default async function ScreensPage({
     getProductions({ type, decade, page }),
   ]);
 
-  const baseUrl = buildBaseUrl(tab, decade, region);
+  const baseUrl = buildBaseUrl(tab, decade);
 
   return (
     <PageContainer>
       <PageHeader title="影视综" titleEn="Screens" description="电影 · 电视剧 · 综艺" />
 
-      <ScreensFilterBar
-        currentTab={tab}
-        currentDecade={decade}
-        currentRegion={region}
-        counts={counts}
-      />
+      <ScreensFilterBar currentTab={tab} currentDecade={decade} counts={counts} className="mb-8" />
 
       {data.items.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

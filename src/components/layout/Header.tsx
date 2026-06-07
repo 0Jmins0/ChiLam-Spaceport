@@ -46,13 +46,13 @@ export function Header() {
                 href={item.href}
                 className={cn(
                   'relative text-sm tracking-wide transition-colors duration-150',
-                  pathname.startsWith(item.href)
+                  (item.href === '/' ? pathname === '/' : pathname.startsWith(item.href))
                     ? 'text-accent'
                     : 'text-text-secondary hover:text-accent',
                 )}
               >
                 {item.label}
-                {pathname.startsWith(item.href) && (
+                {(item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)) && (
                   <span className="absolute -bottom-1 left-0 right-0 h-[0.5px] bg-accent" />
                 )}
               </Link>

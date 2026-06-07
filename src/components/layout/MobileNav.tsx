@@ -58,7 +58,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
               onClick={onClose}
               className={cn(
                 'text-lg tracking-wide transition-colors duration-150',
-                pathname.startsWith(item.href)
+                (item.href === '/' ? pathname === '/' : pathname.startsWith(item.href))
                   ? 'text-accent'
                   : 'text-text-secondary hover:text-accent',
               )}
