@@ -45,7 +45,7 @@
 
 ### P0.4 基础服务配置
 - [x] 注册 Supabase 项目 (已配置, ap-northeast-2)
-- [ ] 配置 Cloudflare R2 (或选定存储方案，第一阶段存链接、预览，先用supabase)
+- [x] 配置 Cloudflare R2 (Bucket: chilam-media, r2.dev 公开访问, AWS SDK v3)
 - [ ] 配置 Vercel 部署 (https://chilam-spaceport.vercel.app/)
 
 ---
@@ -73,7 +73,7 @@
 ### P1.3 API 开发 (动态模块) ✅
 - [x] CRUD API: 动态的增删改查
 - [x] 分页、筛选、搜索接口
-- [ ] 图片上传接口 (对接 R2) — 推迟到 Phase 2
+- [x] 图片上传接口 (对接 R2) — POST /api/upload + /api/upload/presign
 
 ### P1 补充完成项（P0 遗留 + P1 新增）
 - [x] Prisma Client 配置 (db.ts 单例 + adapter-pg)

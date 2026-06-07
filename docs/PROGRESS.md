@@ -19,11 +19,27 @@
 | 留言板 | ✅ 已完成 | 2026-06-07 |
 | 公告模块 | ✅ 已完成 | 2026-06-07 |
 | 后台管理(API) | ✅ 已完成 | 2026-06-07 |
+| R2 存储配置 | ✅ 已完成 | 2026-06-07 |
 | 部署上线 | 未开始 | - |
 
 ---
 
 ## 详细记录
+
+### 2026-06-07 - Cloudflare R2 存储配置（已完成）
+
+#### 基础设施
+- 安装 @aws-sdk/client-s3 + @aws-sdk/s3-request-presigner
+- R2 客户端工具（src/lib/r2.ts）：S3Client 初始化、上传/删除/预签名 URL
+- 文件类型白名单（图片/视频/音频/PDF）+ 大小限制（10~100MB）
+- 自动按 MIME 类型分文件夹（images/videos/audio/files）
+
+#### API
+- POST /api/upload — 服务端中转上传（FormData，适合小文件）
+- POST /api/upload/presign — 预签名 URL（前端直传 R2，适合大文件）
+
+#### 环境变量
+- R2_ACCOUNT_ID、R2_ACCESS_KEY_ID、R2_SECRET_ACCESS_KEY、R2_BUCKET_NAME、R2_PUBLIC_URL
 
 ### 2026-06-07 - P4 互动与管理模块开发（已完成）
 
@@ -294,7 +310,7 @@
 - [x] GET/POST /api/updates/news
 - [x] GET/POST /api/updates/sightings
 - [x] GET/PUT/DELETE /api/updates/[id]
-- [ ] 图片上传接口 (推迟到 Phase 2)
+- [x] 图片上传接口 (R2 存储，POST /api/upload + /api/upload/presign)
 
 ## P2.2 完成清单
 
@@ -432,7 +448,7 @@
 
 ## 待决事项
 - [x] 数据库方案最终确认 → Supabase (PostgreSQL, ap-northeast-2)
-- [ ] 存储方案最终确认 (R2 / 其他)
+- [x] 存储方案最终确认 → Cloudflare R2 (chilam-media, r2.dev 公开访问)
 - [ ] 域名选择
 - [ ] 是否需要用户登录系统
 - [ ] 留言板是否需要登录才能留言

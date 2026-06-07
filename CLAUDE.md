@@ -13,7 +13,7 @@
 - **前端**: Next.js 16.2.6 (App Router) + TypeScript 5.9 + Tailwind CSS 4.3
 - **后端**: Next.js API Routes + Prisma 7.8
 - **数据库**: PostgreSQL (Supabase - 已配置, Session pooler)
-- **存储**: Cloudflare R2 (图片/视频/文件 - 待配置)
+- **存储**: Cloudflare R2 (图片/视频/文件 - 已配置, @aws-sdk/client-s3)
 - **部署**: Vercel (前端) + Supabase (数据库) - 待配置
 - **渲染策略**: 全站动态渲染 (SSR)，所有列表页 `force-dynamic`
 - **包管理**: pnpm 11.5
@@ -45,6 +45,7 @@
 │   │   ├── api/archives/                            # 资料库 CRUD API（专辑+杂志）
 │   │   ├── api/messages/                            # 留言板 CRUD + 点赞 + 评论 API
 │   │   ├── api/announcements/                       # 公告 CRUD API
+│   │   ├── api/upload/                              # 文件上传 API（R2 直传+预签名）
 │   │   ├── api/admin/                               # 管理后台 API（登录+审核）
 │   │   └── ...                                      # 其他栏目路由
 │   ├── components/
@@ -60,7 +61,7 @@
 │   │   └── decorative/                              # 装饰组件（FilmGrain, YearMarquee）
 │   ├── config/                                      # 站点配置（site.ts, navigation.ts）
 │   ├── lib/                                         # 工具函数
-│   │   ├── cn.ts, fonts.ts, db.ts, auth.ts          # 基础工具 + 认证中间件
+│   │   ├── cn.ts, fonts.ts, db.ts, auth.ts, r2.ts   # 基础工具 + 认证 + R2 存储
 │   │   ├── types.ts                                 # 数据类型定义
 │   │   └── queries/                                 # 数据查询层（timeline.ts, updates.ts, productions.ts, performances.ts, activities.ts, archives.ts, guestbook.ts, announcements.ts）
 │   └── generated/                                   # Prisma 生成的客户端代码
@@ -93,7 +94,7 @@
 - **GitHub 仓库**: `git@github.com:0Jmins0/ChiLam-Spaceport.git`（origin）
 - **域名**: 待定
 - **Supabase 项目**: 已配置（Session pooler, ap-northeast-2, 迁移已完成）
-- **Cloudflare R2**: 待创建
+- **Cloudflare R2**: 已配置（Bucket: chilam-media, r2.dev 公开访问）
 - **Vercel 项目**: 待创建
 
 ## 栏目结构
