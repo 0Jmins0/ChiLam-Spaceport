@@ -29,16 +29,16 @@ export async function getGuestbookEntries(options?: {
   tab?: MessageTab;
   page?: number;
   pageSize?: number;
+  storyTag?: string;
 }): Promise<PaginatedResponse<GuestbookItem>> {
   const page = options?.page ?? 1;
   const pageSize = options?.pageSize ?? PAGE_SIZE;
 
-  const where: { status: { not: 'REJECTED' }; tab?: GuestbookTab } = {
+  const where: Record<string, unknown> = {
     status: { not: 'REJECTED' },
+    ...(options?.tab && tabMap[options.tab] ? { tab: tabMap[options.tab] } : {}),
+    ...(options?.storyTag ? { storyTags: { has: options.storyTag } } : {}),
   };
-  if (options?.tab && tabMap[options.tab]) {
-    where.tab = tabMap[options.tab];
-  }
 
   const [rawItems, totalCount] = await Promise.all([
     prisma.guestbook.findMany({

@@ -9,7 +9,7 @@ interface InterviewCardProps {
   title: string;
   source?: string;
   date: Date;
-  mediaType: string; // VIDEO | AUDIO | TEXT | LIVE
+  mediaType: string; // VIDEO | AUDIO | TEXT
   className?: string;
 }
 
@@ -17,7 +17,6 @@ const mediaTypeLabels: Record<string, string> = {
   VIDEO: '视频',
   AUDIO: '音频',
   TEXT: '图文',
-  LIVE: '直播',
 };
 
 function formatDate(date: Date): string {

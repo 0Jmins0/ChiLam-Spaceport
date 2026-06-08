@@ -10,7 +10,6 @@ const mediaTypeLabels: Record<string, string> = {
   VIDEO: '视频',
   AUDIO: '音频',
   TEXT: '图文',
-  LIVE: '直播',
 };
 
 function formatDate(date: Date): string {

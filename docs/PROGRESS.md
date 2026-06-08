@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P4 - 互动与管理 (已完成)
+## 当前阶段: P5 前 - UI 调整与功能补充 (进行中)
 
 ---
 
@@ -14,9 +14,9 @@
 | 动态模块 | ✅ 已完成 | 2026-06-06 |
 | 影视模块 | ✅ 已完成 | 2026-06-06 |
 | 演出模块 | ✅ 已完成 | 2026-06-06 |
-| 活动模块 | ✅ 已完成 | 2026-06-07 |
+| 活动模块 | ✅ 已完成（含直播 tab） | 2026-06-08 |
 | 资料库模块 | ✅ 已完成 | 2026-06-07 |
-| 留言板 | ✅ 已完成 | 2026-06-07 |
+| 留言板 | ✅ 已完成（含故事 tag 筛选） | 2026-06-08 |
 | 公告模块 | ✅ 已完成 | 2026-06-07 |
 | 后台管理(API) | ✅ 已完成 | 2026-06-07 |
 | R2 存储配置 | ✅ 已完成 | 2026-06-07 |
@@ -25,6 +25,34 @@
 ---
 
 ## 详细记录
+
+### 2026-06-08 - UI 调整阶段二（已完成，迁移待执行）
+
+#### 修改 5：故事分享新增 tag 分类筛选
+- GuestbookFilterBar 新增 `storyTagFilters` + `currentStoryTag` prop
+- 故事分享 tab 下显示 tag 筛选：全部 | 追星经历 | 影视回忆 | 音乐记忆 | 冷知识 | 其他
+- 查询层 `getGuestbookEntries` 支持 `storyTag` 过滤（`storyTags: { has }` 操作符）
+- 页面读取 `searchParams.storyTag` 并传递给 FilterBar 和查询层
+
+#### 修改 3 + 4：活动新增「直播」独立 tab + 访谈删除「直播」媒体类型
+- 数据库：`Livestream` 模型（prisma/schema.prisma），含 Tag/Media 多对多关系
+- 类型：`ActivityTab` 新增 `'livestream'`，`LivestreamItem`/`LivestreamDetail` 接口
+- 查询层：`getLivestreams`、`getLivestreamBySlug`、`getActivityCounts` 含 livestream
+- 新组件：`LivestreamCard.tsx` — 平台标签 + 标题 + 日期 + 时长 + 回放标识
+- FilterBar：三 Tab（代言/访谈/直播），直播有平台子筛选（微博/抖音/Instagram）
+- 访谈 `mediaTypeFilters` 删除「直播」项
+- `InterviewMediaType` 枚举删除 `LIVE`
+- API：`/api/activities/livestreams` GET/POST + `[slug]` GET/PUT/DELETE
+- 详情页：`/activities/livestreams/[slug]`
+- **数据库迁移待执行**：`npx prisma migrate dev --name add-livestream-model`
+
+### 2026-06-07 - UI 调整阶段一（已完成）
+
+- 导航栏新增「主页」入口，精确匹配 `/` 激活逻辑
+- 综艺删除地区 tag 筛选
+- 路透新增「其他」tag
+- 筛选栏与内容卡片间距统一（mb-8）
+- 移除内容审核机制：创建时默认 APPROVED，查询排除 REJECTED
 
 ### 2026-06-07 - Cloudflare R2 存储配置（已完成）
 
@@ -442,7 +470,55 @@
 - [x] PUT/DELETE /api/admin/messages/[id] (单条审核)
 - [x] 管理员种子账号
 
-## 下一步: P5 优化上线
+## UI 调整阶段一完成清单（2026-06-07）
+
+- [x] 导航栏新增「主页」入口
+- [x] 综艺删除地区 tag 筛选
+- [x] 路透新增「其他」tag
+- [x] 筛选栏与内容卡片间距统一
+- [x] 移除内容审核机制
+
+## UI 调整阶段二完成清单（2026-06-08）
+
+### 修改 5：故事分享 tag 筛选
+- [x] GuestbookFilterBar 新增 storyTagFilters + currentStoryTag
+- [x] 页面读取 storyTag 参数
+- [x] 查询层 storyTag 过滤
+- [x] pnpm build 通过
+
+### 修改 3 + 4：直播独立 tab
+- [x] Livestream 模型（Schema）
+- [x] LivestreamItem / LivestreamDetail 类型
+- [x] getLivestreams / getLivestreamBySlug 查询
+- [x] LivestreamCard 组件
+- [x] ActivitiesFilterBar 三 Tab + 平台筛选
+- [x] 访谈删除「直播」mediaType
+- [x] 活动列表页三分支渲染
+- [x] 直播详情页 /activities/livestreams/[slug]
+- [x] API GET/POST + [slug] GET/PUT/DELETE
+- [x] pnpm lint 通过
+- [x] pnpm build 通过
+- [ ] 数据库迁移（Supabase 连接超时，待网络恢复）
+
+## P5.0 海报与封面图片填充（2026-06-08 开始）
+
+### 任务概况
+- 总量：135 张（108 影视综海报 + 27 专辑封面）
+- 方式：网络搜索高清图 → 下载到 media/images/ → curl 上传绑定
+- 找不到的跳过，综艺用节目海报代替个人海报
+
+### 批次进度
+| 批次 | 内容 | 数量 | 状态 |
+|------|------|------|------|
+| 第1批 | 近年热门电影（2015+） | ~15 | 进行中 |
+| 第2批 | 热门电视剧 | ~10 | 待执行 |
+| 第3批 | 综艺节目 | 14 | 待执行 |
+| 第4批 | 专辑封面 | 27 | 待执行 |
+| 第5批 | 中期电影（2000-2014） | ~25 | 待执行 |
+| 第6批 | 早期电影（90年代） | ~16 | 待执行 |
+| 第7批 | 剩余电视剧 | ~25 | 待执行 |
+
+## 下一步: P5.0 海报填充（进行中）→ UI 调整阶段三（用户系统）→ P5 优化上线
 
 ---
 

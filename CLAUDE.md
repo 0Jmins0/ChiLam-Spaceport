@@ -4,9 +4,9 @@
 一个集合张智霖各平台、各阶段、各渠道资讯的综合性粉丝网站。
 
 ## 当前进度
-- **阶段**: P4 - 互动与管理（已完成）
-- **已完成**: P0 全部、P1 全部（首页+动态模块+API）、P2 全部（影视+演出模块）、P3 全部（活动+资料库模块）、P4 全部（留言板+公告+管理审核API）
-- **下一步**: P5 优化上线（SEO、性能、部署）
+- **阶段**: UI 调整与功能补充（阶段二已完成）
+- **已完成**: P0~P4 全部、UI 调整阶段一（导航+综艺+路透+间距+审核）、UI 调整阶段二（故事tag筛选+直播独立tab）
+- **下一步**: UI 调整阶段三（用户系统）→ P5 优化上线（SEO、性能、部署）
 - **详细进度**: 查看 `/docs/PROGRESS.md`
 
 ## 技术栈
@@ -41,7 +41,7 @@
 │   │   ├── api/updates/                             # 动态 CRUD API
 │   │   ├── api/screens/                             # 影视 CRUD API
 │   │   ├── api/performances/                        # 演出 CRUD API
-│   │   ├── api/activities/                          # 活动 CRUD API（代言+访谈）
+│   │   ├── api/activities/                          # 活动 CRUD API（代言+访谈+直播）
 │   │   ├── api/archives/                            # 资料库 CRUD API（专辑+杂志）
 │   │   ├── api/messages/                            # 留言板 CRUD + 点赞 + 评论 API
 │   │   ├── api/announcements/                       # 公告 CRUD API
@@ -54,7 +54,7 @@
 │   │   ├── updates/                                 # 动态组件（SocialPostCard, NewsArticleCard 等）
 │   │   ├── screens/                                 # 影视组件（ProductionCard, ScreensFilterBar）
 │   │   ├── performances/                            # 演出组件（PerformanceCard, PerformancesFilterBar）
-│   │   ├── activities/                              # 活动组件（EndorsementCard, InterviewCard, ActivitiesFilterBar）
+│   │   ├── activities/                              # 活动组件（EndorsementCard, InterviewCard, LivestreamCard, ActivitiesFilterBar）
 │   │   ├── archives/                                # 资料库组件（AlbumCard, MagazineCard, ArchivesFilterBar）
 │   │   ├── guestbook/                               # 留言板组件（GuestbookCard, Form, LikeButton, CommentSection 等）
 │   │   ├── announcements/                           # 公告组件（AnnouncementCard, FilterBar）
@@ -104,7 +104,7 @@
 | 动态 | `/updates` | 社交媒体、新闻报道、路透 |
 | 影视 | `/screens` | 电影、电视剧、综艺 |
 | 演出 | `/performances` | 演唱会、舞台、音乐剧 |
-| 活动 | `/activities` | 广告代言、访谈 |
+| 活动 | `/activities` | 广告代言、访谈、直播 |
 | 资料库 | `/archives` | 杂志、专辑 |
 | 留言 | `/messages` | 我想对你说、故事分享、冷知识、建议反馈 |
 | 公告 | `/announcements` | 网站公告、规则、更新通知 |

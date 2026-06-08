@@ -37,7 +37,6 @@ enum InterviewMediaType {
   VIDEO
   AUDIO
   TEXT
-  LIVE
 }
 
 enum ImportMethod {
@@ -117,6 +116,7 @@ model Tag {
   sightings    Sighting[]
   endorsements Endorsement[]
   interviews   Interview[]
+  livestreams  Livestream[]
   albums       Album[]
   magazines    Magazine[]
 
@@ -146,6 +146,7 @@ model Media {
   coverOfAlbums         Album[]            @relation("AlbumCover")
   coverOfMagazines      Magazine[]         @relation("MagazineCover")
   originalOfInterviews  Interview[]        @relation("InterviewOriginalMedia")
+  coverOfLivestreams    Livestream[]       @relation("LivestreamCover")
   performanceMediaFiles PerformanceMedia[] @relation("PerformanceMediaFile")
 
   // 多对多反向关系
@@ -156,6 +157,7 @@ model Media {
   sightings           Sighting[]    @relation("SightingMedia")
   guestbooks          Guestbook[]   @relation("GuestbookImages")
   magazineScans       Magazine[]    @relation("MagazineScans")
+  livestreamMedia      Livestream[]  @relation("LivestreamMedia")
   newsArticles        NewsArticle[] @relation("NewsArticleMedia")
 
   @@map("media")
@@ -356,6 +358,29 @@ model Interview {
 
   @@index([date(sort: Desc)])
   @@map("interviews")
+}
+
+/// 4.10b 直播
+model Livestream {
+  id            String    @id @default(cuid())
+  slug          String    @unique
+  title         String
+  platform      String
+  date          DateTime
+  summary       String?
+  originalUrl   String?   @map("original_url")
+  replayUrl     String?   @map("replay_url")
+  duration      Int?
+  coverImageId  String?   @map("cover_image_id")
+  coverImage    Media?    @relation("LivestreamCover", fields: [coverImageId], references: [id])
+  media         Media[]   @relation("LivestreamMedia")
+  tags          Tag[]
+  isVisible     Boolean   @default(true)  @map("is_visible")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt      @map("updated_at")
+
+  @@index([date(sort: Desc)])
+  @@map("livestreams")
 }
 
 /// 4.11 专辑

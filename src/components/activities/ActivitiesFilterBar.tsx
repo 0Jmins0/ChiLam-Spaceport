@@ -10,7 +10,8 @@ import { Tag } from '@/components/ui/Tag';
 interface ActivitiesFilterBarProps {
   currentTab: string;
   currentMediaType?: string;
-  counts?: { endorsement: number; interview: number };
+  currentPlatform?: string;
+  counts?: { endorsement: number; interview: number; livestream: number };
   className?: string;
 }
 
@@ -19,12 +20,19 @@ const mediaTypeFilters = [
   { label: '视频', value: 'VIDEO' },
   { label: '音频', value: 'AUDIO' },
   { label: '图文', value: 'TEXT' },
-  { label: '直播', value: 'LIVE' },
+];
+
+const livestreamPlatformFilters = [
+  { label: '全部', value: '' },
+  { label: '微博', value: 'weibo' },
+  { label: '抖音', value: 'douyin' },
+  { label: 'Instagram', value: 'instagram' },
 ];
 
 export function ActivitiesFilterBar({
   currentTab,
   currentMediaType,
+  currentPlatform,
   counts,
   className,
 }: ActivitiesFilterBarProps) {
@@ -65,6 +73,13 @@ export function ActivitiesFilterBar({
     [router, buildUrl],
   );
 
+  const handlePlatformChange = useCallback(
+    (platform: string) => {
+      router.push(buildUrl({ tab: 'livestream', platform }), { scroll: false });
+    },
+    [router, buildUrl],
+  );
+
   const tabs = [
     {
       label: counts ? `代言 (${counts.endorsement})` : '代言',
@@ -73,6 +88,10 @@ export function ActivitiesFilterBar({
     {
       label: counts ? `访谈 (${counts.interview})` : '访谈',
       value: 'interview',
+    },
+    {
+      label: counts ? `直播 (${counts.livestream})` : '直播',
+      value: 'livestream',
     },
   ];
 
@@ -90,6 +109,23 @@ export function ActivitiesFilterBar({
                 currentMediaType === filter.value || (!currentMediaType && filter.value === '')
               }
               onClick={() => handleMediaTypeChange(filter.value)}
+            >
+              {filter.label}
+            </Tag>
+          ))}
+        </div>
+      )}
+
+      {/* Platform sub-filters — only for livestream tab */}
+      {currentTab === 'livestream' && (
+        <div className="flex flex-wrap gap-2">
+          {livestreamPlatformFilters.map((filter) => (
+            <Tag
+              key={filter.value}
+              active={
+                currentPlatform === filter.value || (!currentPlatform && filter.value === '')
+              }
+              onClick={() => handlePlatformChange(filter.value)}
             >
               {filter.label}
             </Tag>

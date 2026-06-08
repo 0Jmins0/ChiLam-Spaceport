@@ -1207,7 +1207,7 @@ async function main() {
       summary: '张智霖在《披荆斩棘2025》获得年度滚烫X-Fire后进行微博直播，与粉丝互动庆祝。',
       source: '微博',
       date: new Date('2025-10-25'),
-      mediaType: 'LIVE' as const,
+      mediaType: 'VIDEO' as const,
       originalUrl: 'https://example.com/weibo-live-xfire',
     },
     {
@@ -1248,31 +1248,51 @@ async function main() {
   }
 
   // ─────────────────────────────────────────────
-  // 10. Album — 专辑数据（20 张真实专辑）
+  // 10. Album — 专辑数据（27 张，基于 Wikipedia 音樂作品列表）
   // ─────────────────────────────────────────────
   console.log('Creating albums...');
 
   const albums = [
-    { title: '现代爱情故事', slug: 'modern-love-story-1991', releaseYear: 1991, language: '粤语', tracks: ['现代爱情故事', '不一样的她', '留恋', '片片枫叶情'] },
-    { title: '我不够爱你', slug: 'not-enough-love-1992', releaseYear: 1992, language: '粤语', tracks: ['我不够爱你', '情人节', '天真的因为你'] },
-    { title: '天变地变情不变', slug: 'love-unchanged-1993', releaseYear: 1993, language: '粤语', tracks: ['天变地变情不变', '绝世绝招'] },
-    { title: '逗我开心吧', slug: 'make-me-happy-1993', releaseYear: 1993, language: '粤语', tracks: ['逗我开心吧', '爱是胡涂'] },
-    { title: '我真的可以为所欲为', slug: 'whatever-i-want-1993', releaseYear: 1993, language: '国语', tracks: ['我真的可以为所欲为', '等你到今生'] },
-    { title: '一一道来', slug: 'tell-it-all-1994', releaseYear: 1994, language: '粤语', tracks: ['你太善良', '一一道来'] },
-    { title: '等', slug: 'wait-1995', releaseYear: 1995, language: '粤语', tracks: ['等', '相爱无梦'] },
-    { title: '如果这是情', slug: 'if-this-is-love-1996', releaseYear: 1996, language: '粤语', tracks: ['如果这是情', '天地男儿'] },
-    { title: '原来', slug: 'turns-out-1996', releaseYear: 1996, language: '国语', tracks: ['原来', '你的温柔'] },
-    { title: '怎么舍得你', slug: 'how-to-let-go-1997', releaseYear: 1997, language: '粤语', tracks: ['怎么舍得你', '十指紧扣'] },
-    { title: '认真', slug: 'serious-1997', releaseYear: 1997, language: '国语', tracks: ['认真', '爱你的心'] },
-    { title: '祝君好', slug: 'wish-you-well-1998', releaseYear: 1998, language: '粤语', tracks: ['祝君好', '最爱一刻'] },
-    { title: 'ChiLam 新歌+精选', slug: 'chilam-best-2000', releaseYear: 2000, language: '粤语', tracks: ['十月初五的月光', '我一个人住'] },
-    { title: 'I AM CHILAM', slug: 'i-am-chilam-2009', releaseYear: 2009, language: '粤语', tracks: ['I AM CHILAM', '岁月如歌', '天梯'] },
-    { title: 'ChiLam Crazy Hours', slug: 'crazy-hours-album-2014', releaseYear: 2014, language: '粤语', tracks: ['你是如此难以忘记', '相爱无梦', '岁月如歌'] },
-    { title: 'Ladies & Gentlemen', slug: 'ladies-gentlemen-2015', releaseYear: 2015, language: '粤语', tracks: ['Ladies & Gentlemen', '你太善良'] },
-    { title: 'The Apostle', slug: 'the-apostle-2017', releaseYear: 2017, language: '粤语', tracks: ['觉醒', '先赌为快'] },
-    { title: '17', slug: 'seventeen-2021', releaseYear: 2021, language: '粤语', tracks: ['17岁 (改编)', '烈火战马', '披荆斩棘'] },
-    { title: 'Hip Hop Chilam', slug: 'hiphop-chilam-2022', releaseYear: 2022, language: '粤语', tracks: ['Hip Hop Style', '大湾区'] },
-    { title: '我们的故事', slug: 'our-story-single-2022', releaseYear: 2022, language: '粤语', tracks: ['我们的故事'] },
+    // ── 合作专辑 ──
+    { title: '現代愛情故事', slug: 'modern-love-story-1991', releaseYear: 1991, language: '合作（与许秋怡）' },
+
+    // ── 粤语专辑 ──
+    { title: '逗我開心吧', slug: 'dou-wo-kai-xin-ba-1992', releaseYear: 1992, language: '粤语' },
+    { title: '如此這般想你', slug: 'ru-ci-zhe-ban-xiang-ni-1993', releaseYear: 1993, language: '粤语' },
+    { title: 'Chilam', slug: 'chilam-1994', releaseYear: 1994, language: '粤语' },
+    { title: '多謝關心', slug: 'duo-xie-guan-xin-1995', releaseYear: 1995, language: '粤语' },
+    { title: '我也喜歡你', slug: 'wo-ye-xi-huan-ni-1997', releaseYear: 1997, language: '粤语' },
+    { title: '黑色誘惑', slug: 'hei-se-you-huo-1997', releaseYear: 1997, language: '粤语' },
+    { title: '十指緊扣', slug: 'shi-zhi-jin-kou-2000', releaseYear: 2000, language: '粤语' },
+    { title: 'I Am Chilam', slug: 'i-am-chilam-2009', releaseYear: 2009, language: '粤语' },
+    { title: 'What Is Love', slug: 'what-is-love-2011', releaseYear: 2011, language: '粤语' },
+    { title: 'ChiLam DE JA VU', slug: 'de-ja-vu-2014', releaseYear: 2014, language: '粤语' },
+    { title: 'Crazy Hours', slug: 'crazy-hours-2014', releaseYear: 2014, language: '粤语' },
+
+    // ── 国语专辑 ──
+    { title: '愛情開了我們一個玩笑', slug: 'ai-qing-kai-le-wan-xiao-1995', releaseYear: 1995, language: '国语' },
+    { title: '言不由衷', slug: 'yan-bu-you-zhong-1996', releaseYear: 1996, language: '国语' },
+    { title: '有沒有', slug: 'you-mei-you-1998', releaseYear: 1998, language: '国语' },
+    { title: '天地男兒', slug: 'tian-di-nan-er-1999', releaseYear: 1999, language: '国语' },
+
+    // ── EP / 迷你专辑 ──
+    { title: '孩子先生', slug: 'hai-zi-xian-sheng-ep-1999', releaseYear: 1999, language: 'EP' },
+    { title: 'Hero', slug: 'hero-ep-2016', releaseYear: 2016, language: '迷你专辑' },
+
+    // ── 精选辑 ──
+    { title: '愛在創意的日子', slug: 'ai-zai-chuang-yi-1994', releaseYear: 1994, language: '精选辑' },
+    { title: '天地男兒超級精選', slug: 'tian-di-nan-er-jing-xuan-1996', releaseYear: 1996, language: '精选辑' },
+    { title: '怎會如此天地男兒精選', slug: 'zen-hui-ru-ci-jing-xuan-1996', releaseYear: 1996, language: '精选辑' },
+    { title: '霖歌精選22首', slug: 'lin-ge-jing-xuan-22-1997', releaseYear: 1997, language: '精选辑' },
+    { title: '至霖情歌集', slug: 'zhi-lin-qing-ge-ji-1999', releaseYear: 1999, language: '精选辑' },
+    { title: '星聲傳集 - 張智霖', slug: 'xing-sheng-chuan-ji-2002', releaseYear: 2002, language: '精选辑' },
+    { title: '愛與夢新曲+精選', slug: 'ai-yu-meng-jing-xuan-2003', releaseYear: 2003, language: '精选辑' },
+
+    // ── 原声大碟 ──
+    { title: '十月初五的月光原聲大碟', slug: 'return-of-the-cuckoo-ost-2000', releaseYear: 2000, language: '原声' },
+
+    // ── 细碟 ──
+    { title: '歲月如歌', slug: 'sui-yue-ru-ge-single-2013', releaseYear: 2013, language: '细碟' },
   ];
 
   for (let i = 0; i < albums.length; i++) {
@@ -1283,7 +1303,6 @@ async function main() {
         title: a.title,
         releaseYear: a.releaseYear,
         language: a.language,
-        tracks: a.tracks,
         sortOrder: i,
       },
     });

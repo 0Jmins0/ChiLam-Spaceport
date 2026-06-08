@@ -10,27 +10,31 @@ import type { MessageTab } from '@/lib/types';
 export const metadata = { title: '留言板' };
 export const dynamic = 'force-dynamic';
 
-function buildBaseUrl(tab: string): string {
+function buildBaseUrl(tab: string, storyTag?: string): string {
   const params = new URLSearchParams();
   params.set('tab', tab);
+  if (storyTag) {
+    params.set('storyTag', storyTag);
+  }
   return `/messages?${params.toString()}`;
 }
 
 export default async function MessagesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tab?: string; page?: string }>;
+  searchParams: Promise<{ tab?: string; page?: string; storyTag?: string }>;
 }) {
   const params = await searchParams;
   const tab = (params.tab as MessageTab) || 'message';
   const page = Number(params.page) || 1;
+  const storyTag = params.storyTag || '';
 
   const [counts, data] = await Promise.all([
     getGuestbookCounts(),
-    getGuestbookEntries({ tab, page }),
+    getGuestbookEntries({ tab, page, storyTag: tab === 'story' ? storyTag : undefined }),
   ]);
 
-  const baseUrl = buildBaseUrl(tab);
+  const baseUrl = buildBaseUrl(tab, tab === 'story' ? storyTag : undefined);
 
   return (
     <PageContainer>
@@ -40,7 +44,7 @@ export default async function MessagesPage({
         description="我想对你说 · 故事分享 · 建议反馈"
       />
 
-      <GuestbookFilterBar currentTab={tab} counts={counts} className="mb-8" />
+      <GuestbookFilterBar currentTab={tab} currentStoryTag={storyTag} counts={counts} className="mb-8" />
 
       {data.items.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

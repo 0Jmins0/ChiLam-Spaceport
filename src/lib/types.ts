@@ -145,10 +145,10 @@ export interface PerformanceDetail extends PerformanceItem {
 // ─── 活动模块 ───
 
 // 活动 Tab 类型
-export type ActivityTab = 'endorsement' | 'interview';
+export type ActivityTab = 'endorsement' | 'interview' | 'livestream';
 
 // 访谈媒体类型筛选
-export type InterviewMediaFilter = 'video' | 'audio' | 'text' | 'live';
+export type InterviewMediaFilter = 'video' | 'audio' | 'text';
 
 // 代言卡片展示用
 export interface EndorsementItem {
@@ -186,6 +186,26 @@ export interface InterviewDetail extends InterviewItem {
   transcriptMandarin: string | null;
   proofreadStatus: string;
   originalMediaUrl: string | null;
+}
+
+// 直播卡片展示用
+export interface LivestreamItem {
+  id: string;
+  slug: string;
+  title: string;
+  platform: string;
+  date: string;
+  summary: string | null;
+  originalUrl: string | null;
+  replayUrl: string | null;
+  duration: number | null;
+  coverImageUrl: string | null;
+  tags: { name: string; slug: string }[];
+}
+
+// 直播详情页用
+export interface LivestreamDetail extends LivestreamItem {
+  media: { url: string; type: string }[];
 }
 
 // ─── 资料库模块 ───

@@ -28,6 +28,16 @@
 pnpm dev
 ```
 
+传图片
+```
+  curl -X POST http://localhost:3000/api/upload \
+    -F "file=@/tmp/presence-2026-concert-tour-poster.jpg" \
+    -F "target=performance" \
+    -F "targetId=cmq2lfujm0055zh8lb3tj28z2" \
+    -F "relation=poster" \
+    -F "alt=张智霖2026 PRESENCE 在 巡回演唱会海报"
+```
+
 ## 1. 环境准备
 
 ### 首次使用（只需做一次）
