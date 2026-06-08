@@ -7,7 +7,7 @@ import { Pagination } from '@/components/updates/Pagination';
 import { getGuestbookEntries, getGuestbookCounts } from '@/lib/queries/guestbook';
 import type { MessageTab } from '@/lib/types';
 
-export const metadata = { title: '留言板' };
+export const metadata = { title: '太空留言板' };
 export const dynamic = 'force-dynamic';
 
 function buildBaseUrl(tab: string, storyTag?: string): string {
