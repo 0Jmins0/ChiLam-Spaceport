@@ -1,20 +1,22 @@
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
-const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID!;
-const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID!;
-const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY!;
-const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME!;
-const R2_PUBLIC_URL = process.env.R2_PUBLIC_URL!;
+function getEnv(key: string): string {
+  const value = process.env[key];
+  if (!value) throw new Error(`环境变量 ${key} 未配置`);
+  return value;
+}
 
-export const r2Client = new S3Client({
-  region: 'auto',
-  endpoint: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-  credentials: {
-    accessKeyId: R2_ACCESS_KEY_ID,
-    secretAccessKey: R2_SECRET_ACCESS_KEY,
-  },
-});
+function getR2Client() {
+  return new S3Client({
+    region: 'auto',
+    endpoint: `https://${getEnv('R2_ACCOUNT_ID')}.r2.cloudflarestorage.com`,
+    credentials: {
+      accessKeyId: getEnv('R2_ACCESS_KEY_ID'),
+      secretAccessKey: getEnv('R2_SECRET_ACCESS_KEY'),
+    },
+  });
+}
 
 // 允许的文件类型
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
@@ -70,9 +72,9 @@ export async function uploadFile(
   const folder = getFolderFromMimeType(mimeType);
   const key = generateUniqueKey(folder, originalFilename);
 
-  await r2Client.send(
+  await getR2Client().send(
     new PutObjectCommand({
-      Bucket: R2_BUCKET_NAME,
+      Bucket: getEnv('R2_BUCKET_NAME'),
       Key: key,
       Body: fileBuffer,
       ContentType: mimeType,
@@ -81,15 +83,15 @@ export async function uploadFile(
 
   return {
     key,
-    url: `${R2_PUBLIC_URL}/${key}`,
+    url: `${getEnv('R2_PUBLIC_URL')}/${key}`,
   };
 }
 
 // 删除文件
 export async function deleteFile(key: string): Promise<void> {
-  await r2Client.send(
+  await getR2Client().send(
     new DeleteObjectCommand({
-      Bucket: R2_BUCKET_NAME,
+      Bucket: getEnv('R2_BUCKET_NAME'),
       Key: key,
     }),
   );
@@ -104,16 +106,16 @@ export async function getPresignedUploadUrl(
   const key = generateUniqueKey(folder, originalFilename);
 
   const command = new PutObjectCommand({
-    Bucket: R2_BUCKET_NAME,
+    Bucket: getEnv('R2_BUCKET_NAME'),
     Key: key,
     ContentType: mimeType,
   });
 
-  const uploadUrl = await getSignedUrl(r2Client, command, { expiresIn: 3600 });
+  const uploadUrl = await getSignedUrl(getR2Client(), command, { expiresIn: 3600 });
 
   return {
     key,
     uploadUrl,
-    publicUrl: `${R2_PUBLIC_URL}/${key}`,
+    publicUrl: `${getEnv('R2_PUBLIC_URL')}/${key}`,
   };
 }
