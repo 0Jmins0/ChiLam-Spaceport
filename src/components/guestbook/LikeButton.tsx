@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 interface LikeButtonProps {
   id: string;
@@ -8,33 +9,56 @@ interface LikeButtonProps {
 }
 
 export function LikeButton({ id, initialCount }: LikeButtonProps) {
+  const { user, openLogin } = useAuth();
   const [count, setCount] = useState(initialCount);
-  const [liked, setLiked] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    try {
-      const stored = JSON.parse(localStorage.getItem('liked_messages') || '[]') as string[];
-      return stored.includes(id);
-    } catch {
-      return false;
-    }
-  });
+  const [liked, setLiked] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // 初始化检查是否已赞
+  useEffect(() => {
+    if (!user) return;
+    const token = localStorage.getItem('user_token');
+    if (!token) return;
+
+    let cancelled = false;
+    fetch(`/api/messages/${id}/like`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.data) setLiked(data.data.liked);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [id, user]);
+
   const handleLike = async () => {
-    if (liked || loading) return;
+    if (loading) return;
+
+    if (!user) {
+      openLogin();
+      return;
+    }
+
+    const token = localStorage.getItem('user_token');
+    if (!token) {
+      openLogin();
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const res = await fetch(`/api/messages/${id}/like`, { method: 'POST' });
+      const res = await fetch(`/api/messages/${id}/like`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (res.ok) {
         const data = await res.json();
         setCount(data.data.likesCount);
-        setLiked(true);
-
-        // 存储到 localStorage
-        const stored = JSON.parse(localStorage.getItem('liked_messages') || '[]') as string[];
-        stored.push(id);
-        localStorage.setItem('liked_messages', JSON.stringify(stored));
+        setLiked(data.data.liked);
       }
     } catch {
       // 静默失败
@@ -46,7 +70,7 @@ export function LikeButton({ id, initialCount }: LikeButtonProps) {
   return (
     <button
       onClick={handleLike}
-      disabled={liked || loading}
+      disabled={loading}
       className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition-colors border ${
         liked
           ? 'border-accent/50 bg-accent/10 text-accent'

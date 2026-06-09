@@ -42,9 +42,7 @@ export function LivestreamCard({
         {/* Platform badge */}
         <div className="mb-3 flex items-center gap-2">
           <Tag active>{platformLabel}</Tag>
-          {replayUrl && (
-            <span className="text-xs text-accent">可回放</span>
-          )}
+          {replayUrl && <span className="text-xs text-accent">可回放</span>}
         </div>
 
         {/* Title */}

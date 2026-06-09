@@ -548,6 +548,8 @@ model Guestbook {
   tab GuestbookTab
 
   nickname String
+  userId   String?   @map("user_id")
+  user     User?     @relation(fields: [userId], references: [id])
   content  String
   images   Media[] @relation("GuestbookImages")
 
@@ -572,12 +574,58 @@ model Comment {
   targetType String   @map("target_type")
   targetId   String   @map("target_id")
   nickname   String
+  userId     String?  @map("user_id")
+  user       User?    @relation(fields: [userId], references: [id])
   content    String   @db.VarChar(300)
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
   @@index([targetType, targetId])
   @@map("comments")
+}
+
+/// 用户
+model User {
+  id                    String     @id @default(cuid())
+  username              String     @unique
+  password              String
+  displayName           String?    @map("display_name")
+  avatar                String?
+  isActive              Boolean    @default(true)  @map("is_active")
+
+  // 互动统计（冗余计数，写入时维护）
+  postsCount            Int        @default(0) @map("posts_count")
+  receivedLikesCount    Int        @default(0) @map("received_likes_count")
+  receivedCommentsCount Int        @default(0) @map("received_comments_count")
+  givenLikesCount       Int        @default(0) @map("given_likes_count")
+  givenCommentsCount    Int        @default(0) @map("given_comments_count")
+
+  // 激励积分
+  starlight             Int        @default(0)
+
+  // 关系
+  guestbooks            Guestbook[]
+  comments              Comment[]
+  likes                 Like[]     @relation("UserLikes")
+
+  createdAt             DateTime   @default(now()) @map("created_at")
+  updatedAt             DateTime   @updatedAt      @map("updated_at")
+
+  @@map("users")
+}
+
+/// 点赞记录
+model Like {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  user       User     @relation("UserLikes", fields: [userId], references: [id], onDelete: Cascade)
+  targetType String   @map("target_type")
+  targetId   String   @map("target_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@unique([userId, targetType, targetId])
+  @@index([targetType, targetId])
+  @@map("likes")
 }
 
 /// 4.19 公告

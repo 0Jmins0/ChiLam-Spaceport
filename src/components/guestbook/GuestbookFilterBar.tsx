@@ -78,9 +78,7 @@ export function GuestbookFilterBar({
           {storyTagFilters.map((filter) => (
             <Tag
               key={filter.value}
-              active={
-                currentStoryTag === filter.value || (!currentStoryTag && filter.value === '')
-              }
+              active={currentStoryTag === filter.value || (!currentStoryTag && filter.value === '')}
               onClick={() => handleStoryTagChange(filter.value)}
             >
               {filter.label}

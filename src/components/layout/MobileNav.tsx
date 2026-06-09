@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { NAV_ITEMS } from '@/config/navigation';
 import { siteConfig } from '@/config/site';
 import { cn } from '@/lib/cn';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 interface MobileNavProps {
   open: boolean;
@@ -13,6 +14,7 @@ interface MobileNavProps {
 
 export function MobileNav({ open, onClose }: MobileNavProps) {
   const pathname = usePathname();
+  const { user, loading, openLogin, logout } = useAuth();
 
   return (
     <div
@@ -68,6 +70,41 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
             </Link>
           ))}
         </nav>
+
+        {/* Auth */}
+        <div className="mt-8 pt-6 border-t border-border-gold/30">
+          {loading ? null : user ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full border border-border-gold bg-accent/10 text-xs text-accent">
+                  {(user.displayName || user.username).charAt(0).toUpperCase()}
+                </span>
+                <span className="text-sm text-text-primary truncate">
+                  {user.displayName || user.username}
+                </span>
+              </div>
+              <button
+                onClick={() => {
+                  logout();
+                  onClose();
+                }}
+                className="text-sm text-text-muted hover:text-accent transition-colors"
+              >
+                退出登录
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => {
+                openLogin();
+                onClose();
+              }}
+              className="text-sm text-accent hover:underline"
+            >
+              登录 / 注册
+            </button>
+          )}
+        </div>
 
         {/* Logo at bottom */}
         <div className="absolute bottom-8 left-8">

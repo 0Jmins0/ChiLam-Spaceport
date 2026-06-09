@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/Button';
+import { useAuth } from '@/components/auth/AuthProvider';
 import type { CommentItem } from '@/lib/types';
 
 interface CommentSectionProps {
@@ -12,18 +13,24 @@ interface CommentSectionProps {
 }
 
 export function CommentSection({ targetId, initialComments, totalCount }: CommentSectionProps) {
+  const { user, openLogin } = useAuth();
   const [comments, setComments] = useState<CommentItem[]>(initialComments);
   const [total, setTotal] = useState(totalCount);
-  const [nickname, setNickname] = useState('');
   const [content, setContent] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!nickname.trim() || !content.trim()) return;
+    if (!content.trim()) return;
     if (content.length > 300) {
       setError('评论内容不能超过300字');
+      return;
+    }
+
+    const token = localStorage.getItem('user_token');
+    if (!token) {
+      openLogin();
       return;
     }
 
@@ -33,8 +40,11 @@ export function CommentSection({ targetId, initialComments, totalCount }: Commen
     try {
       const res = await fetch(`/api/messages/${targetId}/comments`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nickname: nickname.trim(), content: content.trim() }),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ content: content.trim() }),
       });
 
       if (res.ok) {
@@ -80,32 +90,31 @@ export function CommentSection({ targetId, initialComments, totalCount }: Commen
       )}
 
       {/* 评论表单 */}
-      <form onSubmit={handleSubmit} className="space-y-3 pt-3 border-t border-border-gold/30">
-        <div className="flex gap-3">
-          <input
-            type="text"
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-            maxLength={30}
-            required
-            className="w-28 rounded-md border border-border-gold/50 bg-bg-darker px-3 py-1.5 text-sm text-text-primary placeholder:text-text-muted/50 focus:border-accent focus:outline-none"
-            placeholder="昵称"
-          />
-          <input
-            type="text"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            maxLength={300}
-            required
-            className="flex-1 rounded-md border border-border-gold/50 bg-bg-darker px-3 py-1.5 text-sm text-text-primary placeholder:text-text-muted/50 focus:border-accent focus:outline-none"
-            placeholder="写点评论..."
-          />
-          <Button type="submit" size="sm" disabled={submitting}>
-            {submitting ? '...' : '发送'}
-          </Button>
+      {user ? (
+        <form onSubmit={handleSubmit} className="space-y-3 pt-3 border-t border-border-gold/30">
+          <div className="flex gap-3">
+            <input
+              type="text"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              maxLength={300}
+              required
+              className="flex-1 rounded-md border border-border-gold/50 bg-bg-darker px-3 py-1.5 text-sm text-text-primary placeholder:text-text-muted/50 focus:border-accent focus:outline-none"
+              placeholder={`以 ${user.displayName || user.username} 的身份评论...`}
+            />
+            <Button type="submit" size="sm" disabled={submitting}>
+              {submitting ? '...' : '发送'}
+            </Button>
+          </div>
+          {error && <p className="text-xs text-red-400">{error}</p>}
+        </form>
+      ) : (
+        <div className="pt-3 border-t border-border-gold/30 text-center">
+          <button onClick={openLogin} className="text-sm text-accent hover:underline">
+            登录后即可评论
+          </button>
         </div>
-        {error && <p className="text-xs text-red-400">{error}</p>}
-      </form>
+      )}
     </div>
   );
 }

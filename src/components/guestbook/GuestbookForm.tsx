@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 import { Button } from '@/components/ui/Button';
+import { useAuth } from '@/components/auth/AuthProvider';
 import type { MessageTab } from '@/lib/types';
 
 const storyTagOptions = ['追星经历', '影视回忆', '音乐记忆', '冷知识', '其他'];
@@ -11,8 +12,8 @@ const storyTagOptions = ['追星经历', '影视回忆', '音乐记忆', '冷知
 export function GuestbookForm() {
   const searchParams = useSearchParams();
   const currentTab = (searchParams.get('tab') as MessageTab) || 'message';
+  const { user, openLogin } = useAuth();
 
-  const [nickname, setNickname] = useState('');
   const [content, setContent] = useState('');
   const [storyTags, setStoryTags] = useState<string[]>([]);
   const [relatedYear, setRelatedYear] = useState('');
@@ -25,14 +26,19 @@ export function GuestbookForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!nickname.trim() || !content.trim()) return;
+    if (!content.trim()) return;
+
+    const token = localStorage.getItem('user_token');
+    if (!token) {
+      openLogin();
+      return;
+    }
 
     setSubmitting(true);
     setMessage('');
 
     try {
       const body: Record<string, unknown> = {
-        nickname: nickname.trim(),
         content: content.trim(),
         tab: currentTab,
       };
@@ -44,13 +50,15 @@ export function GuestbookForm() {
 
       const res = await fetch('/api/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(body),
       });
 
       if (res.ok) {
-        setMessage('留言已提交成功');
-        setNickname('');
+        setMessage('留言已发布');
         setContent('');
         setStoryTags([]);
         setRelatedYear('');
@@ -65,30 +73,32 @@ export function GuestbookForm() {
     }
   };
 
+  // 未登录提示
+  if (!user) {
+    return (
+      <div className="rounded-[var(--radius-card)] border border-border-gold bg-bg-dark/50 p-5 text-center space-y-3">
+        <p className="text-sm text-text-secondary">登录后即可发表留言</p>
+        <Button size="sm" onClick={openLogin}>
+          登录 / 注册
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <form
       onSubmit={handleSubmit}
       className="rounded-[var(--radius-card)] border border-border-gold bg-bg-dark/50 p-5 space-y-4"
     >
-      <h3 className="font-heading text-base text-text-primary">发表留言</h3>
-
-      {/* 昵称 */}
-      <div>
-        <label className="block text-xs text-text-muted mb-1">昵称 *</label>
-        <input
-          type="text"
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
-          maxLength={30}
-          required
-          className="w-full rounded-md border border-border-gold/50 bg-bg-darker px-3 py-2 text-sm text-text-primary placeholder:text-text-muted/50 focus:border-accent focus:outline-none"
-          placeholder="你的昵称"
-        />
+      <div className="flex items-center justify-between">
+        <h3 className="font-heading text-base text-text-primary">发表留言</h3>
+        <span className="text-xs text-text-muted">
+          以 <span className="text-accent">{user.displayName || user.username}</span> 的身份发言
+        </span>
       </div>
 
       {/* 内容 */}
       <div>
-        <label className="block text-xs text-text-muted mb-1">内容 *</label>
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
@@ -141,7 +151,7 @@ export function GuestbookForm() {
       {/* 提交 */}
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={submitting}>
-          {submitting ? '提交中...' : '发表'}
+          {submitting ? '发布中...' : '发表'}
         </Button>
         {message && <span className="text-xs text-accent">{message}</span>}
       </div>

@@ -122,9 +122,7 @@ export function ActivitiesFilterBar({
           {livestreamPlatformFilters.map((filter) => (
             <Tag
               key={filter.value}
-              active={
-                currentPlatform === filter.value || (!currentPlatform && filter.value === '')
-              }
+              active={currentPlatform === filter.value || (!currentPlatform && filter.value === '')}
               onClick={() => handlePlatformChange(filter.value)}
             >
               {filter.label}

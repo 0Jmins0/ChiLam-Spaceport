@@ -71,6 +71,7 @@ export async function getGuestbookEntries(options?: {
     likesCount: item.likesCount,
     commentsCount: countMap.get(item.id) ?? 0,
     createdAt: item.createdAt.toISOString(),
+    userId: item.userId,
   }));
 
   return { items, totalCount, currentPage: page, totalPages, hasMore: page < totalPages };
@@ -99,6 +100,7 @@ export async function getGuestbookById(id: string): Promise<GuestbookDetail | nu
     likesCount: raw.likesCount,
     commentsCount,
     createdAt: raw.createdAt.toISOString(),
+    userId: raw.userId,
     images: raw.images,
   };
 }
@@ -141,6 +143,7 @@ export async function getCommentsByTarget(
     nickname: item.nickname,
     content: item.content,
     createdAt: item.createdAt.toISOString(),
+    userId: item.userId,
   }));
 
   return { items, totalCount, currentPage: pageNum, totalPages, hasMore: pageNum < totalPages };

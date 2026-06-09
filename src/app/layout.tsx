@@ -4,6 +4,9 @@ import { siteConfig } from '@/config/site';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { FilmGrain } from '@/components/decorative/FilmGrain';
+import { AuthProvider } from '@/components/auth/AuthProvider';
+import { LoginModal } from '@/components/auth/LoginModal';
+import { RegisterModal } from '@/components/auth/RegisterModal';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -22,10 +25,14 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" className={fontVariables}>
       <body className="min-h-screen bg-bg-dark font-body text-text-primary antialiased">
-        <FilmGrain />
-        <Header />
-        {children}
-        <Footer />
+        <AuthProvider>
+          <FilmGrain />
+          <Header />
+          {children}
+          <Footer />
+          <LoginModal />
+          <RegisterModal />
+        </AuthProvider>
       </body>
     </html>
   );

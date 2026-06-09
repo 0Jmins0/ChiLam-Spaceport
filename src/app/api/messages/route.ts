@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { GuestbookTab } from '@/generated/prisma/client';
 import { getGuestbookEntries } from '@/lib/queries/guestbook';
+import { verifyUser } from '@/lib/auth';
 import type { MessageTab } from '@/lib/types';
 
 const validTabs: MessageTab[] = ['message', 'story', 'feedback'];
@@ -46,12 +47,31 @@ export async function GET(request: NextRequest) {
 // POST - 创建留言
 export async function POST(request: NextRequest) {
   try {
+    const userPayload = await verifyUser(request);
+    if (!userPayload) {
+      return NextResponse.json(
+        { error: { message: '请先登录', code: 'UNAUTHORIZED' } },
+        { status: 401 },
+      );
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userPayload.userId },
+      select: { id: true, displayName: true, username: true },
+    });
+    if (!user) {
+      return NextResponse.json(
+        { error: { message: '用户不存在', code: 'NOT_FOUND' } },
+        { status: 404 },
+      );
+    }
+
     const body = await request.json();
 
     // 必填字段验证
-    if (!body.nickname?.trim() || !body.content?.trim()) {
+    if (!body.content?.trim()) {
       return NextResponse.json(
-        { error: { message: '昵称和内容为必填项', code: 'VALIDATION_ERROR' } },
+        { error: { message: '内容为必填项', code: 'VALIDATION_ERROR' } },
         { status: 400 },
       );
     }
@@ -66,12 +86,21 @@ export async function POST(request: NextRequest) {
 
     const guestbook = await prisma.guestbook.create({
       data: {
-        nickname: body.nickname.trim(),
+        nickname: user.displayName || user.username,
         content: body.content.trim(),
         tab: tabMap[tab],
         storyTags: body.storyTags || [],
         relatedYear: body.relatedYear ? Number(body.relatedYear) : null,
         status: 'APPROVED',
+        userId: user.id,
+      },
+    });
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        postsCount: { increment: 1 },
+        starlight: { increment: 5 },
       },
     });
 

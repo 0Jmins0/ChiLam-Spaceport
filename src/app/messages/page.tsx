@@ -44,7 +44,12 @@ export default async function MessagesPage({
         description="我想对你说 · 故事分享 · 建议反馈"
       />
 
-      <GuestbookFilterBar currentTab={tab} currentStoryTag={storyTag} counts={counts} className="mb-8" />
+      <GuestbookFilterBar
+        currentTab={tab}
+        currentStoryTag={storyTag}
+        counts={counts}
+        className="mb-8"
+      />
 
       {data.items.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
