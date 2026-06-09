@@ -64,7 +64,8 @@ export function SettingsForm({ user }: SettingsFormProps) {
       });
 
       if (!uploadRes.ok) {
-        throw new Error('上传失败');
+        const errData = await uploadRes.json();
+        throw new Error(errData.error || '上传失败');
       }
 
       const uploadData = await uploadRes.json();
