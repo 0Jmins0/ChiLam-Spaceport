@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P5 前 - UI 调整与功能补充 (进行中)
+## 当前阶段: P5 前 - UI 调整与功能补充 (阶段五已完成)
 
 ---
 
@@ -21,11 +21,42 @@
 | 公告模块 | ✅ 已完成 | 2026-06-07 |
 | 后台管理(API) | ✅ 已完成 | 2026-06-07 |
 | R2 存储配置 | ✅ 已完成 | 2026-06-07 |
+| 全站检索 | ✅ 已完成 | 2026-06-10 |
 | 部署上线 | 未开始 | - |
 
 ---
 
 ## 详细记录
+
+### 2026-06-10 - UI 调整阶段五：全站检索（已完成）
+
+#### 功能 8a：后端 — 搜索查询层 + API
+- `src/lib/queries/search.ts`：10 个内容表并行模糊搜索（Prisma `contains` + `mode: insensitive`）
+  - 搜索范围：SocialPost / NewsArticle / Sighting / Production / Performance / Endorsement / Interview / Livestream / Album / Magazine
+  - 过滤条件：Sighting 排除 REJECTED，其余排除 isVisible=false
+  - 两个导出函数：`searchPreview()`（每类前 3 条）、`searchFull()`（分页+类型筛选）
+- `src/app/api/search/route.ts`：GET API
+  - `?q=关键词&mode=preview` — 预览模式（SearchModal 调用）
+  - `?q=关键词&type=all&page=1` — 完整模式（搜索结果页调用）
+  - 校验：关键词最短 2 字符，类型参数白名单
+- `src/lib/types.ts`：新增 `SearchResultType`、`SearchResultItem`、`SearchPreviewResult`
+
+#### 功能 8b：前端 — 搜索弹窗 + 搜索结果页
+- `SearchModal.tsx`：全屏 overlay 搜索弹窗
+  - debounce 300ms 自动搜索，结果按类型分组预览
+  - 关键词高亮（`<mark>` 标签 + accent 色）
+  - ESC 关闭，点击背景关闭，点击结果跳转并关闭
+  - 底部「查看全部 N 条结果」链接到 /search 页面
+- `SearchResultCard.tsx`：搜索结果卡片（类型标签 + 标题高亮 + 摘要高亮 + 日期）
+- `/search` 搜索结果页：服务端组件，force-dynamic
+  - 11 个类型筛选 tab（全部 + 10 个内容类型）
+  - 分页导航，骨架屏 loading 状态
+  - 空结果/短关键词友好提示
+
+#### 功能 8c：Header 嵌入搜索入口
+- `Header.tsx`：桌面端导航右侧放大镜图标 + 移动端搜索图标（汉堡菜单旁）
+- `Cmd/Ctrl + K` 全局快捷键打开搜索弹窗
+- SearchModal 集成到 Header 组件树
 
 ### 2026-06-10 - UI 调整阶段三：用户系统（已完成）
 

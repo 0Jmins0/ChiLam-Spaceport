@@ -4,9 +4,9 @@
 一个集合张智霖各平台、各阶段、各渠道资讯的综合性粉丝网站。
 
 ## 当前进度
-- **阶段**: UI 调整阶段三已完成
-- **已完成**: P0~P4 全部、UI 调整阶段一+二+三（用户系统）、P5.0 海报/封面填充
-- **下一步**: UI 调整阶段四（用户个人页面）→ 阶段五（全站检索）→ P5 优化上线
+- **阶段**: UI 调整阶段五已完成
+- **已完成**: P0~P4 全部、UI 调整阶段一+二+三（用户系统）+五（全站检索）、P5.0 海报/封面填充
+- **下一步**: UI 调整阶段四（用户个人页面）→ P5 优化上线
 - **详细进度**: 查看 `/docs/PROGRESS.md`
 
 ## 技术栈
@@ -41,11 +41,13 @@
 │   │   ├── api/updates/                             # 动态 CRUD API
 │   │   ├── api/screens/                             # 影视 CRUD API
 │   │   ├── api/performances/                        # 演出 CRUD API
+│   │   ├── search/                                  # 搜索结果页
 │   │   ├── api/activities/                          # 活动 CRUD API（代言+访谈+直播）
 │   │   ├── api/archives/                            # 资料库 CRUD API（专辑+杂志）
 │   │   ├── api/messages/                            # 留言板 CRUD + 点赞 + 评论 API
 │   │   ├── api/announcements/                       # 公告 CRUD API
 │   │   ├── api/upload/                              # 文件上传 API（R2 直传+预签名）
+│   │   ├── api/search/                              # 全站搜索 API
 │   │   ├── api/admin/                               # 管理后台 API（登录+审核）
 │   │   └── ...                                      # 其他栏目路由
 │   ├── components/
