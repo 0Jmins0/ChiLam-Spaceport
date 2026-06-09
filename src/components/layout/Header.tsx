@@ -7,16 +7,32 @@ import { NAV_ITEMS } from '@/config/navigation';
 import { siteConfig } from '@/config/site';
 import { cn } from '@/lib/cn';
 import { MobileNav } from './MobileNav';
+import { SearchModal } from './SearchModal';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { UserMenu } from '@/components/auth/UserMenu';
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const pathname = usePathname();
+  const { user, loading, openLogin } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   return (
@@ -59,20 +75,79 @@ export function Header() {
             ))}
           </nav>
 
-          {/* Mobile Menu Button */}
+          {/* Search Button */}
           <button
-            className="flex flex-col gap-1.5 md:hidden"
-            onClick={() => setMobileOpen(true)}
-            aria-label="打开菜单"
+            onClick={() => setSearchOpen(true)}
+            className="hidden items-center text-text-secondary transition-colors hover:text-accent md:flex"
+            aria-label="搜索"
           >
-            <span className="block h-[1px] w-5 bg-text-primary" />
-            <span className="block h-[1px] w-5 bg-text-primary" />
-            <span className="block h-[1px] w-3.5 bg-text-primary" />
+            <svg
+              className="h-[18px] w-[18px]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+              />
+            </svg>
           </button>
+
+          {/* Auth */}
+          <div className="hidden md:flex items-center ml-6">
+            {loading ? (
+              <span className="h-7 w-7 rounded-full bg-border-gold/20 animate-pulse" />
+            ) : user ? (
+              <UserMenu />
+            ) : (
+              <button
+                onClick={openLogin}
+                className="text-sm text-text-secondary hover:text-accent transition-colors tracking-wide"
+              >
+                登录
+              </button>
+            )}
+          </div>
+
+          {/* Mobile Search + Menu */}
+          <div className="flex items-center gap-4 md:hidden">
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="text-text-secondary transition-colors hover:text-accent"
+              aria-label="搜索"
+            >
+              <svg
+                className="h-[18px] w-[18px]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                />
+              </svg>
+            </button>
+            <button
+              className="flex flex-col gap-1.5"
+              onClick={() => setMobileOpen(true)}
+              aria-label="打开菜单"
+            >
+              <span className="block h-[1px] w-5 bg-text-primary" />
+              <span className="block h-[1px] w-5 bg-text-primary" />
+              <span className="block h-[1px] w-3.5 bg-text-primary" />
+            </button>
+          </div>
         </div>
       </header>
 
       <MobileNav open={mobileOpen} onClose={() => setMobileOpen(false)} />
+      <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
 }

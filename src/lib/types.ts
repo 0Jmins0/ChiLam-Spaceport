@@ -259,6 +259,7 @@ export interface GuestbookItem {
   likesCount: number;
   commentsCount: number;
   createdAt: string;
+  userId: string | null;
 }
 
 export interface GuestbookDetail extends GuestbookItem {
@@ -270,6 +271,7 @@ export interface CommentItem {
   nickname: string;
   content: string;
   createdAt: string;
+  userId: string | null;
 }
 
 // ═══════ 公告 (Announcements) ═══════
@@ -287,4 +289,37 @@ export interface AnnouncementItem {
 export interface AnnouncementDetail extends AnnouncementItem {
   createdAt: string;
   updatedAt: string;
+}
+
+// ═══════ 搜索 (Search) ═══════
+export type SearchResultType =
+  | 'social_post'
+  | 'news'
+  | 'sighting'
+  | 'production'
+  | 'performance'
+  | 'endorsement'
+  | 'interview'
+  | 'livestream'
+  | 'album'
+  | 'magazine';
+
+export interface SearchResultItem {
+  type: SearchResultType;
+  id: string;
+  title: string;
+  snippet: string | null;
+  url: string;
+  date: string | null;
+  typeLabel: string;
+}
+
+export interface SearchPreviewResult {
+  groups: {
+    type: SearchResultType;
+    typeLabel: string;
+    items: SearchResultItem[];
+    totalCount: number;
+  }[];
+  totalCount: number;
 }
