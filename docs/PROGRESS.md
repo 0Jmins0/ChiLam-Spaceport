@@ -16,7 +16,8 @@
 | 演出模块 | ✅ 已完成 | 2026-06-06 |
 | 活动模块 | ✅ 已完成（含直播 tab） | 2026-06-08 |
 | 资料库模块 | ✅ 已完成 | 2026-06-07 |
-| 留言板 | ✅ 已完成（含故事 tag 筛选） | 2026-06-08 |
+| 留言板 | ✅ 已完成（含故事 tag 筛选 + 登录权限） | 2026-06-10 |
+| 用户系统 | ✅ 已完成（注册/登录/权限） | 2026-06-10 |
 | 公告模块 | ✅ 已完成 | 2026-06-07 |
 | 后台管理(API) | ✅ 已完成 | 2026-06-07 |
 | R2 存储配置 | ✅ 已完成 | 2026-06-07 |
@@ -25,6 +26,36 @@
 ---
 
 ## 详细记录
+
+### 2026-06-10 - UI 调整阶段三：用户系统（已完成）
+
+#### 功能 9a：数据库 — User 模型 + Like 表
+- 新增 `User` 模型：username/password/displayName/avatar/isActive + 互动统计（postsCount/receivedLikesCount/receivedCommentsCount/givenLikesCount/givenCommentsCount）+ starlight 激励积分
+- 新增 `Like` 模型：userId + targetType + targetId 联合唯一约束，支持精确去重
+- `Guestbook` / `Comment` 新增可空 `userId` 外键，兼容历史匿名数据
+- 数据库已同步（`prisma db push`）
+
+#### 功能 9b：后端 — 认证 API
+- `src/lib/auth.ts` 扩展：`UserPayload` + `signUserToken()` + `verifyUser()`（独立 `USER_JWT_SECRET`）
+- `src/lib/username-validator.ts`：禁止用户名包含张智霖/張智霖/Chilam/Julian Cheung
+- `POST /api/auth/register`：校验(长度+禁用词+唯一性) → bcrypt(12轮) → 创建 → JWT
+- `POST /api/auth/login`：查找 → isActive 检查 → bcrypt 验证 → JWT
+- `GET /api/auth/me`：验证 token → 返回用户信息（含统计+星光）
+
+#### 功能 9c：前端 — 认证组件
+- `AuthProvider`：React Context 管理 user/loading/modalState，localStorage token 持久化
+- `LoginModal` / `RegisterModal`：弹窗表单，注册时实时校验禁用词
+- `UserMenu`：已登录下拉菜单（头像首字母 + 退出登录）
+- `Header`：Desktop nav 右侧集成登录按钮 / UserMenu
+- `MobileNav`：底部集成登录入口 / 用户信息
+- `layout.tsx`：AuthProvider 包裹全站 + Modal 组件
+
+#### 功能 9d：留言板权限改造
+- 发布留言：需登录，自动关联 userId，nickname 从用户信息填充，+5 星光
+- 点赞：需登录，Like 表 toggle（赞/取消赞），更新双方互动统计和星光
+- 评论：需登录，自动关联 userId，更新双方统计和星光
+- 前端：GuestbookForm 未登录显示登录提示，LikeButton 改为 toggle + GET 检查状态，CommentSection 移除 nickname 输入
+- 浏览：无需登录
 
 ### 2026-06-08 - UI 调整阶段二（已完成，迁移待执行）
 
@@ -507,18 +538,21 @@
 - 方式：网络搜索高清图 → 下载到 media/images/ → curl 上传绑定
 - 找不到的跳过，综艺用节目海报代替个人海报
 
-### 批次进度
-| 批次 | 内容 | 数量 | 状态 |
-|------|------|------|------|
-| 第1批 | 近年热门电影（2015+） | ~15 | 进行中 |
-| 第2批 | 热门电视剧 | ~10 | 待执行 |
-| 第3批 | 综艺节目 | 14 | 待执行 |
-| 第4批 | 专辑封面 | 27 | 待执行 |
-| 第5批 | 中期电影（2000-2014） | ~25 | 待执行 |
-| 第6批 | 早期电影（90年代） | ~16 | 待执行 |
-| 第7批 | 剩余电视剧 | ~25 | 待执行 |
+### 完成统计（2026-06-09）
+| 类别 | 已上传 | 跳过 | 说明 |
+|------|--------|------|------|
+| 电影海报 | 51 | 8 | 跳过: 异兽围城(未上映)、爱情Amoeba、困兽、手足情深、夺魄勾魂、战虎、人在江湖、卧虎（TMDB无海报） |
+| 电视剧海报 | 31 | 4 | 跳过: 璀璨之城(待播)、终结杉计划、草民县令、同一屋檐下（TMDB无收录） |
+| 综艺海报 | 13 | 1 | 跳过: 壮志凌云（无海报资源） |
+| 专辑封面 | 17 | 10 | 跳过: 10张早期精选辑/EP（90年代，网上无高清封面） |
+| **合计** | **112** | **23** | 完成率 83% |
 
-## 下一步: P5.0 海报填充（进行中）→ UI 调整阶段三（用户系统）→ P5 优化上线
+### 图片来源
+- 主要来源: TMDB (The Movie Database) 高清原图
+- 专辑封面: Apple Music 高清封面
+- 存储: 全部上传到 Cloudflare R2，通过 `/api/upload` 绑定到对应记录
+
+## 下一步: UI 调整阶段三（用户系统）→ P5 优化上线
 
 ---
 
