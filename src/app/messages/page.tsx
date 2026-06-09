@@ -1,7 +1,7 @@
 import { PageContainer } from '@/components/layout/PageContainer';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GuestbookFilterBar } from '@/components/guestbook/GuestbookFilterBar';
-import { GuestbookCard } from '@/components/guestbook/GuestbookCard';
+import { GuestbookGrid } from '@/components/guestbook/GuestbookGrid';
 import { GuestbookForm } from '@/components/guestbook/GuestbookForm';
 import { Pagination } from '@/components/updates/Pagination';
 import { getGuestbookEntries, getGuestbookCounts } from '@/lib/queries/guestbook';
@@ -52,11 +52,7 @@ export default async function MessagesPage({
       />
 
       {data.items.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {data.items.map((item) => (
-            <GuestbookCard key={item.id} item={item} />
-          ))}
-        </div>
+        <GuestbookGrid items={data.items} />
       ) : (
         <div className="flex items-center justify-center py-20">
           <p className="text-text-muted">暂无留言，来留下第一条吧</p>

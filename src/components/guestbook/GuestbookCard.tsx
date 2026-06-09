@@ -3,14 +3,16 @@ import Link from 'next/link';
 import { cn } from '@/lib/cn';
 import { Card } from '@/components/ui/Card';
 import { Tag } from '@/components/ui/Tag';
+import { GuestbookCardActions } from '@/components/guestbook/GuestbookCardActions';
 import type { GuestbookItem } from '@/lib/types';
 
 interface GuestbookCardProps {
   item: GuestbookItem;
   className?: string;
+  currentUserId?: string;
 }
 
-export function GuestbookCard({ item, className }: GuestbookCardProps) {
+export function GuestbookCard({ item, className, currentUserId }: GuestbookCardProps) {
   const truncatedContent =
     item.content.length > 150 ? item.content.slice(0, 150) + '...' : item.content;
 
@@ -42,7 +44,7 @@ export function GuestbookCard({ item, className }: GuestbookCardProps) {
           </div>
         )}
 
-        {/* 底部：点赞 + 评论 */}
+        {/* 底部：点赞 + 评论 + 操作按钮 */}
         <div className="flex items-center gap-4 pt-2 border-t border-border-gold/30">
           <span className="flex items-center gap-1 text-xs text-text-muted">
             <HeartIcon />
@@ -52,6 +54,20 @@ export function GuestbookCard({ item, className }: GuestbookCardProps) {
             <CommentIcon />
             {item.commentsCount}
           </span>
+          {currentUserId && item.userId === currentUserId && (
+            <span onClick={(e) => e.preventDefault()}>
+              <GuestbookCardActions
+                messageId={item.id}
+                message={{
+                  id: item.id,
+                  content: item.content,
+                  tab: item.tab,
+                  storyTags: item.storyTags,
+                  relatedYear: item.relatedYear,
+                }}
+              />
+            </span>
+          )}
         </div>
       </Card>
     </Link>

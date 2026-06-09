@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth } from './AuthProvider';
 
 export function UserMenu() {
@@ -30,9 +32,19 @@ export function UserMenu() {
         onClick={() => setOpen(!open)}
         className="flex items-center gap-2 text-sm text-text-secondary hover:text-accent transition-colors"
       >
-        <span className="flex h-7 w-7 items-center justify-center rounded-full border border-border-gold bg-accent/10 text-xs text-accent">
-          {displayName.charAt(0).toUpperCase()}
-        </span>
+        {user.avatar ? (
+          <Image
+            src={user.avatar}
+            alt={displayName}
+            width={28}
+            height={28}
+            className="h-7 w-7 rounded-full border border-border-gold object-cover"
+          />
+        ) : (
+          <span className="flex h-7 w-7 items-center justify-center rounded-full border border-border-gold bg-accent/10 text-xs text-accent">
+            {displayName.charAt(0).toUpperCase()}
+          </span>
+        )}
         <span className="hidden sm:inline max-w-[100px] truncate">{displayName}</span>
       </button>
 
@@ -41,6 +53,13 @@ export function UserMenu() {
           <div className="px-3 py-2 border-b border-border-gold/30">
             <p className="text-xs text-text-muted truncate">{user.username}</p>
           </div>
+          <Link
+            href="/profile"
+            onClick={() => setOpen(false)}
+            className="block w-full px-3 py-2 text-left text-sm text-text-secondary hover:text-accent hover:bg-accent/5 transition-colors"
+          >
+            个人中心
+          </Link>
           <button
             onClick={() => {
               logout();

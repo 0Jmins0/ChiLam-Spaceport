@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P5 前 - UI 调整与功能补充 (阶段五已完成)
+## 当前阶段: P5 前 - UI 调整与功能补充 (阶段四已完成)
 
 ---
 
@@ -18,6 +18,7 @@
 | 资料库模块 | ✅ 已完成 | 2026-06-07 |
 | 留言板 | ✅ 已完成（含故事 tag 筛选 + 登录权限） | 2026-06-10 |
 | 用户系统 | ✅ 已完成（注册/登录/权限） | 2026-06-10 |
+| 用户个人页面 | ✅ 已完成（个人中心/留言管理/设置/头像上传） | 2026-06-10 |
 | 公告模块 | ✅ 已完成 | 2026-06-07 |
 | 后台管理(API) | ✅ 已完成 | 2026-06-07 |
 | R2 存储配置 | ✅ 已完成 | 2026-06-07 |
@@ -27,6 +28,33 @@
 ---
 
 ## 详细记录
+
+### 2026-06-10 - UI 调整阶段四：用户个人页面 + 留言管理（已完成）
+
+#### 功能 10a：后端 — 用户留言管理 + 个人设置 API
+- `src/lib/queries/user.ts`：`getUserProfile()` + `getUserMessages()`（分页，排除 REJECTED）
+- `GET /api/user/messages`：当前用户留言列表（分页）
+- `PUT/DELETE /api/user/messages/[id]`：编辑/删除自己的留言（userId 权限校验，403 拒绝越权）
+  - 删除使用 `$transaction`：清理关联 comments/likes + 回扣 postsCount/starlight
+- `GET/PUT /api/user/profile`：获取/修改个人信息（displayName + avatar URL），修改 displayName 同步更新 Guestbook.nickname
+- `PUT /api/user/password`：修改密码（bcrypt 验证旧密码 + 12 轮哈希新密码）
+
+#### 功能 10b：前端 — 个人中心 + 留言管理 + 设置
+- `/profile` 个人中心主页：ProfileHeader（头像/用户名/统计卡片）+ 快捷入口（我的留言/个人设置）
+- `/profile/messages` 我的留言管理：MessageList（分页 + 编辑弹窗 + 删除确认）
+- `/profile/settings` 个人设置：SettingsForm（头像上传到 R2 + 昵称修改 + 密码修改）
+- 头像上传：点击头像 → 选择文件(2MB 限制) → POST /api/upload → PUT /api/user/profile
+- 所有页面客户端组件，未登录显示提示 + 登录按钮
+
+#### 功能 10c：留言板卡片内联编辑/删除
+- `GuestbookCardActions`：客户端组件，编辑（EditMessageModal）+ 删除（confirm + API）
+- `GuestbookGrid`：客户端包裹组件，useAuth() 获取 currentUserId 传给 GuestbookCard
+- `GuestbookCard`：新增 currentUserId prop，自己的留言显示操作按钮
+- 留言板页面 `messages/page.tsx` 改用 GuestbookGrid 渲染
+
+#### 功能 10d：UserMenu 扩展
+- 下拉菜单新增「个人中心」链接（/profile）
+- 触发按钮支持显示头像图片（有 avatar 用 Image，无 avatar 用首字母）
 
 ### 2026-06-10 - UI 调整阶段五：全站检索（已完成）
 
@@ -583,13 +611,13 @@
 - 专辑封面: Apple Music 高清封面
 - 存储: 全部上传到 Cloudflare R2，通过 `/api/upload` 绑定到对应记录
 
-## 下一步: UI 调整阶段三（用户系统）→ P5 优化上线
+## 下一步: P5 优化上线
 
 ---
 
 ## 待决事项
 - [x] 数据库方案最终确认 → Supabase (PostgreSQL, ap-northeast-2)
 - [x] 存储方案最终确认 → Cloudflare R2 (chilam-media, r2.dev 公开访问)
+- [x] 是否需要用户登录系统 → 已实现（阶段三）
+- [x] 留言板是否需要登录才能留言 → 是，浏览无需登录，发布/点赞/评论需登录
 - [ ] 域名选择
-- [ ] 是否需要用户登录系统
-- [ ] 留言板是否需要登录才能留言
