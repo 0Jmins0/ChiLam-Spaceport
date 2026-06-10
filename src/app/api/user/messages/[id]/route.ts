@@ -3,10 +3,7 @@ import { prisma } from '@/lib/db';
 import { verifyUser } from '@/lib/auth';
 
 // PUT - 编辑自己的留言
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const userPayload = await verifyUser(request);
     if (!userPayload) {
@@ -45,7 +42,11 @@ export async function PUT(
     });
 
     return NextResponse.json({
-      data: { id: updated.id, content: updated.content, updatedAt: updated.updatedAt.toISOString() },
+      data: {
+        id: updated.id,
+        content: updated.content,
+        updatedAt: updated.updatedAt.toISOString(),
+      },
     });
   } catch (error) {
     console.error('编辑留言失败:', error);

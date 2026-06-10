@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P6 用户反馈迭代（P6.1 体验修复已完成）
+## 当前阶段: P6 用户反馈迭代（P6.1 + P6.8 已完成）
 
 ---
 
@@ -28,6 +28,15 @@
 ---
 
 ## 详细记录
+
+### 2026-06-10 - P6.8 演出详情页优化（已完成）
+
+#### 变更内容
+- `prisma/schema.prisma`：Performance 模型新增 `summary String? @map("summary")` 字段
+- `src/lib/types.ts`：`PerformanceDetail` 接口新增 `summary: string | null`
+- `src/lib/queries/performances.ts`：`getPerformanceBySlug` 返回 `summary`
+- `src/app/performances/[slug]/page.tsx`：右栏标签下方新增简介展示区（金线分隔 + 标题 + 正文，仅有内容时渲染）
+- 数据库已同步（`prisma db push`）
 
 ### 2026-06-10 - UI 调整阶段四：用户个人页面 + 留言管理（已完成）
 

@@ -23,8 +23,7 @@ interface ProfileHeaderProps {
 
 export function ProfileHeader({ profile }: ProfileHeaderProps) {
   const initial = (profile.displayName || profile.username).charAt(0).toUpperCase();
-  const showDisplayName =
-    profile.displayName && profile.displayName !== profile.username;
+  const showDisplayName = profile.displayName && profile.displayName !== profile.username;
 
   const joinDate = new Date(profile.createdAt).toLocaleDateString('zh-CN', {
     year: 'numeric',

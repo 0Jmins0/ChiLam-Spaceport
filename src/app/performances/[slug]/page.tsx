@@ -115,6 +115,19 @@ export default async function PerformanceDetailPage({
               ))}
             </div>
           )}
+
+          {/* 简介 */}
+          {performance.summary && (
+            <>
+              <div className="gold-line" />
+              <div>
+                <h2 className="font-heading text-base text-text-primary mb-2">简介</h2>
+                <p className="text-sm text-text-secondary leading-relaxed whitespace-pre-line">
+                  {performance.summary}
+                </p>
+              </div>
+            </>
+          )}
         </div>
       </div>
 

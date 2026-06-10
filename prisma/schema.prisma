@@ -232,6 +232,7 @@ model Performance {
   venue     String?
   city      String?
   series    String?
+  summary   String?         @map("summary")
 
   // 海报 (直接 FK)
   posterId String? @map("poster_id")

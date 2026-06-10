@@ -137,6 +137,7 @@ export interface FanShotItem {
 
 // 演出详情页用
 export interface PerformanceDetail extends PerformanceItem {
+  summary: string | null;
   setlist: string[] | null;
   officialMedia: OfficialMediaItem[];
   fanShots: FanShotItem[];

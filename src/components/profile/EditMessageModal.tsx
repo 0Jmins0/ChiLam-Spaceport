@@ -28,9 +28,7 @@ export function EditMessageModal({ message, onClose, onSave }: EditMessageModalP
   const [error, setError] = useState('');
 
   function toggleTag(tag: string) {
-    setStoryTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
-    );
+    setStoryTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
   }
 
   async function handleSave() {

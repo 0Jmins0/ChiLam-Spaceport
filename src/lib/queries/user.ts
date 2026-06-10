@@ -88,9 +88,7 @@ export async function getUserMessages(
     where: { targetType: 'guestbook', targetId: { in: itemIds } },
     _count: { id: true },
   });
-  const commentCountMap = new Map(
-    commentCounts.map((c) => [c.targetId, c._count.id]),
-  );
+  const commentCountMap = new Map(commentCounts.map((c) => [c.targetId, c._count.id]));
 
   const items: UserMessageItem[] = rawItems.map((item) => ({
     id: item.id,

@@ -108,6 +108,7 @@ export async function getPerformanceBySlug(slug: string): Promise<PerformanceDet
     series: rest.series,
     posterUrl: poster?.url ?? null,
     tags: rest.tags,
+    summary: rest.summary,
     setlist: setlist as string[] | null,
     officialMedia: officialMedia.map((om) => ({
       id: om.id,
