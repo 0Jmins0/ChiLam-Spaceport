@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
-
 import { PageContainer } from '@/components/layout/PageContainer';
+import { BackButton } from '@/components/ui/BackButton';
 import { LikeButton } from '@/components/guestbook/LikeButton';
 import { FavoriteButton } from '@/components/guestbook/FavoriteButton';
 import { CommentSection } from '@/components/guestbook/CommentSection';
@@ -34,12 +33,7 @@ export default async function GuestbookDetailPage({ params }: { params: Promise<
   return (
     <PageContainer>
       <div className="max-w-2xl mx-auto space-y-6">
-        <Link
-          href="/messages"
-          className="inline-block text-sm text-accent hover:text-accent/80 transition-colors"
-        >
-          ← 返回留言板
-        </Link>
+        <BackButton label="返回留言板" />
 
         <div className="space-y-3">
           <div className="flex items-center gap-3">
