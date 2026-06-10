@@ -13,7 +13,9 @@ export function BackButton({ label, className }: BackButtonProps) {
   return (
     <button
       onClick={() => router.back()}
-      className={className || 'inline-block text-sm text-accent hover:text-accent/80 transition-colors'}
+      className={
+        className || 'inline-block text-sm text-accent hover:text-accent/80 transition-colors'
+      }
     >
       ← {label}
     </button>

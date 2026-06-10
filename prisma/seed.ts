@@ -1228,21 +1228,58 @@ async function main() {
       mediaType: 'VIDEO' as const,
       originalUrl: 'https://example.com/tvb-cool-mo-2013',
     },
+    {
+      slug: 'bilibili-pjzj-interview-2025',
+      title: '关于演员这条路，我从未想过放弃',
+      summary: '本段访谈中，张智霖分享了他对表演的初衷与热爱，亦提及多个角色如何影响他对人生的理解与成长。',
+      source: '张智霖个人访谈系列',
+      host: '林 海',
+      location: '香港·九龙塘录音室',
+      duration: '01:24:37',
+      date: new Date('2019-06-18'),
+      mediaType: 'VIDEO' as const,
+      originalUrl: 'https://www.bilibili.com/video/BV1xW4y1n7Gp',
+      embedUrl: 'https://player.bilibili.com/player.html?bvid=BV1xW4y1n7Gp&autoplay=0',
+      transcriptCantonese: {
+        segments: [
+          { speaker: 'J', speakerLabel: '张智霖', timestamp: '00:02:14', text: '其實我細個嘅時候，冇諗過自己會做呢行。細個只係鍾意睇戲，跟住慢先發現，原來表演可以幫我表達一啲自己平時講唔出嘅嘢。' },
+          { speaker: 'H', speakerLabel: '林海', timestamp: '00:02:36', text: '你覺得表演對你嚟講，最吸引嘅地方係咩？' },
+          { speaker: 'J', timestamp: '00:02:52', text: '係可以透過角色去經歷唔同嘅人生。每一次拍戲，都好似活多一次。就算好辛苦，但都覺得好值得。' },
+          { speaker: 'H', timestamp: '00:03:18', text: '有冇試過，拍完某部戲之後，好耐都走唔返出嚟？' },
+          { speaker: 'J', timestamp: '00:04:47', text: '有。特別係嗰啲比較沉重嘅角色。收工之後，成個人會靜咗好耐。要時間消化。' },
+        ],
+      },
+      transcriptMandarin: {
+        segments: [
+          { speaker: 'J', speakerLabel: '张智霖', timestamp: '00:02:14', text: '其实我小时候，没想过自己会做这行。小时候只是喜欢看戏，后来慢慢发现，原来表演可以帮我表达一些自己平时说不出的东西。' },
+          { speaker: 'H', speakerLabel: '林海', timestamp: '00:02:36', text: '你觉得表演对你来说，最吸引的地方是什么？' },
+          { speaker: 'J', timestamp: '00:02:52', text: '是可以通过角色去经历不同的人生。每一次拍戏，都好像多活了一次。就算很辛苦，但都觉得很值得。' },
+          { speaker: 'H', timestamp: '00:03:18', text: '有没有试过，拍完某部戏之后，很久都走不出来？' },
+          { speaker: 'J', timestamp: '00:04:47', text: '有。特别是那些比较沉重的角色。收工之后，整个人会安静很久。需要时间消化。' },
+        ],
+      },
+      proofreadStatus: 'PROOFREAD' as const,
+    },
   ];
 
   for (const iv of interviews) {
+    const ext = iv as Record<string, unknown>;
     await prisma.interview.create({
       data: {
         slug: iv.slug,
         title: iv.title,
         summary: iv.summary,
         source: iv.source,
+        host: (ext.host as string) ?? undefined,
+        location: (ext.location as string) ?? undefined,
+        duration: (ext.duration as string) ?? undefined,
         date: iv.date,
         mediaType: iv.mediaType,
         originalUrl: iv.originalUrl,
-        transcriptCantonese: (iv as Record<string, unknown>).transcriptCantonese as string | undefined,
-        transcriptMandarin: (iv as Record<string, unknown>).transcriptMandarin as string | undefined,
-        proofreadStatus: ((iv as Record<string, unknown>).proofreadStatus as 'PENDING' | 'PROOFREAD') ?? 'PENDING',
+        embedUrl: (ext.embedUrl as string) ?? undefined,
+        transcriptCantonese: ext.transcriptCantonese ?? undefined,
+        transcriptMandarin: ext.transcriptMandarin ?? undefined,
+        proofreadStatus: (ext.proofreadStatus as 'PENDING' | 'PROOFREAD') ?? 'PENDING',
       },
     });
   }

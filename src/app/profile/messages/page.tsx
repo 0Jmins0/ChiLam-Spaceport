@@ -35,7 +35,10 @@ export default function ProfileMessagesPage() {
   if (loading) {
     return (
       <PageContainer>
-        <BackButton label="返回个人中心" className="inline-block text-sm text-accent hover:text-accent/80 transition-colors mb-4" />
+        <BackButton
+          label="返回个人中心"
+          className="inline-block text-sm text-accent hover:text-accent/80 transition-colors mb-4"
+        />
         <PageHeader title="我的留言" titleEn="My Messages" />
         <div className="flex justify-center py-16">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
@@ -46,7 +49,10 @@ export default function ProfileMessagesPage() {
 
   return (
     <PageContainer>
-      <BackButton label="返回个人中心" className="inline-block text-sm text-accent hover:text-accent/80 transition-colors mb-4" />
+      <BackButton
+        label="返回个人中心"
+        className="inline-block text-sm text-accent hover:text-accent/80 transition-colors mb-4"
+      />
       <PageHeader title="我的留言" titleEn="My Messages" />
       <MessageList />
     </PageContainer>

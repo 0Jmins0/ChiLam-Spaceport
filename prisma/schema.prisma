@@ -150,6 +150,7 @@ model Media {
   performanceMediaFiles PerformanceMedia[] @relation("PerformanceMediaFile")
 
   // 多对多反向关系
+  interviewGalleries  Interview[]   @relation("InterviewGallery")
   productionGalleries Production[]  @relation("ProductionGallery")
   socialPosts         SocialPost[]  @relation("SocialPostMedia")
   fanShots            FanShot[]     @relation("FanShotMedia")
@@ -339,6 +340,9 @@ model Interview {
   title     String
   summary   String?
   source    String?
+  host      String?
+  location  String?
+  duration  String?
   date      DateTime
   mediaType InterviewMediaType @map("media_type")
 
@@ -346,9 +350,14 @@ model Interview {
   originalMediaId String? @map("original_media_id")
   originalMedia   Media?  @relation("InterviewOriginalMedia", fields: [originalMediaId], references: [id])
 
-  transcriptCantonese String?         @map("transcript_cantonese")
-  transcriptMandarin  String?         @map("transcript_mandarin")
+  embedUrl    String?  @map("embed_url")
+
+  transcriptCantonese Json?           @map("transcript_cantonese")
+  transcriptMandarin  Json?           @map("transcript_mandarin")
   proofreadStatus     ProofreadStatus @default(PENDING) @map("proofread_status")
+
+  // 图片集 (多对多)
+  gallery     Media[]  @relation("InterviewGallery")
 
   // 标签 (多对多)
   tags Tag[]

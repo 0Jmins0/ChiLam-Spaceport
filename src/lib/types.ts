@@ -175,6 +175,9 @@ export interface InterviewItem {
   title: string;
   summary: string | null;
   source: string | null;
+  host: string | null;
+  location: string | null;
+  duration: string | null;
   date: Date;
   mediaType: string; // InterviewMediaType enum
   originalUrl: string | null;
@@ -183,10 +186,12 @@ export interface InterviewItem {
 
 // 访谈详情页用
 export interface InterviewDetail extends InterviewItem {
-  transcriptCantonese: string | null;
-  transcriptMandarin: string | null;
+  transcriptCantonese: unknown;
+  transcriptMandarin: unknown;
   proofreadStatus: string;
   originalMediaUrl: string | null;
+  embedUrl: string | null;
+  galleryImages: { url: string; alt: string | null }[];
 }
 
 // 直播卡片展示用

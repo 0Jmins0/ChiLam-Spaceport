@@ -129,6 +129,9 @@ export async function getInterviews(options?: {
     title: rest.title,
     summary: rest.summary,
     source: rest.source,
+    host: rest.host,
+    location: rest.location,
+    duration: rest.duration,
     date: rest.date,
     mediaType: rest.mediaType,
     originalUrl: rest.originalUrl,
@@ -151,12 +154,13 @@ export async function getInterviewBySlug(slug: string): Promise<InterviewDetail 
     include: {
       tags: tagSelect,
       originalMedia: { select: { url: true } },
+      gallery: { select: { url: true, alt: true } },
     },
   });
 
   if (!raw) return null;
 
-  const { originalMedia, ...rest } = raw;
+  const { originalMedia, gallery, ...rest } = raw;
 
   return {
     id: rest.id,
@@ -164,6 +168,9 @@ export async function getInterviewBySlug(slug: string): Promise<InterviewDetail 
     title: rest.title,
     summary: rest.summary,
     source: rest.source,
+    host: rest.host,
+    location: rest.location,
+    duration: rest.duration,
     date: rest.date,
     mediaType: rest.mediaType,
     originalUrl: rest.originalUrl,
@@ -172,6 +179,8 @@ export async function getInterviewBySlug(slug: string): Promise<InterviewDetail 
     transcriptMandarin: rest.transcriptMandarin,
     proofreadStatus: rest.proofreadStatus,
     originalMediaUrl: originalMedia?.url ?? null,
+    embedUrl: rest.embedUrl ?? null,
+    galleryImages: gallery,
   };
 }
 

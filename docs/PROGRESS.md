@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P6 用户反馈迭代（P6.1 + P6.8 已完成）
+## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.8 已完成）
 
 ---
 
@@ -28,6 +28,27 @@
 ---
 
 ## 详细记录
+
+### 2026-06-10 - P6.2 访谈详情页重做（已完成）
+
+#### 变更内容
+- `prisma/schema.prisma`：Interview 模型新增 `host`/`location`/`duration`/`embedUrl` 字段，`transcriptCantonese`/`transcriptMandarin` 改为 `Json?` 类型，新增 `gallery Media[]` 多对多关联
+- `src/lib/types.ts`：`InterviewItem` 新增 host/location/duration，`InterviewDetail` 新增 embedUrl/galleryImages，transcript 类型改为 unknown
+- `src/lib/queries/activities.ts`：查询包含新字段和 gallery 关联
+- `src/app/api/activities/interviews/route.ts` + `[slug]/route.ts`：POST/PUT 支持新字段
+- 新建 `src/components/activities/InterviewDetail/` 目录，包含 4 个组件：
+  - `InterviewSidebar.tsx`：左栏元信息（来源/主持/地点/日期/时长，缺数据显示"暂无"）
+  - `InterviewTranscript.tsx`：中栏文稿（粤语/国语切换 + JSON segments 对话渲染 + 旧数据兼容）
+  - `InterviewMediaPanel.tsx`：右栏媒体面板（视频iframe/音频播放器/图片网格/默认占位 + 校对徽章 + 编者备注）
+  - `AudioPlayer.tsx`：自定义音频播放器（进度条/倍速/播放控件）
+- `src/app/activities/interviews/[slug]/page.tsx`：重写为三栏布局（桌面三栏sticky，移动端单栏堆叠）
+- `prisma/seed.ts`：新增含完整字段+B站视频嵌入的样本访谈数据
+
+#### 设计原则
+- 方案B：所有区域始终展示，缺数据用占位文案（"暂无"/"文稿整理中"/"媒体资源整理中"等）
+- 文稿支持 JSON 结构化存储（segments 数组）+ 纯字符串 fallback
+
+---
 
 ### 2026-06-10 - P6.8 演出详情页优化（已完成）
 

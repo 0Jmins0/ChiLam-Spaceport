@@ -1,21 +1,9 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import Link from 'next/link';
 import { getInterviewBySlug } from '@/lib/queries/activities';
-import { PageContainer } from '@/components/layout/PageContainer';
-import { Tag } from '@/components/ui/Tag';
-import { Button } from '@/components/ui/Button';
-
-const mediaTypeLabels: Record<string, string> = {
-  VIDEO: '视频',
-  AUDIO: '音频',
-  TEXT: '图文',
-};
-
-function formatDate(date: Date): string {
-  const d = new Date(date);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
+import InterviewSidebar from '@/components/activities/InterviewDetail/InterviewSidebar';
+import InterviewTranscript from '@/components/activities/InterviewDetail/InterviewTranscript';
+import InterviewMediaPanel from '@/components/activities/InterviewDetail/InterviewMediaPanel';
 
 export async function generateMetadata({
   params,
@@ -45,108 +33,69 @@ export default async function InterviewDetailPage({
 
   if (!interview) notFound();
 
-  const typeLabel = mediaTypeLabels[interview.mediaType] || interview.mediaType;
-  const isProofread = interview.proofreadStatus === 'PROOFREAD';
+  const galleryImages = (interview.galleryImages ?? []).map(
+    (img: { url: string; alt?: string | null }) => ({
+      url: img.url,
+      alt: img.alt ?? null,
+    }),
+  );
 
   return (
-    <PageContainer>
-      {/* Back link */}
-      <div className="mb-6">
-        <Link
-          href="/activities?tab=interview"
-          className="text-sm text-text-secondary hover:text-accent transition-colors"
-        >
-          &larr; 返回活动
-        </Link>
+    <div className="max-w-[var(--width-page)] mx-auto px-4 md:px-8 py-8">
+      {/* 移动端：媒体优先显示 */}
+      <div className="lg:hidden mb-8">
+        <InterviewMediaPanel
+          mediaType={interview.mediaType}
+          proofreadStatus={interview.proofreadStatus}
+          embedUrl={interview.embedUrl ?? null}
+          originalMediaUrl={interview.originalMediaUrl ?? null}
+          galleryImages={galleryImages}
+          summary={interview.summary ?? null}
+          duration={interview.duration ?? null}
+        />
       </div>
 
-      {/* Header section */}
-      <div className="space-y-4 max-w-3xl">
-        {/* Media type badge */}
-        <Tag active>{typeLabel}</Tag>
-
-        {/* Title */}
-        <h1 className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
-          {interview.title}
-        </h1>
-
-        {/* Meta info */}
-        <p className="text-sm text-text-muted">
-          {[interview.source, formatDate(interview.date)].filter(Boolean).join(' · ')}
-        </p>
-
-        {/* Gold line */}
-        <div className="gold-line" />
-
-        {/* Summary */}
-        {interview.summary && (
-          <p className="text-text-secondary leading-relaxed">{interview.summary}</p>
-        )}
-
-        {/* Original URL button */}
-        {interview.originalUrl && (
-          <div>
-            <a href={interview.originalUrl} target="_blank" rel="noopener noreferrer">
-              <Button variant="secondary" size="sm">
-                查看原始内容 ↗
-              </Button>
-            </a>
+      {/* 三栏布局 */}
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* 左栏 - Sidebar */}
+        <div className="lg:w-[220px] shrink-0">
+          <div className="lg:sticky lg:top-24">
+            <InterviewSidebar
+              source={interview.source ?? null}
+              host={interview.host ?? null}
+              location={interview.location ?? null}
+              date={interview.date}
+              duration={interview.duration ?? null}
+            />
           </div>
-        )}
-
-        {/* Tags */}
-        {interview.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {interview.tags.map((tag) => (
-              <Tag key={tag.slug}>{tag.name}</Tag>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Transcript section */}
-      {(interview.transcriptCantonese || interview.transcriptMandarin) && (
-        <div className="mt-8 max-w-3xl space-y-8">
-          {/* Proofread status indicator */}
-          <div className="flex items-center gap-2 text-sm">
-            {isProofread ? (
-              <span className="text-accent">AI 转录，已人工校对 ✓</span>
-            ) : (
-              <span className="text-text-muted">AI 转录，待校对</span>
-            )}
-          </div>
-
-          {/* Cantonese transcript */}
-          {interview.transcriptCantonese && (
-            <div className="space-y-3">
-              <h2 className="font-heading text-lg text-text-primary">粤语原文</h2>
-              <div className="rounded-[var(--radius-card)] border border-border-gold bg-bg-dark/50 p-6">
-                <div className="text-text-secondary leading-relaxed whitespace-pre-wrap">
-                  {interview.transcriptCantonese}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Mandarin transcript */}
-          {interview.transcriptMandarin && (
-            <div className="space-y-3">
-              <h2 className="font-heading text-lg text-text-primary">国语翻译</h2>
-              <div className="rounded-[var(--radius-card)] border border-border-gold bg-bg-dark/50 p-6">
-                <div className="text-text-secondary leading-relaxed whitespace-pre-wrap">
-                  {interview.transcriptMandarin}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
-      )}
 
-      {/* Related info placeholder */}
-      <div className="mt-8">
-        <h2 className="font-heading text-lg text-text-primary mb-4">相关资讯</h2>
-        <p className="text-sm text-text-muted">即将上线，敬请期待</p>
+        {/* 中栏 - Transcript */}
+        <div className="flex-1 min-w-0">
+          <InterviewTranscript
+            title={interview.title}
+            date={interview.date}
+            proofreadStatus={interview.proofreadStatus}
+            transcriptCantonese={interview.transcriptCantonese}
+            transcriptMandarin={interview.transcriptMandarin}
+          />
+        </div>
+
+        {/* 右栏 - MediaPanel（仅桌面端，移动端已在顶部显示） */}
+        <div className="hidden lg:block lg:w-[350px] shrink-0">
+          <div className="lg:sticky lg:top-24">
+            <InterviewMediaPanel
+              mediaType={interview.mediaType}
+              proofreadStatus={interview.proofreadStatus}
+              embedUrl={interview.embedUrl ?? null}
+              originalMediaUrl={interview.originalMediaUrl ?? null}
+              galleryImages={galleryImages}
+              summary={interview.summary ?? null}
+              duration={interview.duration ?? null}
+            />
+          </div>
+        </div>
       </div>
-    </PageContainer>
+    </div>
   );
 }
