@@ -14,6 +14,7 @@ interface NewsArticleCardProps {
   thumbnailUrl?: string;
   publishedAt: string | Date;
   tags?: string[];
+  priority?: boolean;
   className?: string;
 }
 
@@ -32,6 +33,7 @@ export function NewsArticleCard({
   source,
   thumbnailUrl,
   publishedAt,
+  priority,
   className,
 }: NewsArticleCardProps) {
   return (
@@ -52,6 +54,7 @@ export function NewsArticleCard({
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 200px"
+                priority={priority}
               />
             ) : (
               <div className="flex h-full items-center justify-center">

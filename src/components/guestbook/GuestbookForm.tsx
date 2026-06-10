@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/components/auth/AuthProvider';
@@ -12,6 +12,7 @@ const storyTagOptions = ['追星经历', '影视回忆', '音乐记忆', '冷知
 export function GuestbookForm() {
   const searchParams = useSearchParams();
   const currentTab = (searchParams.get('tab') as MessageTab) || 'message';
+  const router = useRouter();
   const { user, openLogin } = useAuth();
 
   const [content, setContent] = useState('');
@@ -62,6 +63,7 @@ export function GuestbookForm() {
         setContent('');
         setStoryTags([]);
         setRelatedYear('');
+        router.refresh();
       } else {
         const data = await res.json();
         setMessage(data.error?.message || '提交失败，请稍后重试');

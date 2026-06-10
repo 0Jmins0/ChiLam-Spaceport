@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import Link from 'next/link';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -34,6 +35,12 @@ export default function ProfileMessagesPage() {
   if (loading) {
     return (
       <PageContainer>
+        <Link
+          href="/profile"
+          className="inline-block text-sm text-accent hover:text-accent/80 transition-colors mb-4"
+        >
+          ← 返回个人中心
+        </Link>
         <PageHeader title="我的留言" titleEn="My Messages" />
         <div className="flex justify-center py-16">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
@@ -44,6 +51,12 @@ export default function ProfileMessagesPage() {
 
   return (
     <PageContainer>
+      <Link
+        href="/profile"
+        className="inline-block text-sm text-accent hover:text-accent/80 transition-colors mb-4"
+      >
+        ← 返回个人中心
+      </Link>
       <PageHeader title="我的留言" titleEn="My Messages" />
       <MessageList />
     </PageContainer>

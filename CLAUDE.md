@@ -4,9 +4,9 @@
 一个集合张智霖各平台、各阶段、各渠道资讯的综合性粉丝网站。
 
 ## 当前进度
-- **阶段**: UI 调整阶段四已完成
-- **已完成**: P0~P4 全部、UI 调整阶段一+二+三（用户系统）+四（用户个人页面）+五（全站检索）、P5.0 海报/封面填充
-- **下一步**: P5 优化上线
+- **阶段**: P6 用户反馈迭代进行中
+- **已完成**: P0~P4 全部、UI 调整阶段一~五、P5.0 海报/封面填充、P6.1 体验修复
+- **下一步**: P6.2 访谈详情页重做 → P6.3 瀑布流 → P6.4~P6.9
 - **详细进度**: 查看 `/docs/PROGRESS.md`
 
 ## 技术栈
@@ -36,39 +36,48 @@
 │   │   ├── page.tsx                                 # 首页（数据库驱动时间线）
 │   │   ├── updates/                                 # 动态模块（列表 + 三种详情页）
 │   │   ├── screens/                                 # 影视模块（列表 + 详情页）
-│   │   ├── activities/                              # 活动模块（列表 + 代言详情 + 访谈详情）
+│   │   ├── activities/                              # 活动模块（列表 + 代言详情 + 访谈详情 + 直播详情）
 │   │   ├── archives/                                # 资料库模块（列表 + 专辑详情 + 杂志详情）
+│   │   ├── messages/                                # 留言板（列表 + 详情页）
+│   │   ├── announcements/                           # 公告（列表 + 详情页）
+│   │   ├── profile/                                 # 用户个人中心（主页 + 留言管理 + 设置）
+│   │   ├── search/                                  # 搜索结果页
 │   │   ├── api/updates/                             # 动态 CRUD API
 │   │   ├── api/screens/                             # 影视 CRUD API
 │   │   ├── api/performances/                        # 演出 CRUD API
-│   │   ├── search/                                  # 搜索结果页
 │   │   ├── api/activities/                          # 活动 CRUD API（代言+访谈+直播）
 │   │   ├── api/archives/                            # 资料库 CRUD API（专辑+杂志）
 │   │   ├── api/messages/                            # 留言板 CRUD + 点赞 + 评论 API
 │   │   ├── api/announcements/                       # 公告 CRUD API
+│   │   ├── api/auth/                                # 用户认证 API（注册+登录+me）
+│   │   ├── api/user/                                # 用户个人 API（profile+password+messages）
 │   │   ├── api/upload/                              # 文件上传 API（R2 直传+预签名）
 │   │   ├── api/search/                              # 全站搜索 API
-│   │   ├── api/admin/                               # 管理后台 API（登录+审核）
-│   │   └── ...                                      # 其他栏目路由
+│   │   └── api/admin/                               # 管理后台 API（登录+审核）
 │   ├── components/
 │   │   ├── layout/                                  # 布局组件（Header, Footer, MobileNav 等）
 │   │   ├── ui/                                      # 通用 UI 组件（Button, Card, Tag, Pagination 等）
+│   │   ├── auth/                                    # 认证组件（AuthProvider, LoginModal, RegisterModal, UserMenu）
+│   │   ├── search/                                  # 搜索组件（SearchModal, SearchResultCard）
+│   │   ├── profile/                                 # 个人中心组件（ProfileHeader, MessageList, EditMessageModal, SettingsForm）
 │   │   ├── updates/                                 # 动态组件（SocialPostCard, NewsArticleCard 等）
 │   │   ├── screens/                                 # 影视组件（ProductionCard, ScreensFilterBar）
 │   │   ├── performances/                            # 演出组件（PerformanceCard, PerformancesFilterBar）
 │   │   ├── activities/                              # 活动组件（EndorsementCard, InterviewCard, LivestreamCard, ActivitiesFilterBar）
 │   │   ├── archives/                                # 资料库组件（AlbumCard, MagazineCard, ArchivesFilterBar）
-│   │   ├── guestbook/                               # 留言板组件（GuestbookCard, Form, LikeButton, CommentSection 等）
+│   │   ├── guestbook/                               # 留言板组件（GuestbookCard, GuestbookGrid, Form, LikeButton, CommentSection, CardActions 等）
 │   │   ├── announcements/                           # 公告组件（AnnouncementCard, FilterBar）
 │   │   └── decorative/                              # 装饰组件（FilmGrain, YearMarquee）
 │   ├── config/                                      # 站点配置（site.ts, navigation.ts）
 │   ├── lib/                                         # 工具函数
-│   │   ├── cn.ts, fonts.ts, db.ts, auth.ts, r2.ts   # 基础工具 + 认证 + R2 存储
+│   │   ├── cn.ts, fonts.ts, db.ts, r2.ts            # 基础工具 + R2 存储
+│   │   ├── auth.ts                                  # JWT 认证（管理员 + 用户双密钥）
+│   │   ├── username-validator.ts                    # 用户名禁用词校验
 │   │   ├── types.ts                                 # 数据类型定义
-│   │   └── queries/                                 # 数据查询层（timeline.ts, updates.ts, productions.ts, performances.ts, activities.ts, archives.ts, guestbook.ts, announcements.ts）
+│   │   └── queries/                                 # 数据查询层（timeline.ts, updates.ts, productions.ts, performances.ts, activities.ts, archives.ts, guestbook.ts, announcements.ts, user.ts, search.ts）
 │   └── generated/                                   # Prisma 生成的客户端代码
 ├── prisma/
-│   ├── schema.prisma                                # 数据库 Schema（已完成，20 张表）
+│   ├── schema.prisma                                # 数据库 Schema（已完成，22 张表）
 │   └── seed.ts                                      # 种子数据脚本
 └── public/                                          # 静态资源
 ```
@@ -85,8 +94,9 @@
 ## 数据库设计
 - **Schema 文件**: `prisma/schema.prisma`（已完成）
 - **设计文档**: `docs/Database_Design_v1.md`（Schema 的设计依据）
-- **表数量**: 20 张表 + 10 个枚举
+- **表数量**: 22 张表 + 10 个枚举
 - **核心设计**:
+  - `User` 用户表 + `Like` 点赞表：登录/注册、互动统计、星光积分
   - `Media` 统一媒体资源表：单引用用直接 FK，集合引用用 Prisma 隐式多对多
   - `Tag` 全站标签：与 9 张内容表多对多关联
   - `ContentRelation` 跨内容关联：多态引用（sourceType/Id → targetType/Id）
@@ -110,6 +120,8 @@
 | 资料库 | `/archives` | 杂志、专辑 |
 | 留言 | `/messages` | 我想对你说、故事分享、冷知识、建议反馈 |
 | 公告 | `/announcements` | 网站公告、规则、更新通知 |
+| 搜索 | `/search` | 全站检索（11 类型筛选） |
+| 个人中心 | `/profile` | 主页、留言管理(/messages)、设置(/settings) |
 
 ## 协作流程（每次开发的标准流程）
 

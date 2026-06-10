@@ -12,6 +12,7 @@ interface ProductionCardProps {
   role?: string;
   posterUrl?: string;
   type: string; // 'MOVIE' | 'TV_SERIES' | 'VARIETY_SHOW'
+  priority?: boolean;
   className?: string;
 }
 
@@ -28,6 +29,7 @@ export function ProductionCard({
   role,
   posterUrl,
   type,
+  priority,
   className,
 }: ProductionCardProps) {
   const typeLabel = typeLabels[type] || type;
@@ -44,6 +46,7 @@ export function ProductionCard({
               fill
               className="object-cover"
               sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              priority={priority}
             />
           ) : (
             <div className="flex h-full items-center justify-center">

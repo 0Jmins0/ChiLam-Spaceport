@@ -13,6 +13,7 @@ interface PerformanceCardProps {
   city?: string;
   posterUrl?: string;
   type: string; // 'CONCERT' | 'STAGE' | 'MUSICAL'
+  priority?: boolean;
   className?: string;
 }
 
@@ -30,6 +31,7 @@ export function PerformanceCard({
   city,
   posterUrl,
   type,
+  priority,
   className,
 }: PerformanceCardProps) {
   const typeLabel = typeLabels[type] || type;
@@ -46,6 +48,7 @@ export function PerformanceCard({
               fill
               className="object-cover"
               sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              priority={priority}
             />
           ) : (
             <div className="flex h-full items-center justify-center">

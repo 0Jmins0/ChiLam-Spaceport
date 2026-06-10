@@ -10,6 +10,7 @@ interface MagazineCardProps {
   issue?: string;
   date: Date;
   coverUrl?: string;
+  priority?: boolean;
   className?: string;
 }
 
@@ -20,7 +21,15 @@ function formatMonth(date: Date): string {
   return `${year}-${month}`;
 }
 
-export function MagazineCard({ slug, title, issue, date, coverUrl, className }: MagazineCardProps) {
+export function MagazineCard({
+  slug,
+  title,
+  issue,
+  date,
+  coverUrl,
+  priority,
+  className,
+}: MagazineCardProps) {
   return (
     <Link href={`/archives/magazines/${slug}`} className={cn('block', className)}>
       <Card className="p-0 overflow-hidden">
@@ -33,6 +42,7 @@ export function MagazineCard({ slug, title, issue, date, coverUrl, className }: 
               fill
               className="object-cover"
               sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              priority={priority}
             />
           ) : (
             <div className="flex h-full items-center justify-center px-4">

@@ -13,6 +13,7 @@ interface SocialPostCardProps {
   thumbnailUrl?: string;
   publishedAt: string | Date;
   tags?: string[];
+  priority?: boolean;
   className?: string;
 }
 
@@ -47,6 +48,7 @@ export function SocialPostCard({
   summary,
   thumbnailUrl,
   publishedAt,
+  priority,
   className,
 }: SocialPostCardProps) {
   return (
@@ -66,6 +68,7 @@ export function SocialPostCard({
               fill
               className="object-cover"
               sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              priority={priority}
             />
           ) : (
             <div className="flex h-full items-center justify-center">

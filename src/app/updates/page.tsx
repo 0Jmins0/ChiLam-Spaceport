@@ -58,7 +58,7 @@ export default async function UpdatesPage({
       ) : (
         <>
           <MasonryGrid>
-            {data.items.map((post) => (
+            {data.items.map((post, index) => (
               <SocialPostCard
                 key={post.id}
                 id={post.id}
@@ -69,6 +69,7 @@ export default async function UpdatesPage({
                 thumbnailUrl={post.thumbnailUrl ?? undefined}
                 publishedAt={post.publishedAt ?? (post as unknown as { createdAt: Date }).createdAt}
                 tags={post.tags.map((t) => t.name)}
+                priority={index < 3}
               />
             ))}
           </MasonryGrid>
@@ -90,7 +91,7 @@ export default async function UpdatesPage({
       ) : (
         <>
           <div className="space-y-4">
-            {data.items.map((article) => (
+            {data.items.map((article, index) => (
               <NewsArticleCard
                 key={article.id}
                 id={article.id}
@@ -104,6 +105,7 @@ export default async function UpdatesPage({
                   article.publishedAt ?? (article as unknown as { createdAt: Date }).createdAt
                 }
                 tags={article.tags.map((t) => t.name)}
+                priority={index < 3}
               />
             ))}
           </div>

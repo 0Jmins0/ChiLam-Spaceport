@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P5 前 - UI 调整与功能补充 (阶段四已完成)
+## 当前阶段: P6 用户反馈迭代（P6.1 体验修复已完成）
 
 ---
 
@@ -511,12 +511,14 @@
 - [x] 种子数据 (13 条留言 + 5 条评论)
 
 ### UI 组件
-- [x] GuestbookCard 留言卡片
-- [x] GuestbookForm 留言提交表单
-- [x] GuestbookFilterBar 筛选栏
-- [x] LikeButton 点赞按钮
+- [x] GuestbookCard 留言卡片（含 currentUserId prop + 内联操作按钮）
+- [x] GuestbookGrid 客户端包裹组件（useAuth 获取 currentUserId）
+- [x] GuestbookCardActions 编辑/删除按钮
+- [x] GuestbookForm 留言提交表单（需登录）
+- [x] GuestbookFilterBar 筛选栏（含故事 tag 子筛选）
+- [x] LikeButton 点赞按钮（需登录，Like 表 toggle）
 - [x] FavoriteButton 收藏按钮
-- [x] CommentSection 评论区
+- [x] CommentSection 评论区（需登录）
 - [x] GuestbookCardSkeleton 骨架屏
 
 ### 页面
@@ -611,7 +613,97 @@
 - 专辑封面: Apple Music 高清封面
 - 存储: 全部上传到 Cloudflare R2，通过 `/api/upload` 绑定到对应记录
 
-## 下一步: P5 优化上线
+## UI 调整阶段三完成清单（2026-06-10）
+
+### 数据库
+- [x] User 模型（username/password/displayName/avatar/统计字段/starlight）
+- [x] Like 模型（userId + targetType + targetId 联合唯一）
+- [x] Guestbook / Comment 新增可空 userId 外键
+- [x] prisma db push 同步（22 张表）
+
+### 后端 API
+- [x] src/lib/auth.ts 扩展（UserPayload + signUserToken + verifyUser，独立 USER_JWT_SECRET）
+- [x] src/lib/username-validator.ts（禁用词校验）
+- [x] POST /api/auth/register（校验+bcrypt+JWT）
+- [x] POST /api/auth/login（bcrypt验证+JWT）
+- [x] GET /api/auth/me（token→用户信息+统计+星光）
+
+### 前端组件
+- [x] AuthProvider（React Context，localStorage token 持久化）
+- [x] LoginModal / RegisterModal（弹窗表单，禁用词实时校验）
+- [x] UserMenu（下拉菜单：头像首字母 + 退出登录）
+- [x] Header / MobileNav 集成登录入口
+
+### 留言板权限改造
+- [x] 发布需登录，自动关联 userId，+5 星光
+- [x] 点赞需登录，Like 表 toggle，更新双方统计和星光
+- [x] 评论需登录，自动关联 userId，更新双方统计和星光
+- [x] 浏览无需登录
+- [x] GuestbookForm 未登录显示登录提示
+- [x] LikeButton 改为 toggle + GET 检查状态
+- [x] CommentSection 移除 nickname 输入
+
+## UI 调整阶段四完成清单（2026-06-10）
+
+### 后端 API
+- [x] src/lib/queries/user.ts（getUserProfile + getUserMessages 分页查询）
+- [x] GET /api/user/messages（当前用户留言列表，分页）
+- [x] PUT/DELETE /api/user/messages/[id]（编辑/删除自己的留言，userId 权限校验）
+- [x] GET/PUT /api/user/profile（获取/修改个人信息，displayName 同步 Guestbook.nickname）
+- [x] PUT /api/user/password（修改密码，bcrypt 验证旧密码 + 12轮哈希新密码）
+
+### 前端页面
+- [x] /profile 个人中心主页（ProfileHeader + 快捷入口）
+- [x] /profile/messages 我的留言管理（MessageList + EditMessageModal + 删除确认）
+- [x] /profile/settings 个人设置（头像上传到 R2 + 昵称修改 + 密码修改）
+
+### 前端组件
+- [x] ProfileHeader（头像/用户名/加入日期/4 统计卡片）
+- [x] MessageList（分页 + 编辑弹窗 + 删除确认）
+- [x] EditMessageModal（编辑内容/storyTags/relatedYear）
+- [x] SettingsForm（头像上传 2MB 限制 + 昵称 + 密码）
+- [x] GuestbookCardActions（客户端编辑/删除按钮，stopPropagation）
+- [x] GuestbookGrid（客户端包裹组件，useAuth 获取 currentUserId）
+- [x] GuestbookCard 新增 currentUserId prop
+- [x] UserMenu 新增「个人中心」链接 + 头像图片显示
+
+### Bug 修复
+- [x] r2.ts 环境变量改为懒加载（修复 Turbopack 模块初始化时序问题）
+- [x] SettingsForm 上传错误改为读取 API 响应体具体错误信息
+
+## UI 调整阶段五完成清单（2026-06-10）
+
+### 功能 8：全站检索
+- [x] 搜索查询层 (queries/search.ts)：10 表并行模糊搜索
+- [x] 搜索 API (GET /api/search)：preview + full 两种模式
+- [x] SearchModal 全屏搜索弹窗（debounce + 关键词高亮 + 分组预览）
+- [x] SearchResultCard 搜索结果卡片
+- [x] /search 搜索结果页（11 类型筛选 + 分页 + 骨架屏）
+- [x] Header 嵌入搜索入口（桌面端 + 移动端 + Cmd/Ctrl+K 快捷键）
+- [x] SearchResult 等类型定义
+- [x] pnpm build 通过
+
+## P6.1 体验修复完成清单（2026-06-10）
+
+### 6.1.1 图片加载优化
+- [x] next.config.ts 添加 `formats: ['image/avif', 'image/webp']`
+- [x] 6 个卡片组件新增 `priority` prop（ProductionCard, PerformanceCard, AlbumCard, MagazineCard, SocialPostCard, NewsArticleCard）
+- [x] 4 个列表页首屏卡片传 `priority={true}`（screens, performances, archives, updates）
+
+### 6.1.2 留言发布后即时更新
+- [x] GuestbookForm 提交成功后调用 `router.refresh()` 刷新列表
+
+### 6.1.3 返回导航按钮
+- [x] `/messages/[id]` 添加「← 返回留言板」链接
+- [x] `/profile/settings` 添加「← 返回个人中心」链接
+- [x] `/profile/messages` 添加「← 返回个人中心」链接
+- [x] 统一样式：金色文字 + hover 过渡
+
+### 验收
+- [x] pnpm lint 通过（0 errors）
+- [x] pnpm build 通过（27 静态 + 动态页面）
+
+## 下一步: P6.2 ~ P6.9 用户反馈迭代（详见 docs/P6_USER_FEEDBACK_PLAN.md）
 
 ---
 

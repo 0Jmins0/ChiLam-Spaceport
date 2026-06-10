@@ -53,7 +53,7 @@ export default async function PerformancesPage({
 
       {data.items.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {data.items.map((item) => (
+          {data.items.map((item, index) => (
             <PerformanceCard
               key={item.id}
               slug={item.slug}
@@ -63,6 +63,7 @@ export default async function PerformancesPage({
               city={item.city ?? undefined}
               posterUrl={item.posterUrl ?? undefined}
               type={item.type}
+              priority={index < 4}
             />
           ))}
         </div>

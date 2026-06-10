@@ -50,7 +50,7 @@ export default async function ArchivesPage({
         <>
           {albumData.items.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {albumData.items.map((item) => (
+              {albumData.items.map((item, index) => (
                 <AlbumCard
                   key={item.id}
                   slug={item.slug}
@@ -58,6 +58,7 @@ export default async function ArchivesPage({
                   releaseYear={item.releaseYear}
                   language={item.language ?? undefined}
                   coverUrl={item.coverUrl ?? undefined}
+                  priority={index < 4}
                 />
               ))}
             </div>
@@ -78,7 +79,7 @@ export default async function ArchivesPage({
         <>
           {magazineData.items.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {magazineData.items.map((item) => (
+              {magazineData.items.map((item, index) => (
                 <MagazineCard
                   key={item.id}
                   slug={item.slug}
@@ -86,6 +87,7 @@ export default async function ArchivesPage({
                   issue={item.issue ?? undefined}
                   date={item.date}
                   coverUrl={item.coverUrl ?? undefined}
+                  priority={index < 4}
                 />
               ))}
             </div>
