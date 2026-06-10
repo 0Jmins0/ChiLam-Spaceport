@@ -10,6 +10,8 @@ interface MagazineCardProps {
   issue?: string;
   date: Date;
   coverUrl?: string;
+  coverWidth?: number | null;
+  coverHeight?: number | null;
   priority?: boolean;
   className?: string;
 }
@@ -27,14 +29,24 @@ export function MagazineCard({
   issue,
   date,
   coverUrl,
+  coverWidth,
+  coverHeight,
   priority,
   className,
 }: MagazineCardProps) {
   return (
-    <Link href={`/archives/magazines/${slug}`} className={cn('block', className)}>
+    <Link
+      href={`/archives/magazines/${slug}`}
+      className={cn('block break-inside-avoid mb-4', className)}
+    >
       <Card className="p-0 overflow-hidden">
         {/* Cover */}
-        <div className="relative aspect-[2/3] w-full bg-bg-darker">
+        <div
+          className="relative w-full bg-bg-darker overflow-hidden"
+          style={{
+            aspectRatio: coverWidth && coverHeight ? `${coverWidth}/${coverHeight}` : '2/3',
+          }}
+        >
           {coverUrl ? (
             <Image
               src={coverUrl}

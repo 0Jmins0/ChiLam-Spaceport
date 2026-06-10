@@ -4,6 +4,7 @@ import { ActivitiesFilterBar } from '@/components/activities/ActivitiesFilterBar
 import { EndorsementCard } from '@/components/activities/EndorsementCard';
 import { InterviewCard } from '@/components/activities/InterviewCard';
 import { LivestreamCard } from '@/components/activities/LivestreamCard';
+import { MasonryLayout } from '@/components/ui/MasonryLayout';
 import { Pagination } from '@/components/updates/Pagination';
 import {
   getEndorsements,
@@ -59,7 +60,7 @@ export default async function ActivitiesPage({
 
       {data.items.length > 0 ? (
         tab === 'endorsement' ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <MasonryLayout>
             {data.items.map((item) => {
               const endorsement = item as Awaited<
                 ReturnType<typeof getEndorsements>
@@ -74,10 +75,12 @@ export default async function ActivitiesPage({
                   startYear={endorsement.startYear}
                   endYear={endorsement.endYear ?? undefined}
                   mediaUrl={endorsement.mediaUrls[0]?.url}
+                  mediaWidth={endorsement.mediaUrls[0]?.width}
+                  mediaHeight={endorsement.mediaUrls[0]?.height}
                 />
               );
             })}
-          </div>
+          </MasonryLayout>
         ) : tab === 'livestream' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {data.items.map((item) => {

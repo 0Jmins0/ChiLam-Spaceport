@@ -2,6 +2,7 @@ import { PageContainer } from '@/components/layout/PageContainer';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { ScreensFilterBar } from '@/components/screens/ScreensFilterBar';
 import { ProductionCard } from '@/components/screens/ProductionCard';
+import { MasonryLayout } from '@/components/ui/MasonryLayout';
 import { Pagination } from '@/components/updates/Pagination';
 import { getProductions, getProductionCounts } from '@/lib/queries/productions';
 
@@ -47,7 +48,7 @@ export default async function ScreensPage({
       <ScreensFilterBar currentTab={tab} currentDecade={decade} counts={counts} className="mb-8" />
 
       {data.items.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <MasonryLayout>
           {data.items.map((item, index) => (
             <ProductionCard
               key={item.id}
@@ -56,11 +57,13 @@ export default async function ScreensPage({
               year={item.year}
               role={item.role ?? undefined}
               posterUrl={item.posterUrl ?? undefined}
+              posterWidth={item.posterWidth}
+              posterHeight={item.posterHeight}
               type={item.type}
               priority={index < 4}
             />
           ))}
-        </div>
+        </MasonryLayout>
       ) : (
         <div className="flex items-center justify-center py-20">
           <p className="text-text-muted">暂无作品</p>

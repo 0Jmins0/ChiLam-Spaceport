@@ -32,7 +32,7 @@ export async function getAlbums(options?: {
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: {
-        cover: { select: { url: true } },
+        cover: { select: { url: true, width: true, height: true } },
         tags: tagSelect,
       },
     }),
@@ -48,6 +48,8 @@ export async function getAlbums(options?: {
     releaseYear: rest.releaseYear,
     language: rest.language,
     coverUrl: cover?.url ?? null,
+    coverWidth: cover?.width ?? null,
+    coverHeight: cover?.height ?? null,
     tags: rest.tags,
   }));
 
@@ -65,7 +67,7 @@ export async function getAlbumBySlug(slug: string): Promise<AlbumDetail | null> 
   const raw = await prisma.album.findUnique({
     where: { slug },
     include: {
-      cover: { select: { url: true } },
+      cover: { select: { url: true, width: true, height: true } },
       tags: tagSelect,
     },
   });
@@ -81,6 +83,8 @@ export async function getAlbumBySlug(slug: string): Promise<AlbumDetail | null> 
     releaseYear: rest.releaseYear,
     language: rest.language,
     coverUrl: cover?.url ?? null,
+    coverWidth: cover?.width ?? null,
+    coverHeight: cover?.height ?? null,
     tags: rest.tags,
     tracks: tracks as string[] | null,
     streamingLinks: streamingLinks as Record<string, string> | null,
@@ -103,7 +107,7 @@ export async function getMagazines(options?: {
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: {
-        cover: { select: { url: true } },
+        cover: { select: { url: true, width: true, height: true } },
         tags: tagSelect,
       },
     }),
@@ -119,6 +123,8 @@ export async function getMagazines(options?: {
     issue: rest.issue,
     date: rest.date,
     coverUrl: cover?.url ?? null,
+    coverWidth: cover?.width ?? null,
+    coverHeight: cover?.height ?? null,
     tags: rest.tags,
   }));
 
@@ -136,7 +142,7 @@ export async function getMagazineBySlug(slug: string): Promise<MagazineDetail | 
   const raw = await prisma.magazine.findUnique({
     where: { slug },
     include: {
-      cover: { select: { url: true } },
+      cover: { select: { url: true, width: true, height: true } },
       scans: { select: { url: true, alt: true } },
       tags: tagSelect,
     },
@@ -153,6 +159,8 @@ export async function getMagazineBySlug(slug: string): Promise<MagazineDetail | 
     issue: rest.issue,
     date: rest.date,
     coverUrl: cover?.url ?? null,
+    coverWidth: cover?.width ?? null,
+    coverHeight: cover?.height ?? null,
     tags: rest.tags,
     scans,
   };

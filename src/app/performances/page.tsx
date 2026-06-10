@@ -2,6 +2,7 @@ import { PageContainer } from '@/components/layout/PageContainer';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PerformancesFilterBar } from '@/components/performances/PerformancesFilterBar';
 import { PerformanceCard } from '@/components/performances/PerformanceCard';
+import { MasonryLayout } from '@/components/ui/MasonryLayout';
 import { Pagination } from '@/components/updates/Pagination';
 import { getPerformances, getPerformanceCounts } from '@/lib/queries/performances';
 
@@ -52,7 +53,7 @@ export default async function PerformancesPage({
       />
 
       {data.items.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <MasonryLayout>
           {data.items.map((item, index) => (
             <PerformanceCard
               key={item.id}
@@ -62,11 +63,13 @@ export default async function PerformancesPage({
               venue={item.venue ?? undefined}
               city={item.city ?? undefined}
               posterUrl={item.posterUrl ?? undefined}
+              posterWidth={item.posterWidth}
+              posterHeight={item.posterHeight}
               type={item.type}
               priority={index < 4}
             />
           ))}
-        </div>
+        </MasonryLayout>
       ) : (
         <div className="flex items-center justify-center py-20">
           <p className="text-text-muted">暂无演出</p>

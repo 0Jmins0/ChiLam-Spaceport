@@ -83,6 +83,8 @@ export interface ProductionItem {
   role: string | null;
   synopsis: string | null;
   posterUrl: string | null;
+  posterWidth: number | null;
+  posterHeight: number | null;
   language: string | null;
   varietyRegion: string | null;
   varietyRole: string | null;
@@ -114,6 +116,8 @@ export interface PerformanceItem {
   city: string | null;
   series: string | null;
   posterUrl: string | null; // 从 poster 关系展平
+  posterWidth: number | null;
+  posterHeight: number | null;
   tags: { name: string; slug: string }[];
 }
 
@@ -161,7 +165,7 @@ export interface EndorsementItem {
   description: string | null;
   startYear: number;
   endYear: number | null;
-  mediaUrls: { url: string; alt: string | null }[];
+  mediaUrls: { url: string; alt: string | null; width: number | null; height: number | null }[];
   tags: { name: string; slug: string }[];
 }
 
@@ -227,6 +231,8 @@ export interface AlbumItem {
   releaseYear: number;
   language: string | null;
   coverUrl: string | null;
+  coverWidth: number | null;
+  coverHeight: number | null;
   tags: { name: string; slug: string }[];
 }
 
@@ -244,6 +250,8 @@ export interface MagazineItem {
   issue: string | null;
   date: Date;
   coverUrl: string | null;
+  coverWidth: number | null;
+  coverHeight: number | null;
   tags: { name: string; slug: string }[];
 }
 

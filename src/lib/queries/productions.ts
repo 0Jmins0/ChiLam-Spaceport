@@ -37,7 +37,7 @@ export async function getProductions(options?: {
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: {
-        poster: { select: { url: true } },
+        poster: { select: { url: true, width: true, height: true } },
         tags: tagSelect,
       },
     }),
@@ -56,6 +56,8 @@ export async function getProductions(options?: {
     role: rest.role,
     synopsis: rest.synopsis,
     posterUrl: poster?.url ?? null,
+    posterWidth: poster?.width ?? null,
+    posterHeight: poster?.height ?? null,
     language: rest.language,
     varietyRegion: rest.varietyRegion,
     varietyRole: rest.varietyRole,
@@ -76,7 +78,7 @@ export async function getProductionBySlug(slug: string): Promise<ProductionDetai
   const raw = await prisma.production.findUnique({
     where: { slug },
     include: {
-      poster: { select: { url: true, alt: true } },
+      poster: { select: { url: true, alt: true, width: true, height: true } },
       gallery: { select: { url: true, alt: true } },
       tags: tagSelect,
     },
@@ -96,6 +98,8 @@ export async function getProductionBySlug(slug: string): Promise<ProductionDetai
     role: rest.role,
     synopsis: rest.synopsis,
     posterUrl: poster?.url ?? null,
+    posterWidth: poster?.width ?? null,
+    posterHeight: poster?.height ?? null,
     language: rest.language,
     varietyRegion: rest.varietyRegion,
     varietyRole: rest.varietyRole,

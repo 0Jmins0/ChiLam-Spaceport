@@ -36,7 +36,7 @@ export async function getPerformances(options?: {
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: {
-        poster: { select: { url: true } },
+        poster: { select: { url: true, width: true, height: true } },
         tags: tagSelect,
       },
     }),
@@ -58,6 +58,8 @@ export async function getPerformances(options?: {
     city: rest.city,
     series: rest.series,
     posterUrl: poster?.url ?? null,
+    posterWidth: poster?.width ?? null,
+    posterHeight: poster?.height ?? null,
     tags: rest.tags,
   }));
 
@@ -75,7 +77,7 @@ export async function getPerformanceBySlug(slug: string): Promise<PerformanceDet
   const raw = await prisma.performance.findUnique({
     where: { slug },
     include: {
-      poster: { select: { url: true } },
+      poster: { select: { url: true, width: true, height: true } },
       tags: tagSelect,
       officialMedia: {
         orderBy: { sortOrder: 'asc' },
@@ -107,6 +109,8 @@ export async function getPerformanceBySlug(slug: string): Promise<PerformanceDet
     city: rest.city,
     series: rest.series,
     posterUrl: poster?.url ?? null,
+    posterWidth: poster?.width ?? null,
+    posterHeight: poster?.height ?? null,
     tags: rest.tags,
     summary: rest.summary,
     setlist: setlist as string[] | null,

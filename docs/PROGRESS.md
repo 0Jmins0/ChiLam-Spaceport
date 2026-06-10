@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.8 已完成）
+## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.8 已完成）
 
 ---
 
@@ -28,6 +28,20 @@
 ---
 
 ## 详细记录
+
+### 2026-06-11 - P6.3 瀑布流布局改版（已完成）
+
+#### 变更内容
+- 新建 `src/components/ui/MasonryLayout.tsx`：通用瀑布流容器组件（CSS columns，2→3→4 列响应式）
+- `src/lib/types.ts`：ProductionItem/PerformanceItem 新增 posterWidth/posterHeight，AlbumItem/MagazineItem 新增 coverWidth/coverHeight，EndorsementItem mediaUrls 新增 width/height
+- 4 个查询文件（productions/performances/archives/activities）：列表+详情查询的 Media select 加入 width/height
+- 5 个卡片组件改造：ProductionCard/PerformanceCard/AlbumCard/MagazineCard/EndorsementCard 移除固定 aspect-ratio，改为动态 style aspectRatio（有尺寸用实际比例，无尺寸用默认 fallback），添加 break-inside-avoid mb-4
+- 5 个列表页（screens/performances/archives/activities/updates）：CSS Grid 替换为 MasonryLayout 组件，传递图片尺寸 props
+- updates 页面：MasonryGrid 导入统一为 MasonryLayout（新闻 tab 保持 space-y-4 不变）
+
+#### 未改动（按设计）
+- InterviewCard / LivestreamCard：纯文字卡片，保持 grid 列表布局
+- NewsArticleCard：横向排列布局，不适合瀑布流
 
 ### 2026-06-10 - P6.2 访谈详情页重做（已完成）
 

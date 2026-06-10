@@ -3,6 +3,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { ArchivesFilterBar } from '@/components/archives/ArchivesFilterBar';
 import { AlbumCard } from '@/components/archives/AlbumCard';
 import { MagazineCard } from '@/components/archives/MagazineCard';
+import { MasonryLayout } from '@/components/ui/MasonryLayout';
 import { Pagination } from '@/components/updates/Pagination';
 import { getAlbums, getMagazines, getArchiveCounts } from '@/lib/queries/archives';
 
@@ -49,7 +50,7 @@ export default async function ArchivesPage({
       {tab === 'album' && albumData && (
         <>
           {albumData.items.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <MasonryLayout>
               {albumData.items.map((item, index) => (
                 <AlbumCard
                   key={item.id}
@@ -58,10 +59,12 @@ export default async function ArchivesPage({
                   releaseYear={item.releaseYear}
                   language={item.language ?? undefined}
                   coverUrl={item.coverUrl ?? undefined}
+                  coverWidth={item.coverWidth}
+                  coverHeight={item.coverHeight}
                   priority={index < 4}
                 />
               ))}
-            </div>
+            </MasonryLayout>
           ) : (
             <div className="flex items-center justify-center py-20">
               <p className="text-text-muted">暂无专辑</p>
@@ -78,7 +81,7 @@ export default async function ArchivesPage({
       {tab === 'magazine' && magazineData && (
         <>
           {magazineData.items.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <MasonryLayout>
               {magazineData.items.map((item, index) => (
                 <MagazineCard
                   key={item.id}
@@ -87,10 +90,12 @@ export default async function ArchivesPage({
                   issue={item.issue ?? undefined}
                   date={item.date}
                   coverUrl={item.coverUrl ?? undefined}
+                  coverWidth={item.coverWidth}
+                  coverHeight={item.coverHeight}
                   priority={index < 4}
                 />
               ))}
-            </div>
+            </MasonryLayout>
           ) : (
             <div className="flex items-center justify-center py-20">
               <p className="text-text-muted">暂无杂志</p>

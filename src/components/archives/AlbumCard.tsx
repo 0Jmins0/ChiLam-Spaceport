@@ -11,6 +11,8 @@ interface AlbumCardProps {
   releaseYear: number;
   language?: string;
   coverUrl?: string;
+  coverWidth?: number | null;
+  coverHeight?: number | null;
   priority?: boolean;
   className?: string;
 }
@@ -21,14 +23,24 @@ export function AlbumCard({
   releaseYear,
   language,
   coverUrl,
+  coverWidth,
+  coverHeight,
   priority,
   className,
 }: AlbumCardProps) {
   return (
-    <Link href={`/archives/albums/${slug}`} className={cn('block', className)}>
+    <Link
+      href={`/archives/albums/${slug}`}
+      className={cn('block break-inside-avoid mb-4', className)}
+    >
       <Card className="p-0 overflow-hidden">
         {/* Cover */}
-        <div className="relative aspect-[1/1] w-full bg-bg-darker">
+        <div
+          className="relative w-full bg-bg-darker overflow-hidden"
+          style={{
+            aspectRatio: coverWidth && coverHeight ? `${coverWidth}/${coverHeight}` : '1/1',
+          }}
+        >
           {coverUrl ? (
             <Image
               src={coverUrl}

@@ -35,7 +35,7 @@ export async function getEndorsements(options?: {
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: {
-        media: { select: { url: true, alt: true } },
+        media: { select: { url: true, alt: true, width: true, height: true } },
         tags: tagSelect,
       },
     }),
@@ -71,7 +71,7 @@ export async function getEndorsementBySlug(slug: string): Promise<EndorsementDet
   const raw = await prisma.endorsement.findUnique({
     where: { slug },
     include: {
-      media: { select: { url: true, alt: true } },
+      media: { select: { url: true, alt: true, width: true, height: true } },
       tags: tagSelect,
     },
   });

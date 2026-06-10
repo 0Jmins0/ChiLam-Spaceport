@@ -4,7 +4,7 @@ import { UpdatesFilterBar } from '@/components/updates/UpdatesFilterBar';
 import { SocialPostCard } from '@/components/updates/SocialPostCard';
 import { NewsArticleCard } from '@/components/updates/NewsArticleCard';
 import { SightingCard } from '@/components/updates/SightingCard';
-import { MasonryGrid } from '@/components/updates/MasonryGrid';
+import { MasonryLayout } from '@/components/ui/MasonryLayout';
 import { Pagination } from '@/components/updates/Pagination';
 import {
   getSocialPosts,
@@ -57,7 +57,7 @@ export default async function UpdatesPage({
         <p className="py-16 text-center text-sm text-text-muted">暂无内容</p>
       ) : (
         <>
-          <MasonryGrid>
+          <MasonryLayout>
             {data.items.map((post, index) => (
               <SocialPostCard
                 key={post.id}
@@ -72,7 +72,7 @@ export default async function UpdatesPage({
                 priority={index < 3}
               />
             ))}
-          </MasonryGrid>
+          </MasonryLayout>
           {data.totalPages > 1 && (
             <Pagination
               currentPage={data.currentPage}
@@ -126,7 +126,7 @@ export default async function UpdatesPage({
         <p className="py-16 text-center text-sm text-text-muted">暂无内容</p>
       ) : (
         <>
-          <MasonryGrid>
+          <MasonryLayout>
             {data.items.map((sighting) => (
               <SightingCard
                 key={sighting.id}
@@ -143,7 +143,7 @@ export default async function UpdatesPage({
                 tags={sighting.tags.map((t) => t.name)}
               />
             ))}
-          </MasonryGrid>
+          </MasonryLayout>
           {data.totalPages > 1 && (
             <Pagination
               currentPage={data.currentPage}

@@ -13,6 +13,8 @@ interface EndorsementCardProps {
   startYear: number;
   endYear?: number;
   mediaUrl?: string;
+  mediaWidth?: number | null;
+  mediaHeight?: number | null;
   className?: string;
 }
 
@@ -24,15 +26,25 @@ export function EndorsementCard({
   startYear,
   endYear,
   mediaUrl,
+  mediaWidth,
+  mediaHeight,
   className,
 }: EndorsementCardProps) {
   const yearRange = endYear ? `${startYear}-${endYear}` : `${startYear}-至今`;
 
   return (
-    <Link href={`/activities/endorsements/${slug}`} className={cn('block', className)}>
+    <Link
+      href={`/activities/endorsements/${slug}`}
+      className={cn('block break-inside-avoid mb-4', className)}
+    >
       <Card className="p-0 overflow-hidden">
         {/* Image */}
-        <div className="relative aspect-[4/3] w-full bg-bg-darker">
+        <div
+          className="relative w-full bg-bg-darker overflow-hidden"
+          style={{
+            aspectRatio: mediaWidth && mediaHeight ? `${mediaWidth}/${mediaHeight}` : '4/3',
+          }}
+        >
           {mediaUrl ? (
             <Image
               src={mediaUrl}
