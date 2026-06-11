@@ -108,10 +108,23 @@ export async function POST(request: NextRequest) {
     const result = await uploadFile(buffer, file.name, file.type);
 
     if (!wantsBind) {
+      const media = await prisma.media.create({
+        data: {
+          type: getMediaType(file.type),
+          url: result.url,
+          filename: file.name,
+          mimeType: file.type,
+          size: file.size,
+          alt: alt || undefined,
+          caption: caption || undefined,
+        },
+      });
+
       return NextResponse.json({
         success: true,
         key: result.key,
         url: result.url,
+        media,
       });
     }
 
