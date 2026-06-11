@@ -38,10 +38,11 @@
 - `src/app/api/messages/route.ts`：POST 支持 imageId/imageCropData/imageAsBackground
 - `src/app/api/messages/[id]/comments/route.ts`：POST 支持 imageId，返回图片
 - 新建 `src/app/api/admin/messages/featured/route.ts`：管理员切换精选状态 API
-- 新建 `src/components/guestbook/ImageUploader.tsx`：图片选择+裁切+上传组件（react-image-crop）
+- 新建 `src/components/guestbook/ImageUploader.tsx`：图片选择+直接上传组件（裁切功能暂关闭，后续开启）
 - `src/components/guestbook/GuestbookCard.tsx`：两种图片展示模式（融合背景/缩略图）+ 精选金色标记
-- `src/components/guestbook/GuestbookForm.tsx`：图片上传 + 融合模式开关
+- `src/components/guestbook/GuestbookForm.tsx`：图片上传，默认融合背景显示
 - `src/components/guestbook/CommentSection.tsx`：评论图片上传 + 评论图片展示
+- `src/app/api/upload/route.ts`：无绑定上传也创建 Media 记录
 
 ### 2026-06-11 - P6.3 瀑布流布局改版（已完成）
 

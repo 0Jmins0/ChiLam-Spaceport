@@ -25,7 +25,7 @@ export function GuestbookForm() {
     url: string;
     cropData: ImageCropData | null;
   } | null>(null);
-  const [imageAsBackground, setImageAsBackground] = useState(false);
+  const [imageAsBackground, setImageAsBackground] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
 
