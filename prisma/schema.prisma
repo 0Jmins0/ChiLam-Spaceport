@@ -157,6 +157,7 @@ model Media {
   endorsements        Endorsement[] @relation("EndorsementMedia")
   sightings           Sighting[]    @relation("SightingMedia")
   guestbooks          Guestbook[]   @relation("GuestbookImages")
+  comments            Comment[]     @relation("CommentImage")
   magazineScans       Magazine[]    @relation("MagazineScans")
   livestreamMedia      Livestream[]  @relation("LivestreamMedia")
   newsArticles        NewsArticle[] @relation("NewsArticleMedia")
@@ -569,12 +570,17 @@ model Guestbook {
   likesCount Int              @default(0) @map("likes_count")
   status     ModerationStatus @default(PENDING)
 
+  isFeatured      Boolean  @default(false) @map("is_featured")
+  imageCropData   Json?    @map("image_crop_data")
+  imageAsBackground Boolean @default(false) @map("image_as_background")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@index([tab])
   @@index([status])
   @@index([createdAt(sort: Desc)])
+  @@index([isFeatured])
   @@map("guestbook")
 }
 
@@ -587,6 +593,8 @@ model Comment {
   userId     String?  @map("user_id")
   user       User?    @relation(fields: [userId], references: [id])
   content    String   @db.VarChar(300)
+  imageId    String?  @map("image_id")
+  image      Media?   @relation("CommentImage", fields: [imageId], references: [id])
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 

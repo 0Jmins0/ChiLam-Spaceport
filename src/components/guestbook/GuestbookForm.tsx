@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/Button';
+import { ImageUploader } from '@/components/guestbook/ImageUploader';
 import { useAuth } from '@/components/auth/AuthProvider';
-import type { MessageTab } from '@/lib/types';
+import type { ImageCropData, MessageTab } from '@/lib/types';
 
 const storyTagOptions = ['追星经历', '影视回忆', '音乐记忆', '冷知识', '其他'];
 
@@ -18,6 +19,12 @@ export function GuestbookForm() {
   const [content, setContent] = useState('');
   const [storyTags, setStoryTags] = useState<string[]>([]);
   const [relatedYear, setRelatedYear] = useState('');
+  const [imageData, setImageData] = useState<{
+    mediaId: string;
+    url: string;
+    cropData: ImageCropData | null;
+  } | null>(null);
+  const [imageAsBackground, setImageAsBackground] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -49,6 +56,12 @@ export function GuestbookForm() {
         if (relatedYear) body.relatedYear = Number(relatedYear);
       }
 
+      if (imageData) {
+        body.imageId = imageData.mediaId;
+        if (imageData.cropData) body.imageCropData = imageData.cropData;
+        body.imageAsBackground = imageAsBackground;
+      }
+
       const res = await fetch('/api/messages', {
         method: 'POST',
         headers: {
@@ -63,6 +76,8 @@ export function GuestbookForm() {
         setContent('');
         setStoryTags([]);
         setRelatedYear('');
+        setImageData(null);
+        setImageAsBackground(false);
         router.refresh();
       } else {
         const data = await res.json();
@@ -110,6 +125,28 @@ export function GuestbookForm() {
           className="w-full rounded-md border border-border-gold/50 bg-bg-darker px-3 py-2 text-sm text-text-primary placeholder:text-text-muted/50 focus:border-accent focus:outline-none resize-none"
           placeholder="想说的话..."
         />
+      </div>
+
+      {/* 图片上传 */}
+      <div className="space-y-2">
+        <ImageUploader
+          onImageUploaded={(data) => setImageData(data)}
+          onImageRemoved={() => {
+            setImageData(null);
+            setImageAsBackground(false);
+          }}
+        />
+        {imageData && (
+          <label className="flex items-center gap-2 text-xs text-text-muted cursor-pointer">
+            <input
+              type="checkbox"
+              checked={imageAsBackground}
+              onChange={(e) => setImageAsBackground(e.target.checked)}
+              className="rounded border-border-gold/50 bg-bg-darker text-accent focus:ring-accent"
+            />
+            <span>在卡片中作为背景融合显示</span>
+          </label>
+        )}
       </div>
 
       {/* 故事 tab 额外字段 */}

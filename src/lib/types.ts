@@ -263,6 +263,13 @@ export interface MagazineDetail extends MagazineItem {
 // ═══════ 留言板 (Guestbook) ═══════
 export type MessageTab = 'message' | 'story' | 'feedback';
 
+export interface ImageCropData {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export interface GuestbookItem {
   id: string;
   tab: MessageTab;
@@ -274,6 +281,10 @@ export interface GuestbookItem {
   commentsCount: number;
   createdAt: string;
   userId: string | null;
+  isFeatured: boolean;
+  thumbnail: string | null;
+  imageCropData: ImageCropData | null;
+  imageAsBackground: boolean;
 }
 
 export interface GuestbookDetail extends GuestbookItem {
@@ -286,6 +297,7 @@ export interface CommentItem {
   content: string;
   createdAt: string;
   userId: string | null;
+  image: { url: string; alt: string | null } | null;
 }
 
 // ═══════ 公告 (Announcements) ═══════

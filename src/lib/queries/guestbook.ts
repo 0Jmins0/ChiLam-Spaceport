@@ -6,6 +6,7 @@ import type {
   GuestbookDetail,
   CommentItem,
   MessageTab,
+  ImageCropData,
 } from '@/lib/types';
 
 const PAGE_SIZE = 12;
@@ -43,7 +44,8 @@ export async function getGuestbookEntries(options?: {
   const [rawItems, totalCount] = await Promise.all([
     prisma.guestbook.findMany({
       where,
-      orderBy: { createdAt: 'desc' },
+      include: { images: { select: { url: true }, take: 1 } },
+      orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
       skip: (page - 1) * pageSize,
       take: pageSize,
     }),
@@ -72,6 +74,10 @@ export async function getGuestbookEntries(options?: {
     commentsCount: countMap.get(item.id) ?? 0,
     createdAt: item.createdAt.toISOString(),
     userId: item.userId,
+    isFeatured: item.isFeatured,
+    thumbnail: item.images?.[0]?.url ?? null,
+    imageCropData: (item.imageCropData as ImageCropData | null) ?? null,
+    imageAsBackground: item.imageAsBackground,
   }));
 
   return { items, totalCount, currentPage: page, totalPages, hasMore: page < totalPages };
@@ -101,6 +107,10 @@ export async function getGuestbookById(id: string): Promise<GuestbookDetail | nu
     commentsCount,
     createdAt: raw.createdAt.toISOString(),
     userId: raw.userId,
+    isFeatured: raw.isFeatured,
+    thumbnail: raw.images?.[0]?.url ?? null,
+    imageCropData: (raw.imageCropData as ImageCropData | null) ?? null,
+    imageAsBackground: raw.imageAsBackground,
     images: raw.images,
   };
 }
@@ -129,6 +139,7 @@ export async function getCommentsByTarget(
   const [rawItems, totalCount] = await Promise.all([
     prisma.comment.findMany({
       where,
+      include: { image: { select: { url: true, alt: true } } },
       orderBy: { createdAt: 'asc' },
       skip: (pageNum - 1) * pageSize,
       take: pageSize,
@@ -144,7 +155,13 @@ export async function getCommentsByTarget(
     content: item.content,
     createdAt: item.createdAt.toISOString(),
     userId: item.userId,
+    image: item.image ? { url: item.image.url, alt: item.image.alt } : null,
   }));
 
   return { items, totalCount, currentPage: pageNum, totalPages, hasMore: pageNum < totalPages };
+}
+
+// 精选留言数量
+export async function getFeaturedCount(): Promise<number> {
+  return prisma.guestbook.count({ where: { status: { not: 'REJECTED' }, isFeatured: true } });
 }

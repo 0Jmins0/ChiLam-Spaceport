@@ -22,21 +22,76 @@ export function GuestbookCard({ item, className, currentUserId }: GuestbookCardP
     day: 'numeric',
   });
 
+  const hasBackground = !!(item.thumbnail && item.imageAsBackground);
+  const hasThumbnail = !!(item.thumbnail && !item.imageAsBackground);
+
   return (
     <Link href={`/messages/${item.id}`} className={cn('block', className)}>
-      <Card className="flex flex-col gap-3 p-4 h-full">
+      <Card
+        className={cn(
+          'flex flex-col gap-3 p-4 h-full',
+          hasBackground && 'relative overflow-hidden',
+          item.isFeatured &&
+            'border-amber-500/40 bg-gradient-to-br from-amber-500/5 to-transparent',
+        )}
+      >
+        {/* 精選标记 */}
+        {item.isFeatured && (
+          <span className="absolute top-2 right-2 z-20 flex items-center gap-1 rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-medium text-amber-400 border border-amber-500/30">
+            ⭐ 精選
+          </span>
+        )}
+
+        {/* 融合模式背景图 */}
+        {hasBackground && (
+          <div
+            className="absolute inset-y-0 right-0 w-[45%] pointer-events-none"
+            style={{
+              backgroundImage: `url(${item.thumbnail})`,
+              backgroundSize: 'cover',
+              backgroundPosition: item.imageCropData
+                ? `${item.imageCropData.x * 100 + item.imageCropData.width * 50}% ${item.imageCropData.y * 100 + item.imageCropData.height * 50}%`
+                : 'center',
+              maskImage:
+                'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.8) 70%, black 100%)',
+              WebkitMaskImage:
+                'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.8) 70%, black 100%)',
+            }}
+          />
+        )}
+
         {/* 头部：昵称 + 时间 */}
-        <div className="flex items-center justify-between">
+        <div className={cn('flex items-center justify-between', hasBackground && 'relative z-10')}>
           <span className="font-heading text-sm text-accent">{item.nickname}</span>
-          <span className="text-xs text-text-muted">{timeStr}</span>
+          <span className={cn('text-xs text-text-muted', item.isFeatured && 'mr-20')}>
+            {timeStr}
+          </span>
         </div>
 
-        {/* 内容 */}
-        <p className="flex-1 text-sm leading-relaxed text-text-secondary">{truncatedContent}</p>
+        {/* 内容（可能带缩略图） */}
+        <div
+          className={cn(
+            'flex-1',
+            hasBackground && 'relative z-10',
+            hasThumbnail && 'flex gap-3',
+          )}
+        >
+          {hasThumbnail && (
+            <div className="flex-shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={item.thumbnail!}
+                alt=""
+                className="h-16 w-16 rounded object-cover"
+              />
+            </div>
+          )}
+          <p className="text-sm leading-relaxed text-text-secondary">{truncatedContent}</p>
+        </div>
 
         {/* 故事 tab 额外信息 */}
         {item.tab === 'story' && (
-          <div className="flex flex-wrap gap-1.5">
+          <div className={cn('flex flex-wrap gap-1.5', hasBackground && 'relative z-10')}>
             {item.relatedYear && <Tag active>{item.relatedYear}</Tag>}
             {item.storyTags.map((tag) => (
               <Tag key={tag}>{tag}</Tag>
@@ -45,7 +100,12 @@ export function GuestbookCard({ item, className, currentUserId }: GuestbookCardP
         )}
 
         {/* 底部：点赞 + 评论 + 操作按钮 */}
-        <div className="flex items-center gap-4 pt-2 border-t border-border-gold/30">
+        <div
+          className={cn(
+            'flex items-center gap-4 pt-2 border-t border-border-gold/30',
+            hasBackground && 'relative z-10',
+          )}
+        >
           <span className="flex items-center gap-1 text-xs text-text-muted">
             <HeartIcon />
             {item.likesCount}

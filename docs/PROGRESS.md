@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.8 已完成）
+## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.8 已完成）
 
 ---
 
@@ -16,7 +16,7 @@
 | 演出模块 | ✅ 已完成 | 2026-06-06 |
 | 活动模块 | ✅ 已完成（含直播 tab） | 2026-06-08 |
 | 资料库模块 | ✅ 已完成 | 2026-06-07 |
-| 留言板 | ✅ 已完成（含故事 tag 筛选 + 登录权限） | 2026-06-10 |
+| 留言板 | ✅ 已完成（含故事 tag 筛选 + 登录权限 + 精选/图片上传） | 2026-06-11 |
 | 用户系统 | ✅ 已完成（注册/登录/权限） | 2026-06-10 |
 | 用户个人页面 | ✅ 已完成（个人中心/留言管理/设置/头像上传） | 2026-06-10 |
 | 公告模块 | ✅ 已完成 | 2026-06-07 |
@@ -28,6 +28,20 @@
 ---
 
 ## 详细记录
+
+### 2026-06-11 - P6.4 留言板增强（已完成）
+
+#### 变更内容
+- `prisma/schema.prisma`：Guestbook 新增 `isFeatured`/`imageCropData`/`imageAsBackground` 字段 + 索引；Comment 新增 `imageId` + Media 关联（CommentImage）
+- `src/lib/types.ts`：新增 `ImageCropData` 接口；GuestbookItem 新增 isFeatured/thumbnail/imageCropData/imageAsBackground；CommentItem 新增 image
+- `src/lib/queries/guestbook.ts`：列表查询含首图+精选置顶排序；详情含新字段；评论含图片；新增 `getFeaturedCount()`
+- `src/app/api/messages/route.ts`：POST 支持 imageId/imageCropData/imageAsBackground
+- `src/app/api/messages/[id]/comments/route.ts`：POST 支持 imageId，返回图片
+- 新建 `src/app/api/admin/messages/featured/route.ts`：管理员切换精选状态 API
+- 新建 `src/components/guestbook/ImageUploader.tsx`：图片选择+裁切+上传组件（react-image-crop）
+- `src/components/guestbook/GuestbookCard.tsx`：两种图片展示模式（融合背景/缩略图）+ 精选金色标记
+- `src/components/guestbook/GuestbookForm.tsx`：图片上传 + 融合模式开关
+- `src/components/guestbook/CommentSection.tsx`：评论图片上传 + 评论图片展示
 
 ### 2026-06-11 - P6.3 瀑布流布局改版（已完成）
 

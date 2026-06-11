@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/Button';
+import { ImageUploader } from '@/components/guestbook/ImageUploader';
 import { useAuth } from '@/components/auth/AuthProvider';
 import type { CommentItem } from '@/lib/types';
 
@@ -17,6 +18,10 @@ export function CommentSection({ targetId, initialComments, totalCount }: Commen
   const [comments, setComments] = useState<CommentItem[]>(initialComments);
   const [total, setTotal] = useState(totalCount);
   const [content, setContent] = useState('');
+  const [commentImageData, setCommentImageData] = useState<{
+    mediaId: string;
+    url: string;
+  } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -44,7 +49,10 @@ export function CommentSection({ targetId, initialComments, totalCount }: Commen
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ content: content.trim() }),
+        body: JSON.stringify({
+          content: content.trim(),
+          ...(commentImageData ? { imageId: commentImageData.mediaId } : {}),
+        }),
       });
 
       if (res.ok) {
@@ -52,6 +60,7 @@ export function CommentSection({ targetId, initialComments, totalCount }: Commen
         setComments((prev) => [...prev, data.data]);
         setTotal((prev) => prev + 1);
         setContent('');
+        setCommentImageData(null);
       } else {
         const data = await res.json();
         setError(data.error?.message || '提交失败');
@@ -82,6 +91,14 @@ export function CommentSection({ targetId, initialComments, totalCount }: Commen
                 </span>
               </div>
               <p className="text-sm text-text-secondary">{comment.content}</p>
+              {comment.image && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={comment.image.url}
+                  alt={comment.image.alt || '评论图片'}
+                  className="mt-2 max-h-32 rounded object-cover"
+                />
+              )}
             </div>
           ))}
         </div>
@@ -106,6 +123,12 @@ export function CommentSection({ targetId, initialComments, totalCount }: Commen
               {submitting ? '...' : '发送'}
             </Button>
           </div>
+          <ImageUploader
+            onImageUploaded={(data) =>
+              setCommentImageData({ mediaId: data.mediaId, url: data.url })
+            }
+            onImageRemoved={() => setCommentImageData(null)}
+          />
           {error && <p className="text-xs text-red-400">{error}</p>}
         </form>
       ) : (

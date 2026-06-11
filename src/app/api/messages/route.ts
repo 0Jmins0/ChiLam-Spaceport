@@ -93,6 +93,11 @@ export async function POST(request: NextRequest) {
         relatedYear: body.relatedYear ? Number(body.relatedYear) : null,
         status: 'APPROVED',
         userId: user.id,
+        ...(body.imageId ? { images: { connect: { id: body.imageId } } } : {}),
+        ...(body.imageCropData ? { imageCropData: body.imageCropData } : {}),
+        ...(body.imageAsBackground !== undefined
+          ? { imageAsBackground: body.imageAsBackground }
+          : {}),
       },
     });
 

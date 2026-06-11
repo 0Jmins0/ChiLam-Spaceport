@@ -89,6 +89,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         nickname: user.displayName || user.username,
         content: body.content.trim(),
         userId: user.id,
+        ...(body.imageId ? { imageId: body.imageId } : {}),
+      },
+      include: {
+        image: true,
       },
     });
 
@@ -120,6 +124,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
           content: comment.content,
           createdAt: comment.createdAt.toISOString(),
           userId: comment.userId,
+          image: comment.image || null,
         },
       },
       { status: 201 },
