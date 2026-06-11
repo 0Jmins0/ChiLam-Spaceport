@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 import { Button } from '@/components/ui/Button';
-import { ImageUploader } from '@/components/guestbook/ImageUploader';
+import { ImageUploader, type ImageUploaderRef } from '@/components/guestbook/ImageUploader';
 import { useAuth } from '@/components/auth/AuthProvider';
 import type { CommentItem } from '@/lib/types';
 
@@ -17,6 +17,7 @@ export function CommentSection({ targetId, initialComments, totalCount }: Commen
   const { user, openLogin } = useAuth();
   const [comments, setComments] = useState<CommentItem[]>(initialComments);
   const [total, setTotal] = useState(totalCount);
+  const commentImageRef = useRef<ImageUploaderRef>(null);
   const [content, setContent] = useState('');
   const [commentImageData, setCommentImageData] = useState<{
     mediaId: string;
@@ -61,6 +62,7 @@ export function CommentSection({ targetId, initialComments, totalCount }: Commen
         setTotal((prev) => prev + 1);
         setContent('');
         setCommentImageData(null);
+        commentImageRef.current?.reset();
       } else {
         const data = await res.json();
         setError(data.error?.message || '提交失败');
@@ -124,6 +126,7 @@ export function CommentSection({ targetId, initialComments, totalCount }: Commen
             </Button>
           </div>
           <ImageUploader
+            ref={commentImageRef}
             onImageUploaded={(data) =>
               setCommentImageData({ mediaId: data.mediaId, url: data.url })
             }

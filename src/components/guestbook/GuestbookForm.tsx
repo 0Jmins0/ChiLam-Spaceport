@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/Button';
-import { ImageUploader } from '@/components/guestbook/ImageUploader';
+import { ImageUploader, type ImageUploaderRef } from '@/components/guestbook/ImageUploader';
 import { useAuth } from '@/components/auth/AuthProvider';
 import type { ImageCropData, MessageTab } from '@/lib/types';
 
@@ -16,6 +16,7 @@ export function GuestbookForm() {
   const router = useRouter();
   const { user, openLogin } = useAuth();
 
+  const imageUploaderRef = useRef<ImageUploaderRef>(null);
   const [content, setContent] = useState('');
   const [storyTags, setStoryTags] = useState<string[]>([]);
   const [relatedYear, setRelatedYear] = useState('');
@@ -78,6 +79,7 @@ export function GuestbookForm() {
         setRelatedYear('');
         setImageData(null);
         setImageAsBackground(false);
+        imageUploaderRef.current?.reset();
         router.refresh();
       } else {
         const data = await res.json();
@@ -130,6 +132,7 @@ export function GuestbookForm() {
       {/* 图片上传 */}
       <div className="space-y-2">
         <ImageUploader
+          ref={imageUploaderRef}
           onImageUploaded={(data) => setImageData(data)}
           onImageRemoved={() => {
             setImageData(null);
