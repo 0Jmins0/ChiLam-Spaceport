@@ -139,17 +139,7 @@ export function GuestbookForm() {
             setImageAsBackground(false);
           }}
         />
-        {imageData && (
-          <label className="flex items-center gap-2 text-xs text-text-muted cursor-pointer">
-            <input
-              type="checkbox"
-              checked={imageAsBackground}
-              onChange={(e) => setImageAsBackground(e.target.checked)}
-              className="rounded border-border-gold/50 bg-bg-darker text-accent focus:ring-accent"
-            />
-            <span>在卡片中作为背景融合显示</span>
-          </label>
-        )}
+        {/* 融合显示选项暂时关闭，后续开启 */}
       </div>
 
       {/* 故事 tab 额外字段 */}
