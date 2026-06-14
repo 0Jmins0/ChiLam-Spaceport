@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 已完成）
+## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 + P6.13 已完成）
 
 ---
 
@@ -29,6 +29,22 @@
 ---
 
 ## 详细记录
+
+### 2026-06-15 - P6.13 详情页图片完整显示（已完成）
+
+#### 完成内容
+- **详情页图片不再裁剪**：所有详情页的主图和画廊图片从 `object-cover` 改为 `object-contain`，显示完整未裁剪的原图
+- **列表页不受影响**：列表页/卡片仍保持标准比例裁剪
+
+#### 涉及文件（6 个文件，9 处改动）
+- `src/app/screens/[slug]/page.tsx` — 影视主海报 + 画廊
+- `src/app/performances/[slug]/page.tsx` — 演出主海报
+- `src/app/archives/albums/[slug]/page.tsx` — 专辑封面
+- `src/app/archives/magazines/[slug]/page.tsx` — 杂志封面 + 扫描画廊
+- `src/app/activities/endorsements/[slug]/page.tsx` — 代言主图 + 画廊
+- `src/components/interviews/InterviewDetail/InterviewMediaPanel.tsx` — 访谈图片
+
+---
 
 ### 2026-06-15 - P6.12 霖言霖语独立模块（已完成）
 

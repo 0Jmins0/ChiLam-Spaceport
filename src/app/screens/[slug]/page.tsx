@@ -68,7 +68,7 @@ export default async function ScreenDetailPage({ params }: { params: Promise<{ s
                   src={production.posterUrl}
                   alt={production.title}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   sizes="(max-width: 768px) 100vw, 300px"
                 />
               ) : (
@@ -190,7 +190,7 @@ export default async function ScreenDetailPage({ params }: { params: Promise<{ s
                   src={img.url}
                   alt={img.alt || ''}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 />
               </div>

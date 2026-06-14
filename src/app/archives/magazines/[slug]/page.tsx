@@ -66,7 +66,7 @@ export default async function MagazineDetailPage({
                   src={magazine.coverUrl}
                   alt={magazine.title}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   sizes="(max-width: 768px) 100vw, 300px"
                 />
               ) : (
@@ -124,7 +124,7 @@ export default async function MagazineDetailPage({
                   src={scan.url}
                   alt={scan.alt || ''}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 />
               </div>

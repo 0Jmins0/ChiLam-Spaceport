@@ -62,7 +62,7 @@ export default async function EndorsementDetailPage({
                 src={firstMedia.url}
                 alt={firstMedia.alt || endorsement.brand}
                 fill
-                className="object-cover"
+                className="object-contain"
                 sizes="(max-width: 768px) 100vw, 400px"
               />
             ) : (
@@ -135,7 +135,7 @@ export default async function EndorsementDetailPage({
                   src={img.url}
                   alt={img.alt || ''}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 />
               </div>

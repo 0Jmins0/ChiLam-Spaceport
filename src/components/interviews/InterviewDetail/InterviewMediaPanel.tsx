@@ -162,7 +162,7 @@ export default function InterviewMediaPanel({
                 src={img.url}
                 alt={img.alt || `图片 ${i + 1}`}
                 fill
-                className="object-cover"
+                className="object-contain"
                 sizes="(max-width: 768px) 50vw, 300px"
               />
             </div>

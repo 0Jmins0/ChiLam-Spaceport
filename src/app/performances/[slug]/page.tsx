@@ -74,7 +74,7 @@ export default async function PerformanceDetailPage({
                   src={performance.posterUrl}
                   alt={performance.title}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   sizes="(max-width: 768px) 100vw, 300px"
                 />
               ) : (
