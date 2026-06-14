@@ -66,8 +66,6 @@ export default async function ArchivesPage({
                   releaseYear={item.releaseYear}
                   language={item.language ?? undefined}
                   coverUrl={item.coverUrl ?? undefined}
-                  coverWidth={item.coverWidth}
-                  coverHeight={item.coverHeight}
                   priority={index < 4}
                 />
               ))}
@@ -97,8 +95,6 @@ export default async function ArchivesPage({
                   issue={item.issue ?? undefined}
                   date={item.date}
                   coverUrl={item.coverUrl ?? undefined}
-                  coverWidth={item.coverWidth}
-                  coverHeight={item.coverHeight}
                   priority={index < 4}
                 />
               ))}

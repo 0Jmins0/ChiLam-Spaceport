@@ -89,12 +89,12 @@ export function SightingCard({
         href={originalUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className={cn('block break-inside-avoid mb-4', className)}
+        className={cn('block', className)}
       >
         {content}
       </a>
     );
   }
 
-  return <div className={cn('break-inside-avoid mb-4', className)}>{content}</div>;
+  return <div className={cn('', className)}>{content}</div>;
 }

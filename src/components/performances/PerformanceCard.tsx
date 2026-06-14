@@ -12,8 +12,6 @@ interface PerformanceCardProps {
   venue?: string;
   city?: string;
   posterUrl?: string;
-  posterWidth?: number | null;
-  posterHeight?: number | null;
   type: string; // 'CONCERT' | 'STAGE' | 'MUSICAL'
   priority?: boolean;
   className?: string;
@@ -32,8 +30,6 @@ export function PerformanceCard({
   venue,
   city,
   posterUrl,
-  posterWidth,
-  posterHeight,
   type,
   priority,
   className,
@@ -41,15 +37,10 @@ export function PerformanceCard({
   const typeLabel = typeLabels[type] || type;
 
   return (
-    <Link href={`/performances/${slug}`} className={cn('block break-inside-avoid mb-4', className)}>
+    <Link href={`/performances/${slug}`} className={cn('block', className)}>
       <Card className="p-0 overflow-hidden">
         {/* Poster */}
-        <div
-          className="relative w-full bg-bg-darker overflow-hidden"
-          style={{
-            aspectRatio: posterWidth && posterHeight ? `${posterWidth}/${posterHeight}` : '2/3',
-          }}
-        >
+        <div className="relative aspect-[2/3] w-full bg-bg-darker overflow-hidden">
           {posterUrl ? (
             <Image
               src={posterUrl}

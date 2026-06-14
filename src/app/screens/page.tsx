@@ -61,8 +61,6 @@ export default async function ScreensPage({
               year={item.year}
               role={item.role ?? undefined}
               posterUrl={item.posterUrl ?? undefined}
-              posterWidth={item.posterWidth}
-              posterHeight={item.posterHeight}
               type={item.type}
               priority={index < 4}
             />

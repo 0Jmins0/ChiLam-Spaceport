@@ -67,8 +67,6 @@ export default async function PerformancesPage({
               venue={item.venue ?? undefined}
               city={item.city ?? undefined}
               posterUrl={item.posterUrl ?? undefined}
-              posterWidth={item.posterWidth}
-              posterHeight={item.posterHeight}
               type={item.type}
               priority={index < 4}
             />

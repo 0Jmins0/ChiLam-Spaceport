@@ -82,8 +82,6 @@ export default async function ActivitiesPage({
                   startYear={endorsement.startYear}
                   endYear={endorsement.endYear ?? undefined}
                   mediaUrl={endorsement.mediaUrls[0]?.url}
-                  mediaWidth={endorsement.mediaUrls[0]?.width}
-                  mediaHeight={endorsement.mediaUrls[0]?.height}
                 />
               );
             })}

@@ -56,7 +56,7 @@ export function SocialPostCard({
       href={originalUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className={cn('block break-inside-avoid mb-4', className)}
+      className={cn('block', className)}
     >
       <Card className="p-0 overflow-hidden">
         {/* Thumbnail */}

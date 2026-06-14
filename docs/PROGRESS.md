@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.6 + P6.8 + P6.10 已完成）
+## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.6 + P6.8 + P6.10 + P6.11 已完成）
 
 ---
 
@@ -28,6 +28,21 @@
 ---
 
 ## 详细记录
+
+### 2026-06-14 - P6.11 网格布局统一（已完成）
+
+#### 完成内容
+- **瀑布流改网格布局**：MasonryLayout/MasonryGrid 从 CSS columns 改为 CSS Grid，修复阅读顺序（从左到右、从上到下）
+- **海报比例标准化**：去掉动态宽高比，统一使用标准比例 — 影视/演出 `2:3`、专辑 `1:1`、杂志 `3:4`、代言 `4:3`、社交/路透 `4:5`
+- **清理冗余 props**：去掉各卡片不再需要的 posterWidth/posterHeight 等动态尺寸属性
+
+#### 技术变更
+- `src/components/ui/MasonryLayout.tsx`：`columns-*` → `grid grid-cols-*`
+- `src/components/updates/MasonryGrid.tsx`：同步改为 grid
+- 7 个卡片组件：去掉 `break-inside-avoid`，固定 aspect-ratio
+- 4 个列表页：清理不再传递的宽高 props
+
+---
 
 ### 2026-06-14 - P6.10 全站时间排序优化（已完成）
 

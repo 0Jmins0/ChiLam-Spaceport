@@ -11,8 +11,6 @@ interface ProductionCardProps {
   year: number;
   role?: string;
   posterUrl?: string;
-  posterWidth?: number | null;
-  posterHeight?: number | null;
   type: string; // 'MOVIE' | 'TV_SERIES' | 'VARIETY_SHOW'
   priority?: boolean;
   className?: string;
@@ -30,8 +28,6 @@ export function ProductionCard({
   year,
   role,
   posterUrl,
-  posterWidth,
-  posterHeight,
   type,
   priority,
   className,
@@ -39,15 +35,10 @@ export function ProductionCard({
   const typeLabel = typeLabels[type] || type;
 
   return (
-    <Link href={`/screens/${slug}`} className={cn('block break-inside-avoid mb-4', className)}>
+    <Link href={`/screens/${slug}`} className={cn('block', className)}>
       <Card className="p-0 overflow-hidden">
         {/* Poster */}
-        <div
-          className="relative w-full bg-bg-darker overflow-hidden"
-          style={{
-            aspectRatio: posterWidth && posterHeight ? `${posterWidth}/${posterHeight}` : '2/3',
-          }}
-        >
+        <div className="relative aspect-[2/3] w-full bg-bg-darker overflow-hidden">
           {posterUrl ? (
             <Image
               src={posterUrl}
