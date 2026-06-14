@@ -131,42 +131,6 @@ export default function InterviewTranscript({
 
   return (
     <div className="space-y-8">
-      {/* Language toggle */}
-      {hasBoth && (
-        <div className="flex justify-center">
-          <div className="inline-flex rounded-full border border-border-gold bg-bg-darker p-1">
-            <button
-              onClick={() => setActiveTab('cantonese')}
-              className={`px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-colors ${
-                activeTab === 'cantonese'
-                  ? 'bg-accent/20 text-accent'
-                  : 'text-text-muted hover:text-text-secondary'
-              }`}
-            >
-              <span className="hidden sm:inline">粤语原文 </span>
-              <span className="sm:hidden">粤语 </span>
-              <span className="uppercase text-[10px] sm:text-xs tracking-wider opacity-70">
-                Cantonese <span className="hidden sm:inline">Original</span>
-              </span>
-            </button>
-            <button
-              onClick={() => setActiveTab('mandarin')}
-              className={`px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-colors ${
-                activeTab === 'mandarin'
-                  ? 'bg-accent/20 text-accent'
-                  : 'text-text-muted hover:text-text-secondary'
-              }`}
-            >
-              <span className="hidden sm:inline">国语翻译 </span>
-              <span className="sm:hidden">国语 </span>
-              <span className="uppercase text-[10px] sm:text-xs tracking-wider opacity-70">
-                Mandarin <span className="hidden sm:inline">Translation</span>
-              </span>
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Title area */}
       <div className="space-y-3">
         <EditableText
@@ -207,6 +171,40 @@ export default function InterviewTranscript({
           <span className="text-xs text-text-muted uppercase tracking-wider">Excerpt</span>
         </div>
       </div>
+
+      {/* Language toggle */}
+      {hasBoth && (
+        <div className="flex justify-center">
+          <div className="inline-flex rounded-full border border-border-gold bg-bg-darker p-0.5">
+            <button
+              onClick={() => setActiveTab('cantonese')}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                activeTab === 'cantonese'
+                  ? 'bg-accent/20 text-accent'
+                  : 'text-text-muted hover:text-text-secondary'
+              }`}
+            >
+              粤语原文
+              <span className="uppercase text-[9px] tracking-wider opacity-70 ml-1">
+                Cantonese
+              </span>
+            </button>
+            <button
+              onClick={() => setActiveTab('mandarin')}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                activeTab === 'mandarin'
+                  ? 'bg-accent/20 text-accent'
+                  : 'text-text-muted hover:text-text-secondary'
+              }`}
+            >
+              国语翻译
+              <span className="uppercase text-[9px] tracking-wider opacity-70 ml-1">
+                Mandarin
+              </span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Divider */}
       <div className="h-px bg-border-gold/20" />

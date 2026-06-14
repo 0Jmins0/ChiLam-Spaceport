@@ -10,10 +10,10 @@ const tagSelect = { select: { name: true, slug: true } } as const;
 // 合法的 ProductionType 值集合
 const validProductionTypes = new Set(Object.values(ProductionType));
 
-// 影视作品列表（支持类型 + 年代筛选 + 分页）
+// 影视作品列表（支持类型 + 角色类型筛选 + 分页）
 export async function getProductions(options?: {
   type?: string;
-  decade?: string;
+  roleType?: string;
   page?: number;
   pageSize?: number;
 }): Promise<PaginatedResponse<ProductionItem>> {
@@ -25,15 +25,14 @@ export async function getProductions(options?: {
     where.type = options.type as ProductionType;
   }
 
-  if (options?.decade) {
-    const decadeStart = Number(options.decade);
-    where.year = { gte: decadeStart, lt: decadeStart + 10 };
+  if (options?.roleType) {
+    where.roleType = options.roleType;
   }
 
   const [rawItems, totalCount] = await Promise.all([
     prisma.production.findMany({
       where,
-      orderBy: [{ year: 'desc' }, { sortOrder: 'asc' }],
+      orderBy: [{ releaseDate: { sort: 'desc', nulls: 'last' } }, { year: 'desc' }, { createdAt: 'desc' }],
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: {
@@ -61,6 +60,7 @@ export async function getProductions(options?: {
     language: rest.language,
     varietyRegion: rest.varietyRegion,
     varietyRole: rest.varietyRole,
+    roleType: rest.roleType,
     tags: rest.tags,
   }));
 
@@ -103,6 +103,7 @@ export async function getProductionBySlug(slug: string): Promise<ProductionDetai
     language: rest.language,
     varietyRegion: rest.varietyRegion,
     varietyRole: rest.varietyRole,
+    roleType: rest.roleType,
     tags: rest.tags,
     gallery,
     watchLinks: watchLinks as { platform: string; url: string }[] | null,

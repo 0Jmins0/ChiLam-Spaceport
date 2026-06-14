@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.6 + P6.8 已完成）
+## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.6 + P6.8 + P6.10 已完成）
 
 ---
 
@@ -28,6 +28,25 @@
 ---
 
 ## 详细记录
+
+### 2026-06-14 - P6.10 全站时间排序优化（已完成）
+
+#### 完成内容
+- **Schema 新增 3 个日期字段**：Production.releaseDate、Album.releaseDate、Endorsement.startDate
+- **回填精确日期数据**：76 条 Production + 27 条 Album + 15 条 Endorsement 的精确日期已写入数据库
+- **排序逻辑统一优化**：修改 5 个查询文件（productions/performances/archives/activities/search）的排序逻辑，统一为日期优先排序
+- **前台编辑模式适配**：编辑白名单、CreateEntryModal、单资源 PUT API 全部支持新日期字段
+
+#### 技术变更
+- `prisma/schema.prisma`：Production 新增 `releaseDate DateTime?`，Album 新增 `releaseDate DateTime?`，Endorsement 新增 `startDate DateTime?`
+- `src/lib/queries/productions.ts`：排序改为 releaseDate 优先
+- `src/lib/queries/performances.ts`：排序改为日期优先
+- `src/lib/queries/archives.ts`：排序改为 releaseDate 优先
+- `src/lib/queries/activities.ts`：排序改为 startDate / date 优先
+- `src/lib/queries/search.ts`：搜索结果排序适配新日期字段
+- `src/app/api/admin/edit/route.ts`：编辑白名单新增 releaseDate、startDate
+- `src/components/edit/CreateEntryModal.tsx`：新增条目表单支持日期字段
+- 各实体 PUT API：支持新日期字段的更新
 
 ### 2026-06-14 - P6.6 前台编辑模式 — 认证统一 + 元信息可编辑（已完成）
 
@@ -873,6 +892,31 @@
 - [x] performances 列表页 — 新增演出
 - [x] activities 列表页 — 新增代言/访谈/直播
 - [x] archives 列表页 — 新增专辑/杂志
+
+## P6.10 全站时间排序优化完成清单（2026-06-14）
+
+### Schema 变更
+- [x] Production 新增 releaseDate DateTime? 字段
+- [x] Album 新增 releaseDate DateTime? 字段
+- [x] Endorsement 新增 startDate DateTime? 字段
+- [x] prisma db push 同步
+
+### 数据回填
+- [x] 76 条 Production 精确日期回填
+- [x] 27 条 Album 精确日期回填
+- [x] 15 条 Endorsement 精确日期回填
+
+### 排序逻辑优化
+- [x] queries/productions.ts — releaseDate 优先排序
+- [x] queries/performances.ts — 日期优先排序
+- [x] queries/archives.ts — releaseDate 优先排序
+- [x] queries/activities.ts — startDate / date 优先排序
+- [x] queries/search.ts — 搜索结果排序适配
+
+### 前台编辑模式适配
+- [x] /api/admin/edit 编辑白名单新增日期字段
+- [x] CreateEntryModal 新增条目表单支持日期字段
+- [x] 各实体 PUT API 支持新日期字段更新
 
 ## 下一步: P6.5 相册模块 → P6.7 → P6.9（详见 docs/P6_USER_FEEDBACK_PLAN.md）
 

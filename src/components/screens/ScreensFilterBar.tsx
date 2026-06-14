@@ -9,22 +9,26 @@ import { Tag } from '@/components/ui/Tag';
 
 interface ScreensFilterBarProps {
   currentTab: string;
-  currentDecade?: string;
+  currentRoleType?: string;
   counts?: { movie: number; tv_series: number; variety_show: number };
   className?: string;
 }
 
-const decadeFilters = [
+const actingRoleFilters = [
   { label: '全部', value: '' },
-  { label: '90年代', value: '1990' },
-  { label: '00年代', value: '2000' },
-  { label: '10年代', value: '2010' },
-  { label: '20年代', value: '2020' },
+  { label: '主演', value: '主演' },
+  { label: '客串', value: '客串' },
+];
+
+const varietyRoleFilters = [
+  { label: '全部', value: '' },
+  { label: '常驻', value: '常驻' },
+  { label: '飞行', value: '飞行' },
 ];
 
 export function ScreensFilterBar({
   currentTab,
-  currentDecade,
+  currentRoleType,
   counts,
   className,
 }: ScreensFilterBarProps) {
@@ -58,12 +62,14 @@ export function ScreensFilterBar({
     [router],
   );
 
-  const handleDecadeChange = useCallback(
-    (decade: string) => {
-      router.push(buildUrl({ tab: currentTab, decade }), { scroll: false });
+  const handleRoleTypeChange = useCallback(
+    (roleType: string) => {
+      router.push(buildUrl({ tab: currentTab, roleType }), { scroll: false });
     },
     [router, buildUrl, currentTab],
   );
+
+  const roleFilters = currentTab === 'variety_show' ? varietyRoleFilters : actingRoleFilters;
 
   const tabs = [
     {
@@ -84,13 +90,13 @@ export function ScreensFilterBar({
     <div className={cn('space-y-4', className)}>
       <TabBar tabs={tabs} activeTab={currentTab} onTabChange={handleTabChange} />
 
-      {/* Decade sub-filters — shown for all tabs */}
+      {/* Role type sub-filters — different options per tab */}
       <div className="flex flex-wrap gap-2">
-        {decadeFilters.map((filter) => (
+        {roleFilters.map((filter) => (
           <Tag
             key={filter.value}
-            active={currentDecade === filter.value || (!currentDecade && filter.value === '')}
-            onClick={() => handleDecadeChange(filter.value)}
+            active={currentRoleType === filter.value || (!currentRoleType && filter.value === '')}
+            onClick={() => handleRoleTypeChange(filter.value)}
           >
             {filter.label}
           </Tag>

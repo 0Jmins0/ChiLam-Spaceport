@@ -42,6 +42,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       'varietyRegion',
       'varietyRole',
       'watchLinks',
+      'releaseDate',
       'isVisible',
     ] as const;
 

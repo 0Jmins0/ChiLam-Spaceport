@@ -112,7 +112,7 @@ async function searchProductions(q: string, take: number, skip: number = 0) {
     ],
   };
   const [items, count] = await Promise.all([
-    prisma.production.findMany({ where, take, skip, orderBy: { year: 'desc' } }),
+    prisma.production.findMany({ where, take, skip, orderBy: [{ releaseDate: { sort: 'desc', nulls: 'last' } }, { year: 'desc' }] }),
     prisma.production.count({ where }),
   ]);
   return {
@@ -140,7 +140,7 @@ async function searchPerformances(q: string, take: number, skip: number = 0) {
     ],
   };
   const [items, count] = await Promise.all([
-    prisma.performance.findMany({ where, take, skip, orderBy: { startDate: 'desc' } }),
+    prisma.performance.findMany({ where, take, skip, orderBy: { startDate: { sort: 'desc', nulls: 'last' } } }),
     prisma.performance.count({ where }),
   ]);
   return {
@@ -167,7 +167,7 @@ async function searchEndorsements(q: string, take: number, skip: number = 0) {
     ],
   };
   const [items, count] = await Promise.all([
-    prisma.endorsement.findMany({ where, take, skip, orderBy: { startYear: 'desc' } }),
+    prisma.endorsement.findMany({ where, take, skip, orderBy: [{ startDate: { sort: 'desc', nulls: 'last' } }, { startYear: 'desc' }] }),
     prisma.endorsement.count({ where }),
   ]);
   return {
@@ -242,7 +242,7 @@ async function searchAlbums(q: string, take: number, skip: number = 0) {
     OR: [{ title: { contains: q, mode: 'insensitive' as const } }],
   };
   const [items, count] = await Promise.all([
-    prisma.album.findMany({ where, take, skip, orderBy: { releaseYear: 'desc' } }),
+    prisma.album.findMany({ where, take, skip, orderBy: [{ releaseDate: { sort: 'desc', nulls: 'last' } }, { releaseYear: 'desc' }] }),
     prisma.album.count({ where }),
   ]);
   return {

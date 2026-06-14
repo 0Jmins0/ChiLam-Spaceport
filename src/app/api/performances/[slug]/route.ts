@@ -40,6 +40,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       'city',
       'series',
       'setlist',
+      'startDate',
       'isVisible',
     ] as const;
 

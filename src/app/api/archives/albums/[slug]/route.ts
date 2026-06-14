@@ -38,6 +38,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       'language',
       'tracks',
       'streamingLinks',
+      'releaseDate',
       'sortOrder',
       'isVisible',
     ] as const;

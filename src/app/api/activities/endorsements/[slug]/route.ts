@@ -39,6 +39,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       'description',
       'startYear',
       'endYear',
+      'startDate',
       'isVisible',
     ] as const;
 

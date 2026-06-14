@@ -114,6 +114,23 @@ export default async function ScreenDetailPage({ params }: { params: Promise<{ s
             </EditableText>
           </div>
 
+          {/* 角色类型 */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-text-muted/60">参与类型</span>
+            <EditableText
+              value={production.roleType || ''}
+              entityType="production"
+              entityId={production.id}
+              field="roleType"
+              placeholder={production.type === 'VARIETY_SHOW' ? '常驻/飞行...' : '主演/客串...'}
+              className="text-sm text-accent"
+            >
+              {production.roleType ? (
+                <Tag active>{production.roleType}</Tag>
+              ) : null}
+            </EditableText>
+          </div>
+
           {/* 综艺额外信息 */}
           {production.type === 'VARIETY_SHOW' &&
             (production.varietyRegion || production.varietyRole) && (

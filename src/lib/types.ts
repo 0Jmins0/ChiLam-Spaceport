@@ -69,9 +69,6 @@ export interface SightingItem {
 // 影视综 Tab 类型
 export type ScreenTab = 'movie' | 'tv_series' | 'variety_show';
 
-// 年代筛选
-export type DecadeFilter = '1990' | '2000' | '2010' | '2020';
-
 // 影视作品卡片展示用
 export interface ProductionItem {
   id: string;
@@ -88,6 +85,7 @@ export interface ProductionItem {
   language: string | null;
   varietyRegion: string | null;
   varietyRole: string | null;
+  roleType: string | null;
   tags: { name: string; slug: string }[];
 }
 

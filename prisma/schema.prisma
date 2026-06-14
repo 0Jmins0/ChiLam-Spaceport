@@ -195,8 +195,9 @@ model Production {
   slug     String         @unique
   title    String
   titleEn  String?        @map("title_en")
-  year     Int
-  role     String?
+  year        Int
+  releaseDate DateTime? @map("release_date")
+  role        String?
   synopsis String?
 
   // 海报 (直接 FK)
@@ -211,6 +212,7 @@ model Production {
   // 综艺专属字段
   varietyRegion String? @map("variety_region")
   varietyRole   String? @map("variety_role")
+  roleType      String? @map("role_type")
   language      String?
 
   // 标签 (多对多)
@@ -323,8 +325,9 @@ model Endorsement {
   role        String?
   category    String?
   description String?
-  startYear   Int     @map("start_year")
-  endYear     Int?    @map("end_year")
+  startYear   Int       @map("start_year")
+  endYear     Int?      @map("end_year")
+  startDate   DateTime? @map("start_date")
 
   // 素材 (多对多)
   media Media[] @relation("EndorsementMedia")
@@ -404,7 +407,8 @@ model Album {
   id          String  @id @default(cuid())
   slug        String  @unique
   title       String
-  releaseYear Int     @map("release_year")
+  releaseYear Int       @map("release_year")
+  releaseDate DateTime? @map("release_date")
   language    String?
 
   // 封面 (直接 FK)

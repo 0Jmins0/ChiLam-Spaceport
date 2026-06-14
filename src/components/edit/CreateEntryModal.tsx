@@ -95,6 +95,19 @@ function getFieldConfigs(entityType: string): FieldConfig[] {
           options: TYPE_OPTIONS.production,
         },
         { key: 'year', label: '年份', type: 'number', required: true, defaultValue: currentYear },
+        {
+          key: 'roleType',
+          label: '参与类型',
+          type: 'select',
+          required: false,
+          options: [
+            { label: '主演', value: '主演' },
+            { label: '客串', value: '客串' },
+            { label: '常驻', value: '常驻' },
+            { label: '飞行', value: '飞行' },
+          ],
+        },
+        { key: 'releaseDate', label: '上映/首播日期', type: 'date', required: false },
       ];
     case 'performance':
       return [
@@ -107,6 +120,7 @@ function getFieldConfigs(entityType: string): FieldConfig[] {
           options: TYPE_OPTIONS.performance,
         },
         { key: 'year', label: '年份', type: 'number', required: true, defaultValue: currentYear },
+        { key: 'startDate', label: '演出日期', type: 'date', required: false },
       ];
     case 'endorsement':
       return [
@@ -118,6 +132,7 @@ function getFieldConfigs(entityType: string): FieldConfig[] {
           required: true,
           defaultValue: currentYear,
         },
+        { key: 'startDate', label: '开始日期', type: 'date', required: false },
       ];
     case 'interview':
       return [
@@ -153,6 +168,7 @@ function getFieldConfigs(entityType: string): FieldConfig[] {
           required: true,
           defaultValue: currentYear,
         },
+        { key: 'releaseDate', label: '发行日期', type: 'date', required: false },
       ];
     case 'magazine':
       return [

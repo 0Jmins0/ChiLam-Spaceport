@@ -16,38 +16,38 @@ const tabToType: Record<string, string> = {
   variety_show: 'VARIETY_SHOW',
 };
 
-function buildBaseUrl(tab: string, decade?: string): string {
+function buildBaseUrl(tab: string, roleType?: string): string {
   const params = new URLSearchParams();
   params.set('tab', tab);
-  if (decade) params.set('decade', decade);
+  if (roleType) params.set('roleType', roleType);
   return `/screens?${params.toString()}`;
 }
 
 export default async function ScreensPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tab?: string; decade?: string; page?: string }>;
+  searchParams: Promise<{ tab?: string; roleType?: string; page?: string }>;
 }) {
   const params = await searchParams;
   const tab = params.tab || 'movie';
-  const decade = params.decade;
+  const roleType = params.roleType;
   const page = Number(params.page) || 1;
 
   const type = tabToType[tab];
 
   const [counts, data] = await Promise.all([
     getProductionCounts(),
-    getProductions({ type, decade, page }),
+    getProductions({ type, roleType, page }),
   ]);
 
-  const baseUrl = buildBaseUrl(tab, decade);
+  const baseUrl = buildBaseUrl(tab, roleType);
 
   return (
     <PageContainer>
       <PageHeader title="影视综" titleEn="Screens" description="电影 · 电视剧 · 综艺" />
 
       <div className="flex items-center justify-between gap-4 mb-8">
-        <ScreensFilterBar currentTab={tab} currentDecade={decade} counts={counts} className="flex-1" />
+        <ScreensFilterBar currentTab={tab} currentRoleType={roleType} counts={counts} className="flex-1" />
         <CreateEntryTrigger entityType="production" defaultValues={{ type: type || 'MOVIE' }} label="新增作品" />
       </div>
 

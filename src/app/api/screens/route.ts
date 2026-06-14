@@ -7,11 +7,11 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl;
     const type = searchParams.get('type') || undefined;
-    const decade = searchParams.get('decade') || undefined;
+    const roleType = searchParams.get('roleType') || undefined;
     const page = Number(searchParams.get('page')) || 1;
     const pageSize = Math.min(Number(searchParams.get('pageSize')) || 20, 50);
 
-    const data = await getProductions({ type, decade, page, pageSize });
+    const data = await getProductions({ type, roleType, page, pageSize });
 
     return NextResponse.json({
       data: data.items,

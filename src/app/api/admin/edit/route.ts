@@ -6,9 +6,9 @@ import { verifyAdmin } from '@/lib/auth';
 
 /** 可编辑字段白名单 */
 const EDITABLE_FIELDS: Record<string, string[]> = {
-  production: ['title', 'titleEn', 'synopsis', 'year', 'role', 'language', 'posterId'],
-  performance: ['title', 'titleEn', 'summary', 'year', 'venue', 'city', 'series', 'posterId'],
-  endorsement: ['title', 'brand', 'category', 'description', 'role', 'startYear', 'endYear'],
+  production: ['title', 'titleEn', 'synopsis', 'year', 'role', 'roleType', 'language', 'varietyRegion', 'varietyRole', 'posterId', 'releaseDate'],
+  performance: ['title', 'titleEn', 'summary', 'year', 'venue', 'city', 'series', 'posterId', 'startDate'],
+  endorsement: ['title', 'brand', 'category', 'description', 'role', 'startYear', 'endYear', 'startDate'],
   interview: [
     'title',
     'titleEn',
@@ -21,7 +21,7 @@ const EDITABLE_FIELDS: Record<string, string[]> = {
     'proofreadStatus',
     'date',
   ],
-  album: ['title', 'titleEn', 'releaseYear', 'language', 'coverId'],
+  album: ['title', 'titleEn', 'releaseYear', 'language', 'coverId', 'releaseDate'],
   magazine: ['title', 'issue', 'coverId'],
   livestream: [
     'title',
@@ -44,7 +44,7 @@ const INTEGER_FIELDS = new Set([
 ]);
 
 /** 需要 Date 解析的字段 */
-const DATE_FIELDS = new Set(['releaseDate', 'publishDate', 'date']);
+const DATE_FIELDS = new Set(['releaseDate', 'publishDate', 'date', 'startDate']);
 
 /** entityType → Prisma model accessor */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

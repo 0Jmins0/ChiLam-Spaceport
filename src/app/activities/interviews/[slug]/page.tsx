@@ -41,7 +41,7 @@ export default async function InterviewDetailPage({
   );
 
   return (
-    <div className="max-w-[var(--width-page)] mx-auto px-4 md:px-8 py-8">
+    <div className="max-w-[var(--width-page)] mx-auto px-4 md:px-8 pt-16 pb-8">
       {/* 移动端：媒体优先显示 */}
       <div className="lg:hidden mb-8">
         <InterviewMediaPanel

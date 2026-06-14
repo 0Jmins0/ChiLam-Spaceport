@@ -31,7 +31,7 @@ export async function getEndorsements(options?: {
   const [rawItems, totalCount] = await Promise.all([
     prisma.endorsement.findMany({
       where,
-      orderBy: [{ startYear: 'desc' }, { brand: 'asc' }],
+      orderBy: [{ startDate: { sort: 'desc', nulls: 'last' } }, { startYear: 'desc' }, { createdAt: 'desc' }],
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: {
