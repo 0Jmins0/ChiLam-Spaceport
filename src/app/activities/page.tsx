@@ -12,6 +12,7 @@ import {
   getLivestreams,
   getActivityCounts,
 } from '@/lib/queries/activities';
+import { CreateEntryTrigger } from '@/components/edit/CreateEntryTrigger';
 
 export const metadata = { title: '活动' };
 export const dynamic = 'force-dynamic';
@@ -50,13 +51,19 @@ export default async function ActivitiesPage({
     <PageContainer>
       <PageHeader title="活动" titleEn="Activities" description="广告代言 · 访谈 · 直播" />
 
-      <ActivitiesFilterBar
-        currentTab={tab}
-        currentMediaType={mediaType}
-        currentPlatform={platform}
-        counts={counts}
-        className="mb-8"
-      />
+      <div className="flex items-center justify-between gap-4 mb-8">
+        <ActivitiesFilterBar
+          currentTab={tab}
+          currentMediaType={mediaType}
+          currentPlatform={platform}
+          counts={counts}
+          className="flex-1"
+        />
+        <CreateEntryTrigger
+          entityType={tab === 'interview' ? 'interview' : tab === 'livestream' ? 'livestream' : 'endorsement'}
+          label={tab === 'interview' ? '新增访谈' : tab === 'livestream' ? '新增直播' : '新增代言'}
+        />
+      </div>
 
       {data.items.length > 0 ? (
         tab === 'endorsement' ? (

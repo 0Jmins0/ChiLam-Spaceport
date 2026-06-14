@@ -3,6 +3,8 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getMagazineBySlug } from '@/lib/queries/archives';
+import { EditableText } from '@/components/edit/EditableText';
+import { EditableImage } from '@/components/edit/EditableImage';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Tag } from '@/components/ui/Tag';
 
@@ -57,29 +59,33 @@ export default async function MagazineDetailPage({
       <div className="flex flex-col md:flex-row gap-8">
         {/* Left: cover */}
         <div className="w-full md:w-[300px] shrink-0">
-          <div className="relative aspect-[2/3] overflow-hidden rounded-[var(--radius-card)]">
-            {magazine.coverUrl ? (
-              <Image
-                src={magazine.coverUrl}
-                alt={magazine.title}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 300px"
-              />
-            ) : (
-              <div className="absolute inset-0 bg-bg-darker flex items-center justify-center px-4">
-                <span className="text-center text-lg text-text-muted">{magazine.title}</span>
-              </div>
-            )}
-          </div>
+          <EditableImage src={magazine.coverUrl} entityType="magazine" entityId={magazine.id} field="coverId">
+            <div className="relative aspect-[2/3] overflow-hidden rounded-[var(--radius-card)]">
+              {magazine.coverUrl ? (
+                <Image
+                  src={magazine.coverUrl}
+                  alt={magazine.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 300px"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-bg-darker flex items-center justify-center px-4">
+                  <span className="text-center text-lg text-text-muted">{magazine.title}</span>
+                </div>
+              )}
+            </div>
+          </EditableImage>
         </div>
 
         {/* Right: info */}
         <div className="flex-1 space-y-4">
           {/* Title */}
-          <h1 className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
-            {magazine.title}
-          </h1>
+          <EditableText value={magazine.title} entityType="magazine" entityId={magazine.id} field="title" className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
+            <h1 className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
+              {magazine.title}
+            </h1>
+          </EditableText>
 
           {/* Meta info */}
           <p className="text-sm text-text-muted">

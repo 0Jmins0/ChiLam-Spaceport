@@ -10,6 +10,7 @@ import { MobileNav } from './MobileNav';
 import { SearchModal } from './SearchModal';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { UserMenu } from '@/components/auth/UserMenu';
+import { EditModeToggle } from '@/components/edit/EditModeToggle';
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -97,7 +98,8 @@ export function Header() {
           </button>
 
           {/* Auth */}
-          <div className="hidden md:flex items-center ml-6">
+          <div className="hidden md:flex items-center gap-3 ml-6">
+            <EditModeToggle />
             {loading ? (
               <span className="h-7 w-7 rounded-full bg-border-gold/20 animate-pulse" />
             ) : user ? (

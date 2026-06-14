@@ -3,6 +3,8 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getAlbumBySlug } from '@/lib/queries/archives';
+import { EditableText } from '@/components/edit/EditableText';
+import { EditableImage } from '@/components/edit/EditableImage';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Tag } from '@/components/ui/Tag';
 import { Button } from '@/components/ui/Button';
@@ -57,21 +59,23 @@ export default async function AlbumDetailPage({ params }: { params: Promise<{ sl
       <div className="flex flex-col md:flex-row gap-8">
         {/* Left: cover */}
         <div className="w-full md:w-[300px] shrink-0">
-          <div className="relative aspect-[1/1] overflow-hidden rounded-[var(--radius-card)]">
-            {album.coverUrl ? (
-              <Image
-                src={album.coverUrl}
-                alt={album.title}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 300px"
-              />
-            ) : (
-              <div className="absolute inset-0 bg-bg-darker flex items-center justify-center">
-                <span className="text-text-muted text-4xl">♪</span>
-              </div>
-            )}
-          </div>
+          <EditableImage src={album.coverUrl} entityType="album" entityId={album.id} field="coverId">
+            <div className="relative aspect-[1/1] overflow-hidden rounded-[var(--radius-card)]">
+              {album.coverUrl ? (
+                <Image
+                  src={album.coverUrl}
+                  alt={album.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 300px"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-bg-darker flex items-center justify-center">
+                  <span className="text-text-muted text-4xl">♪</span>
+                </div>
+              )}
+            </div>
+          </EditableImage>
         </div>
 
         {/* Right: info */}
@@ -80,9 +84,11 @@ export default async function AlbumDetailPage({ params }: { params: Promise<{ sl
           {album.language && <Tag active>{album.language}</Tag>}
 
           {/* Title */}
-          <h1 className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
-            {album.title}
-          </h1>
+          <EditableText value={album.title} entityType="album" entityId={album.id} field="title" className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
+            <h1 className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
+              {album.title}
+            </h1>
+          </EditableText>
 
           {/* Meta info */}
           <p className="text-sm text-text-muted">

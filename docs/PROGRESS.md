@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.8 已完成）
+## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.6 + P6.8 已完成）
 
 ---
 
@@ -28,6 +28,42 @@
 ---
 
 ## 详细记录
+
+### 2026-06-13 - P6.6 前台编辑模式（已完成）
+
+#### 变更内容
+- `prisma/schema.prisma`：新增 `EditHistory` 模型（entityType/entityId/field/oldValue/newValue/editedBy，支持一次撤销）
+- 新建 `src/components/edit/` 目录，包含 6 个组件：
+  - `EditModeProvider.tsx`：全局 Context（isAdmin/editMode/toggleEditMode/canShowEditButton），读取 `NEXT_PUBLIC_EDIT_MODE_PUBLIC` 环境变量控制可见性
+  - `EditModeToggle.tsx`：Header 右上角编辑模式开关按钮
+  - `EditStatusBar.tsx`：编辑模式顶部状态条
+  - `EditableText.tsx`：可编辑文字组件（单行/多行，保存/取消/错误处理）
+  - `EditableImage.tsx`：可编辑图片组件（预签名上传→R2→替换→刷新页面）
+  - `EditableTag.tsx`：标签编辑骨架组件（UI 就绪，API 待后续接入）
+- 新建 3 个 API 路由：
+  - `src/app/api/admin/edit/route.ts`：PATCH 通用字段编辑（白名单校验 + EditHistory 记录）
+  - `src/app/api/admin/edit/undo/route.ts`：POST 撤销最近一次编辑
+  - `src/app/api/admin/edit/history/route.ts`：GET 查询撤销可用性
+- `src/app/layout.tsx`：包裹 EditModeProvider + 添加 EditStatusBar
+- `src/components/layout/Header.tsx`：嵌入 EditModeToggle
+- 6 个详情页集成编辑模式：
+  - `screens/[slug]`：标题、英文标题、简介、海报
+  - `performances/[slug]`：标题、英文标题、简介、海报
+  - `endorsements/[slug]`：品牌名、描述
+  - `livestreams/[slug]`：标题、简介
+  - `albums/[slug]`：标题、封面
+  - `magazines/[slug]`：标题、封面
+
+#### 2026-06-14 补充：列表页新增条目
+- 新建 `src/components/edit/CreateEntryButton.tsx`：编辑模式下「+ 新增」按钮
+- 新建 `src/components/edit/CreateEntryModal.tsx`：新增条目弹窗（7 种实体，动态表单，自动生成 slug，创建后跳转详情页）
+- 新建 `src/components/edit/CreateEntryTrigger.tsx`：按钮+弹窗整合包裹器
+- 4 个列表页嵌入新增按钮：screens、performances、activities（代言/访谈/直播）、archives（专辑/杂志）
+- 按钮自动根据当前 tab 设置默认类型（如电影 tab → 新增电影）
+
+#### 未改动（待后续）
+- interviews 详情页：内容渲染在子组件中（InterviewSidebar/InterviewTranscript/InterviewMediaPanel），需单独改造
+- EditableTag API 对接：标签多对多关系编辑逻辑较复杂，骨架 UI 已就绪
 
 ### 2026-06-11 - P6.4 留言板增强（已完成）
 
@@ -762,7 +798,51 @@
 - [x] pnpm lint 通过（0 errors）
 - [x] pnpm build 通过（27 静态 + 动态页面）
 
-## 下一步: P6.2 ~ P6.9 用户反馈迭代（详见 docs/P6_USER_FEEDBACK_PLAN.md）
+## P6.6 前台编辑模式完成清单（2026-06-13）
+
+### Schema 变更
+- [x] EditHistory 模型（entityType/entityId/field/oldValue/newValue/editedBy）
+
+### 编辑模式基础设施
+- [x] EditModeProvider 全局 Context
+- [x] EditModeToggle Header 开关按钮
+- [x] EditStatusBar 编辑模式状态条
+- [x] EditableText 可编辑文字组件
+- [x] EditableImage 可编辑图片组件
+- [x] EditableTag 标签编辑骨架组件
+
+### API 路由
+- [x] PATCH /api/admin/edit（通用字段编辑 + 白名单校验）
+- [x] POST /api/admin/edit/undo（撤销最近一次编辑）
+- [x] GET /api/admin/edit/history（查询撤销可用性）
+
+### 详情页集成
+- [x] screens/[slug] — 标题、英文标题、简介、海报
+- [x] performances/[slug] — 标题、英文标题、简介、海报
+- [x] endorsements/[slug] — 品牌名、描述
+- [x] livestreams/[slug] — 标题、简介
+- [x] albums/[slug] — 标题、封面
+- [x] magazines/[slug] — 标题、封面
+
+### 布局集成
+- [x] layout.tsx 包裹 EditModeProvider + EditStatusBar
+- [x] Header.tsx 嵌入 EditModeToggle
+
+### 验收
+- [x] pnpm build 通过
+- [x] pnpm lint 通过（无新 error）
+- [x] prisma db push（已完成）
+
+### 列表页新增条目
+- [x] CreateEntryButton 新增按钮组件
+- [x] CreateEntryModal 新增弹窗组件（7 种实体类型）
+- [x] CreateEntryTrigger 整合包裹器
+- [x] screens 列表页 — 新增作品
+- [x] performances 列表页 — 新增演出
+- [x] activities 列表页 — 新增代言/访谈/直播
+- [x] archives 列表页 — 新增专辑/杂志
+
+## 下一步: P6.5 相册模块 → P6.7 → P6.9（详见 docs/P6_USER_FEEDBACK_PLAN.md）
 
 ---
 

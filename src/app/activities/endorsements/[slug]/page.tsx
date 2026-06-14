@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getEndorsementBySlug } from '@/lib/queries/activities';
+import { EditableText } from '@/components/edit/EditableText';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Tag } from '@/components/ui/Tag';
 
@@ -79,9 +80,11 @@ export default async function EndorsementDetailPage({
           {endorsement.category && <Tag active>{endorsement.category}</Tag>}
 
           {/* Brand name */}
-          <h1 className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
-            {endorsement.brand}
-          </h1>
+          <EditableText value={endorsement.brand} entityType="endorsement" entityId={endorsement.id} field="brand" className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
+            <h1 className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
+              {endorsement.brand}
+            </h1>
+          </EditableText>
 
           {/* Meta info */}
           <p className="text-sm text-text-muted">
@@ -92,9 +95,9 @@ export default async function EndorsementDetailPage({
           <div className="gold-line" />
 
           {/* Description */}
-          {endorsement.description && (
-            <p className="text-text-secondary leading-relaxed">{endorsement.description}</p>
-          )}
+          <EditableText value={endorsement.description} entityType="endorsement" entityId={endorsement.id} field="description" multiline placeholder="添加描述..." className="text-text-secondary leading-relaxed">
+            {endorsement.description ? <p className="text-text-secondary leading-relaxed">{endorsement.description}</p> : null}
+          </EditableText>
 
           {/* Tags */}
           {endorsement.tags.length > 0 && (

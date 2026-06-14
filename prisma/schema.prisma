@@ -674,3 +674,18 @@ model Admin {
 
   @@map("admins")
 }
+
+/// 4.21 编辑历史（支持一次撤销）
+model EditHistory {
+  id         String   @id @default(cuid())
+  entityType String   @map("entity_type")
+  entityId   String   @map("entity_id")
+  field      String
+  oldValue   String?  @map("old_value")
+  newValue   String?  @map("new_value")
+  editedBy   String?  @map("edited_by")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([entityType, entityId, field])
+  @@map("edit_history")
+}

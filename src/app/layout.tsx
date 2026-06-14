@@ -5,6 +5,8 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { FilmGrain } from '@/components/decorative/FilmGrain';
 import { AuthProvider } from '@/components/auth/AuthProvider';
+import { EditModeProvider } from '@/components/edit/EditModeProvider';
+import { EditStatusBar } from '@/components/edit/EditStatusBar';
 import { LoginModal } from '@/components/auth/LoginModal';
 import { RegisterModal } from '@/components/auth/RegisterModal';
 import './globals.css';
@@ -26,12 +28,15 @@ export default function RootLayout({
     <html lang="zh-CN" className={fontVariables}>
       <body className="min-h-screen bg-bg-dark font-body text-text-primary antialiased">
         <AuthProvider>
-          <FilmGrain />
-          <Header />
-          {children}
-          <Footer />
-          <LoginModal />
-          <RegisterModal />
+          <EditModeProvider>
+            <FilmGrain />
+            <Header />
+            <EditStatusBar />
+            {children}
+            <Footer />
+            <LoginModal />
+            <RegisterModal />
+          </EditModeProvider>
         </AuthProvider>
       </body>
     </html>

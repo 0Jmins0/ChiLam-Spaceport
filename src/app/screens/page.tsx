@@ -5,6 +5,7 @@ import { ProductionCard } from '@/components/screens/ProductionCard';
 import { MasonryLayout } from '@/components/ui/MasonryLayout';
 import { Pagination } from '@/components/updates/Pagination';
 import { getProductions, getProductionCounts } from '@/lib/queries/productions';
+import { CreateEntryTrigger } from '@/components/edit/CreateEntryTrigger';
 
 export const metadata = { title: '影视综' };
 export const dynamic = 'force-dynamic';
@@ -45,7 +46,10 @@ export default async function ScreensPage({
     <PageContainer>
       <PageHeader title="影视综" titleEn="Screens" description="电影 · 电视剧 · 综艺" />
 
-      <ScreensFilterBar currentTab={tab} currentDecade={decade} counts={counts} className="mb-8" />
+      <div className="flex items-center justify-between gap-4 mb-8">
+        <ScreensFilterBar currentTab={tab} currentDecade={decade} counts={counts} className="flex-1" />
+        <CreateEntryTrigger entityType="production" defaultValues={{ type: type || 'MOVIE' }} label="新增作品" />
+      </div>
 
       {data.items.length > 0 ? (
         <MasonryLayout>

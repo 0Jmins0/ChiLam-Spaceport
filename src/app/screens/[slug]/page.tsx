@@ -6,6 +6,8 @@ import { getProductionBySlug } from '@/lib/queries/productions';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Tag } from '@/components/ui/Tag';
 import { Button } from '@/components/ui/Button';
+import { EditableText } from '@/components/edit/EditableText';
+import { EditableImage } from '@/components/edit/EditableImage';
 
 const typeLabels: Record<string, string> = {
   MOVIE: '电影',
@@ -59,21 +61,23 @@ export default async function ScreenDetailPage({ params }: { params: Promise<{ s
       <div className="flex flex-col md:flex-row gap-8">
         {/* 左侧海报 */}
         <div className="w-full md:w-[300px] shrink-0">
-          <div className="relative aspect-[2/3] overflow-hidden rounded-[var(--radius-card)]">
-            {production.posterUrl ? (
-              <Image
-                src={production.posterUrl}
-                alt={production.title}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 300px"
-              />
-            ) : (
-              <div className="absolute inset-0 bg-bg-darker flex items-center justify-center">
-                <span className="text-text-muted text-lg">{typeLabels[production.type]}</span>
-              </div>
-            )}
-          </div>
+          <EditableImage src={production.posterUrl} entityType="production" entityId={production.id} field="posterId">
+            <div className="relative aspect-[2/3] overflow-hidden rounded-[var(--radius-card)]">
+              {production.posterUrl ? (
+                <Image
+                  src={production.posterUrl}
+                  alt={production.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 300px"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-bg-darker flex items-center justify-center">
+                  <span className="text-text-muted text-lg">{typeLabels[production.type]}</span>
+                </div>
+              )}
+            </div>
+          </EditableImage>
         </div>
 
         {/* 右侧信息 */}
@@ -82,14 +86,18 @@ export default async function ScreenDetailPage({ params }: { params: Promise<{ s
           <Tag active>{typeLabels[production.type]}</Tag>
 
           {/* 标题 */}
-          <h1 className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
-            {production.title}
-          </h1>
+          <EditableText value={production.title} entityType="production" entityId={production.id} field="title" className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
+            <h1 className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
+              {production.title}
+            </h1>
+          </EditableText>
 
           {/* 英文标题 */}
-          {production.titleEn && (
-            <p className="text-lg text-text-secondary">{production.titleEn}</p>
-          )}
+          <EditableText value={production.titleEn} entityType="production" entityId={production.id} field="titleEn" placeholder="英文标题..." className="text-lg text-text-secondary">
+            {production.titleEn && (
+              <p className="text-lg text-text-secondary">{production.titleEn}</p>
+            )}
+          </EditableText>
 
           {/* 元信息行 */}
           <p className="text-sm text-text-muted">
@@ -108,9 +116,11 @@ export default async function ScreenDetailPage({ params }: { params: Promise<{ s
           <div className="gold-line" />
 
           {/* 简介 */}
-          {production.synopsis && (
-            <p className="text-text-secondary leading-relaxed">{production.synopsis}</p>
-          )}
+          <EditableText value={production.synopsis} entityType="production" entityId={production.id} field="synopsis" multiline placeholder="添加简介..." className="text-text-secondary leading-relaxed">
+            {production.synopsis ? (
+              <p className="text-text-secondary leading-relaxed">{production.synopsis}</p>
+            ) : null}
+          </EditableText>
 
           {/* 播放平台链接 */}
           {production.watchLinks && production.watchLinks.length > 0 && (

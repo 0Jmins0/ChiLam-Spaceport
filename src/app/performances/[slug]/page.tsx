@@ -6,6 +6,8 @@ import { getPerformanceBySlug } from '@/lib/queries/performances';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Tag } from '@/components/ui/Tag';
 import { Button } from '@/components/ui/Button';
+import { EditableText } from '@/components/edit/EditableText';
+import { EditableImage } from '@/components/edit/EditableImage';
 
 const typeLabels: Record<string, string> = {
   CONCERT: '演唱会',
@@ -65,21 +67,23 @@ export default async function PerformanceDetailPage({
       <div className="flex flex-col md:flex-row gap-8">
         {/* 左侧海报 */}
         <div className="w-full md:w-[300px] shrink-0">
-          <div className="relative aspect-[2/3] overflow-hidden rounded-[var(--radius-card)]">
-            {performance.posterUrl ? (
-              <Image
-                src={performance.posterUrl}
-                alt={performance.title}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 300px"
-              />
-            ) : (
-              <div className="absolute inset-0 bg-bg-darker flex items-center justify-center">
-                <span className="text-text-muted text-lg">{typeLabels[performance.type]}</span>
-              </div>
-            )}
-          </div>
+          <EditableImage src={performance.posterUrl} entityType="performance" entityId={performance.id} field="posterId">
+            <div className="relative aspect-[2/3] overflow-hidden rounded-[var(--radius-card)]">
+              {performance.posterUrl ? (
+                <Image
+                  src={performance.posterUrl}
+                  alt={performance.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 300px"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-bg-darker flex items-center justify-center">
+                  <span className="text-text-muted text-lg">{typeLabels[performance.type]}</span>
+                </div>
+              )}
+            </div>
+          </EditableImage>
         </div>
 
         {/* 右侧信息 */}
@@ -88,14 +92,18 @@ export default async function PerformanceDetailPage({
           <Tag active>{typeLabels[performance.type]}</Tag>
 
           {/* 标题 */}
-          <h1 className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
-            {performance.title}
-          </h1>
+          <EditableText value={performance.title} entityType="performance" entityId={performance.id} field="title" className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
+            <h1 className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
+              {performance.title}
+            </h1>
+          </EditableText>
 
           {/* 英文标题 */}
-          {performance.titleEn && (
-            <p className="text-lg text-text-secondary">{performance.titleEn}</p>
-          )}
+          <EditableText value={performance.titleEn} entityType="performance" entityId={performance.id} field="titleEn" placeholder="英文标题..." className="text-lg text-text-secondary">
+            {performance.titleEn && (
+              <p className="text-lg text-text-secondary">{performance.titleEn}</p>
+            )}
+          </EditableText>
 
           {/* 元信息行 */}
           <p className="text-sm text-text-muted">
@@ -117,17 +125,17 @@ export default async function PerformanceDetailPage({
           )}
 
           {/* 简介 */}
-          {performance.summary && (
-            <>
-              <div className="gold-line" />
-              <div>
-                <h2 className="font-heading text-base text-text-primary mb-2">简介</h2>
+          <div className="gold-line" />
+          <div>
+            <h2 className="font-heading text-base text-text-primary mb-2">简介</h2>
+            <EditableText value={performance.summary} entityType="performance" entityId={performance.id} field="summary" multiline placeholder="添加简介..." className="text-sm text-text-secondary leading-relaxed whitespace-pre-line">
+              {performance.summary ? (
                 <p className="text-sm text-text-secondary leading-relaxed whitespace-pre-line">
                   {performance.summary}
                 </p>
-              </div>
-            </>
-          )}
+              ) : null}
+            </EditableText>
+          </div>
         </div>
       </div>
 

@@ -5,6 +5,7 @@ import { PerformanceCard } from '@/components/performances/PerformanceCard';
 import { MasonryLayout } from '@/components/ui/MasonryLayout';
 import { Pagination } from '@/components/updates/Pagination';
 import { getPerformances, getPerformanceCounts } from '@/lib/queries/performances';
+import { CreateEntryTrigger } from '@/components/edit/CreateEntryTrigger';
 
 export const metadata = { title: '演出' };
 export const dynamic = 'force-dynamic';
@@ -45,12 +46,15 @@ export default async function PerformancesPage({
     <PageContainer>
       <PageHeader title="演出" titleEn="Performances" description="演唱会 · 舞台 · 音乐剧" />
 
-      <PerformancesFilterBar
-        currentTab={tab}
-        currentSeries={series}
-        counts={counts}
-        className="mb-8"
-      />
+      <div className="flex items-center justify-between gap-4 mb-8">
+        <PerformancesFilterBar
+          currentTab={tab}
+          currentSeries={series}
+          counts={counts}
+          className="flex-1"
+        />
+        <CreateEntryTrigger entityType="performance" defaultValues={{ type: type || 'CONCERT' }} label="新增演出" />
+      </div>
 
       {data.items.length > 0 ? (
         <MasonryLayout>

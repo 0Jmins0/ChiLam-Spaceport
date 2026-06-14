@@ -6,6 +6,7 @@ import { MagazineCard } from '@/components/archives/MagazineCard';
 import { MasonryLayout } from '@/components/ui/MasonryLayout';
 import { Pagination } from '@/components/updates/Pagination';
 import { getAlbums, getMagazines, getArchiveCounts } from '@/lib/queries/archives';
+import { CreateEntryTrigger } from '@/components/edit/CreateEntryTrigger';
 
 export const metadata = { title: '资料库' };
 export const dynamic = 'force-dynamic';
@@ -39,12 +40,18 @@ export default async function ArchivesPage({
     <PageContainer>
       <PageHeader title="资料库" titleEn="Archives" description="专辑 · 杂志" />
 
-      <ArchivesFilterBar
-        currentTab={tab}
-        currentLanguage={language}
-        counts={counts}
-        className="mb-8"
-      />
+      <div className="flex items-center justify-between gap-4 mb-8">
+        <ArchivesFilterBar
+          currentTab={tab}
+          currentLanguage={language}
+          counts={counts}
+          className="flex-1"
+        />
+        <CreateEntryTrigger
+          entityType={tab === 'magazine' ? 'magazine' : 'album'}
+          label={tab === 'magazine' ? '新增杂志' : '新增专辑'}
+        />
+      </div>
 
       {/* Album grid */}
       {tab === 'album' && albumData && (

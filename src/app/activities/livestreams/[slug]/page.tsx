@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { getLivestreamBySlug } from '@/lib/queries/activities';
+import { EditableText } from '@/components/edit/EditableText';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Tag } from '@/components/ui/Tag';
 import { Button } from '@/components/ui/Button';
@@ -65,9 +66,11 @@ export default async function LivestreamDetailPage({
         <Tag active>{platformLabel}</Tag>
 
         {/* Title */}
-        <h1 className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
-          {livestream.title}
-        </h1>
+        <EditableText value={livestream.title} entityType="livestream" entityId={livestream.id} field="title" className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
+          <h1 className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
+            {livestream.title}
+          </h1>
+        </EditableText>
 
         {/* Meta info */}
         <p className="text-sm text-text-muted">
@@ -79,9 +82,9 @@ export default async function LivestreamDetailPage({
         <div className="gold-line" />
 
         {/* Summary */}
-        {livestream.summary && (
-          <p className="text-text-secondary leading-relaxed">{livestream.summary}</p>
-        )}
+        <EditableText value={livestream.summary} entityType="livestream" entityId={livestream.id} field="summary" multiline placeholder="添加简介..." className="text-text-secondary leading-relaxed">
+          {livestream.summary ? <p className="text-text-secondary leading-relaxed">{livestream.summary}</p> : null}
+        </EditableText>
 
         {/* Action buttons */}
         <div className="flex flex-wrap gap-3">
