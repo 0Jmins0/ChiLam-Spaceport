@@ -148,7 +148,7 @@ export interface PerformanceDetail extends PerformanceItem {
 // ─── 活动模块 ───
 
 // 活动 Tab 类型
-export type ActivityTab = 'endorsement' | 'interview' | 'livestream';
+export type ActivityTab = 'endorsement' | 'livestream';
 
 // 访谈媒体类型筛选
 export type InterviewMediaFilter = 'video' | 'audio' | 'text';

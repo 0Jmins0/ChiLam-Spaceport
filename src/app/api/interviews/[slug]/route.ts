@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { getInterviewBySlug } from '@/lib/queries/activities';
+import { getInterviewBySlug } from '@/lib/queries/interviews';
 
 // GET - 获取单个访谈详情
 export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {

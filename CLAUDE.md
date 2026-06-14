@@ -5,7 +5,7 @@
 
 ## 当前进度
 - **阶段**: P6 用户反馈迭代进行中
-- **已完成**: P0~P4 全部、UI 调整阶段一~五、P5.0 海报/封面填充、P6.1 体验修复、P6.8 演出详情页优化、P6.2 访谈详情页重做、P6.3 瀑布流布局改版、P6.4 留言板增强、P6.6 前台编辑模式、P6.10 全站时间排序、P6.11 网格布局统一
+- **已完成**: P0~P4 全部、UI 调整阶段一~五、P5.0 海报/封面填充、P6.1 体验修复、P6.8 演出详情页优化、P6.2 访谈详情页重做、P6.3 瀑布流布局改版、P6.4 留言板增强、P6.6 前台编辑模式、P6.10 全站时间排序、P6.11 网格布局统一、P6.12 霖言霖语独立模块
 - **下一步**: P6.5 相册模块 → P6.7 → P6.9
 - **详细进度**: 查看 `/docs/PROGRESS.md`
 
@@ -36,7 +36,8 @@
 │   │   ├── page.tsx                                 # 首页（数据库驱动时间线）
 │   │   ├── updates/                                 # 动态模块（列表 + 三种详情页）
 │   │   ├── screens/                                 # 影视模块（列表 + 详情页）
-│   │   ├── activities/                              # 活动模块（列表 + 代言详情 + 访谈详情 + 直播详情）
+│   │   ├── activities/                              # 活动模块（列表 + 代言详情 + 直播详情）
+│   │   ├── interviews/                              # 霖言霖语模块（列表 + 详情页，原活动子模块独立）
 │   │   ├── archives/                                # 资料库模块（列表 + 专辑详情 + 杂志详情）
 │   │   ├── messages/                                # 留言板（列表 + 详情页）
 │   │   ├── announcements/                           # 公告（列表 + 详情页）
@@ -45,7 +46,8 @@
 │   │   ├── api/updates/                             # 动态 CRUD API
 │   │   ├── api/screens/                             # 影视 CRUD API
 │   │   ├── api/performances/                        # 演出 CRUD API
-│   │   ├── api/activities/                          # 活动 CRUD API（代言+访谈+直播）
+│   │   ├── api/activities/                          # 活动 CRUD API（代言+直播）
+│   │   ├── api/interviews/                          # 霖言霖语 CRUD API
 │   │   ├── api/archives/                            # 资料库 CRUD API（专辑+杂志）
 │   │   ├── api/messages/                            # 留言板 CRUD + 点赞 + 评论 API
 │   │   ├── api/announcements/                       # 公告 CRUD API
@@ -63,7 +65,8 @@
 │   │   ├── updates/                                 # 动态组件（SocialPostCard, NewsArticleCard 等）
 │   │   ├── screens/                                 # 影视组件（ProductionCard, ScreensFilterBar）
 │   │   ├── performances/                            # 演出组件（PerformanceCard, PerformancesFilterBar）
-│   │   ├── activities/                              # 活动组件（EndorsementCard, InterviewCard, LivestreamCard, ActivitiesFilterBar）
+│   │   ├── activities/                              # 活动组件（EndorsementCard, LivestreamCard, ActivitiesFilterBar）
+│   │   ├── interviews/                              # 霖言霖语组件（InterviewCard, InterviewsFilterBar, InterviewDetail/）
 │   │   ├── archives/                                # 资料库组件（AlbumCard, MagazineCard, ArchivesFilterBar）
 │   │   ├── guestbook/                               # 留言板组件（GuestbookCard, GuestbookGrid, Form, LikeButton, CommentSection, CardActions 等）
 │   │   ├── announcements/                           # 公告组件（AnnouncementCard, FilterBar）
@@ -74,7 +77,7 @@
 │   │   ├── auth.ts                                  # JWT 认证（管理员 + 用户双密钥）
 │   │   ├── username-validator.ts                    # 用户名禁用词校验
 │   │   ├── types.ts                                 # 数据类型定义
-│   │   └── queries/                                 # 数据查询层（timeline.ts, updates.ts, productions.ts, performances.ts, activities.ts, archives.ts, guestbook.ts, announcements.ts, user.ts, search.ts）
+│   │   └── queries/                                 # 数据查询层（timeline.ts, updates.ts, productions.ts, performances.ts, activities.ts, interviews.ts, archives.ts, guestbook.ts, announcements.ts, user.ts, search.ts）
 │   └── generated/                                   # Prisma 生成的客户端代码
 ├── prisma/
 │   ├── schema.prisma                                # 数据库 Schema（已完成，22 张表）
@@ -129,8 +132,9 @@
 | 动态 | `/updates` | 社交媒体、新闻报道、路透 |
 | 影视 | `/screens` | 电影、电视剧、综艺 |
 | 演出 | `/performances` | 演唱会、舞台、音乐剧 |
-| 活动 | `/activities` | 广告代言、访谈、直播 |
+| 活动 | `/activities` | 广告代言、直播 |
 | 资料库 | `/archives` | 杂志、专辑 |
+| 霖言霖语 | `/interviews` | 视频访谈、音频访谈、图文访谈 |
 | 留言 | `/messages` | 我想对你说、故事分享、冷知识、建议反馈 |
 | 公告 | `/announcements` | 网站公告、规则、更新通知 |
 | 搜索 | `/search` | 全站检索（11 类型筛选） |

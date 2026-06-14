@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { getInterviews } from '@/lib/queries/activities';
+import { getInterviews } from '@/lib/queries/interviews';
 
 // GET - 访谈列表（复用查询层）
 export async function GET(request: NextRequest) {

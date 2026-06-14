@@ -9,18 +9,10 @@ import { Tag } from '@/components/ui/Tag';
 
 interface ActivitiesFilterBarProps {
   currentTab: string;
-  currentMediaType?: string;
   currentPlatform?: string;
-  counts?: { endorsement: number; interview: number; livestream: number };
+  counts?: { endorsement: number; livestream: number };
   className?: string;
 }
-
-const mediaTypeFilters = [
-  { label: '全部', value: '' },
-  { label: '视频', value: 'VIDEO' },
-  { label: '音频', value: 'AUDIO' },
-  { label: '图文', value: 'TEXT' },
-];
 
 const livestreamPlatformFilters = [
   { label: '全部', value: '' },
@@ -31,7 +23,6 @@ const livestreamPlatformFilters = [
 
 export function ActivitiesFilterBar({
   currentTab,
-  currentMediaType,
   currentPlatform,
   counts,
   className,
@@ -66,13 +57,6 @@ export function ActivitiesFilterBar({
     [router],
   );
 
-  const handleMediaTypeChange = useCallback(
-    (mediaType: string) => {
-      router.push(buildUrl({ tab: 'interview', mediaType }), { scroll: false });
-    },
-    [router, buildUrl],
-  );
-
   const handlePlatformChange = useCallback(
     (platform: string) => {
       router.push(buildUrl({ tab: 'livestream', platform }), { scroll: false });
@@ -86,10 +70,6 @@ export function ActivitiesFilterBar({
       value: 'endorsement',
     },
     {
-      label: counts ? `访谈 (${counts.interview})` : '访谈',
-      value: 'interview',
-    },
-    {
       label: counts ? `直播 (${counts.livestream})` : '直播',
       value: 'livestream',
     },
@@ -98,23 +78,6 @@ export function ActivitiesFilterBar({
   return (
     <div className={cn('space-y-4', className)}>
       <TabBar tabs={tabs} activeTab={currentTab} onTabChange={handleTabChange} />
-
-      {/* Media type sub-filters — only for interview tab */}
-      {currentTab === 'interview' && (
-        <div className="flex flex-wrap gap-2">
-          {mediaTypeFilters.map((filter) => (
-            <Tag
-              key={filter.value}
-              active={
-                currentMediaType === filter.value || (!currentMediaType && filter.value === '')
-              }
-              onClick={() => handleMediaTypeChange(filter.value)}
-            >
-              {filter.label}
-            </Tag>
-          ))}
-        </div>
-      )}
 
       {/* Platform sub-filters — only for livestream tab */}
       {currentTab === 'livestream' && (

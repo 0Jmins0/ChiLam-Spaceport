@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import { getInterviewBySlug } from '@/lib/queries/activities';
-import InterviewSidebar from '@/components/activities/InterviewDetail/InterviewSidebar';
-import InterviewTranscript from '@/components/activities/InterviewDetail/InterviewTranscript';
-import InterviewMediaPanel from '@/components/activities/InterviewDetail/InterviewMediaPanel';
+import { getInterviewBySlug } from '@/lib/queries/interviews';
+import InterviewSidebar from '@/components/interviews/InterviewDetail/InterviewSidebar';
+import InterviewTranscript from '@/components/interviews/InterviewDetail/InterviewTranscript';
+import InterviewMediaPanel from '@/components/interviews/InterviewDetail/InterviewMediaPanel';
 
 export async function generateMetadata({
   params,

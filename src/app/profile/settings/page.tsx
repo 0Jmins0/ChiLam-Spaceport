@@ -11,7 +11,7 @@ export default function ProfileSettingsPage() {
   const { user, loading, openLogin } = useAuth();
 
   useEffect(() => {
-    document.title = '个人设置 - 太空留言板';
+    document.title = '个人设置 - 留言板';
   }, []);
 
   // 未登录

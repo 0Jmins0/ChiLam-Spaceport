@@ -229,12 +229,12 @@ export default function InterviewSidebar({
       {/* Back button */}
       <div className="mt-6 col-span-2">
         <Link
-          href="/activities?tab=interview"
+          href="/interviews"
           className="inline-flex items-center gap-2 border border-border-gold rounded-[var(--radius-card)] px-4 py-2 text-sm text-text-secondary transition-colors hover:border-accent hover:text-text-primary"
         >
           <span>&larr;</span>
           <span>
-            返回活动 / <span className="uppercase tracking-wider text-xs">Back to Activities</span>
+            返回霖言霖语 / <span className="uppercase tracking-wider text-xs">Back to Interviews</span>
           </span>
         </Link>
       </div>

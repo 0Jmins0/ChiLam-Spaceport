@@ -15,7 +15,7 @@ export default function ProfilePage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    document.title = '个人中心 - 太空留言板';
+    document.title = '个人中心 - 留言板';
   }, []);
 
   useEffect(() => {

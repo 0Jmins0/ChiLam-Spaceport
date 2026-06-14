@@ -202,7 +202,7 @@ async function searchInterviews(q: string, take: number, skip: number = 0) {
       id: item.id,
       title: item.title,
       snippet: item.summary?.slice(0, 100) ?? null,
-      url: `/activities/interviews/${item.slug}`,
+      url: `/interviews/${item.slug}`,
       date: item.date.toISOString(),
       typeLabel: TYPE_LABELS.interview,
     })),

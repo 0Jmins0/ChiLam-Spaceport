@@ -11,7 +11,7 @@ export default function ProfileMessagesPage() {
   const { user, loading, openLogin } = useAuth();
 
   useEffect(() => {
-    document.title = '我的留言 - 太空留言板';
+    document.title = '我的留言 - 留言板';
   }, []);
 
   // 未登录

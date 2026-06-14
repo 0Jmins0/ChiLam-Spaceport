@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.6 + P6.8 + P6.10 + P6.11 已完成）
+## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 已完成）
 
 ---
 
@@ -14,7 +14,8 @@
 | 动态模块 | ✅ 已完成 | 2026-06-06 |
 | 影视模块 | ✅ 已完成 | 2026-06-06 |
 | 演出模块 | ✅ 已完成 | 2026-06-06 |
-| 活动模块 | ✅ 已完成（含直播 tab） | 2026-06-08 |
+| 活动模块 | ✅ 已完成（代言+直播，访谈已独立） | 2026-06-15 |
+| 霖言霖语模块 | ✅ 已完成（从活动独立为顶级栏目） | 2026-06-15 |
 | 资料库模块 | ✅ 已完成 | 2026-06-07 |
 | 留言板 | ✅ 已完成（含故事 tag 筛选 + 登录权限 + 精选/图片上传） | 2026-06-11 |
 | 用户系统 | ✅ 已完成（注册/登录/权限） | 2026-06-10 |
@@ -28,6 +29,35 @@
 ---
 
 ## 详细记录
+
+### 2026-06-15 - P6.12 霖言霖语独立模块（已完成）
+
+#### 完成内容
+- **访谈模块独立**：将访谈从活动模块（`/activities`）的子 Tab 提升为独立顶级栏目「霖言霖语」
+- **新路由**：`/interviews`（列表页）+ `/interviews/[slug]`（详情页）+ `/api/interviews`（API）
+- **导航更新**：导航栏新增「霖言霖语」入口，位于「资料库」和「留言板」之间
+- **活动模块瘦身**：活动页面只保留代言 + 直播两个 Tab
+
+#### 技术变更
+- `src/config/navigation.ts`：新增 `{ label: '霖言霖语', href: '/interviews' }` 导航项
+- `src/lib/types.ts`：`ActivityTab` 删除 `'interview'`
+- 新建 `src/lib/queries/interviews.ts`：从 `activities.ts` 拆出 `getInterviews`、`getInterviewBySlug`、`getInterviewCounts`
+- `src/lib/queries/activities.ts`：删除访谈相关函数，`getActivityCounts` 只统计代言+直播
+- `src/lib/queries/search.ts`：搜索结果 URL 从 `/activities/interviews/` 改为 `/interviews/`
+- 新建 `src/app/interviews/`：列表页 + 详情页 + loading 骨架屏
+- 新建 `src/app/api/interviews/`：GET/POST + [slug] GET/PUT/DELETE
+- 新建 `src/components/interviews/`：InterviewCard、InterviewsFilterBar、InterviewDetail/（4 个子组件）
+- `src/app/activities/page.tsx`：删除 interview Tab 和相关逻辑
+- `src/components/activities/ActivitiesFilterBar.tsx`：删除 interview Tab 和 mediaType 筛选
+- `src/components/edit/CreateEntryModal.tsx`：API 和详情路由指向新路径
+
+#### 删除文件
+- `src/app/activities/interviews/`（旧页面路由）
+- `src/app/api/activities/interviews/`（旧 API 路由）
+- `src/components/activities/InterviewCard.tsx`（旧组件）
+- `src/components/activities/InterviewDetail/`（旧详情组件目录）
+
+---
 
 ### 2026-06-14 - P6.11 网格布局统一（已完成）
 

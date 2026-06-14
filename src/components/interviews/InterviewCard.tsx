@@ -35,7 +35,7 @@ export function InterviewCard({
   const typeLabel = mediaTypeLabels[mediaType] || mediaType;
 
   return (
-    <Link href={`/activities/interviews/${slug}`} className={cn('block', className)}>
+    <Link href={`/interviews/${slug}`} className={cn('block', className)}>
       <Card className="p-4">
         {/* Media type badge */}
         <div className="mb-3">
