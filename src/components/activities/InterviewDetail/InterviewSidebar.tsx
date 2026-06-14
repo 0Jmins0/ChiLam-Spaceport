@@ -1,6 +1,10 @@
+'use client';
+
 import Link from 'next/link';
+import { EditableText } from '@/components/edit/EditableText';
 
 interface InterviewSidebarProps {
+  interviewId: string;
   source: string | null;
   host: string | null;
   location: string | null;
@@ -14,13 +18,6 @@ function formatDate(date: Date): string {
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
   return `${y}.${m}.${day}`;
-}
-
-function MetaValue({ value }: { value: string | null }) {
-  if (value) {
-    return <p className="text-base text-text-primary">{value}</p>;
-  }
-  return <p className="text-base text-text-muted italic">暂无</p>;
 }
 
 const SourceIcon = () => (
@@ -131,6 +128,7 @@ function MetaItem({ icon, labelCn, labelEn, children }: MetaItemProps) {
 }
 
 export default function InterviewSidebar({
+  interviewId,
   source,
   host,
   location,
@@ -142,23 +140,89 @@ export default function InterviewSidebar({
       {/* Desktop: vertical list / Mobile: 2-col grid */}
       <div className="grid grid-cols-2 gap-x-4 gap-y-0 lg:grid-cols-1 lg:gap-0">
         <MetaItem icon={<SourceIcon />} labelCn="来源" labelEn="SOURCE">
-          <MetaValue value={source} />
+          <EditableText
+            value={source}
+            entityType="interview"
+            entityId={interviewId}
+            field="source"
+            as="span"
+            className="text-base text-text-primary"
+            placeholder="来源..."
+          >
+            {source ? (
+              <span className="text-base text-text-primary">{source}</span>
+            ) : (
+              <span className="text-base text-text-muted italic">暂无</span>
+            )}
+          </EditableText>
         </MetaItem>
 
         <MetaItem icon={<HostIcon />} labelCn="主持" labelEn="HOST">
-          <MetaValue value={host} />
+          <EditableText
+            value={host}
+            entityType="interview"
+            entityId={interviewId}
+            field="host"
+            as="span"
+            className="text-base text-text-primary"
+            placeholder="主持人..."
+          >
+            {host ? (
+              <span className="text-base text-text-primary">{host}</span>
+            ) : (
+              <span className="text-base text-text-muted italic">暂无</span>
+            )}
+          </EditableText>
         </MetaItem>
 
         <MetaItem icon={<LocationIcon />} labelCn="地点" labelEn="LOCATION">
-          <MetaValue value={location} />
+          <EditableText
+            value={location}
+            entityType="interview"
+            entityId={interviewId}
+            field="location"
+            as="span"
+            className="text-base text-text-primary"
+            placeholder="地点..."
+          >
+            {location ? (
+              <span className="text-base text-text-primary">{location}</span>
+            ) : (
+              <span className="text-base text-text-muted italic">暂无</span>
+            )}
+          </EditableText>
         </MetaItem>
 
         <MetaItem icon={<DateIcon />} labelCn="日期" labelEn="DATE">
-          <p className="text-base text-text-primary">{formatDate(date)}</p>
+          <EditableText
+            value={new Date(date).toISOString().split('T')[0]}
+            entityType="interview"
+            entityId={interviewId}
+            field="date"
+            as="span"
+            className="text-base text-text-primary"
+            placeholder="日期(YYYY-MM-DD)..."
+          >
+            <span className="text-base text-text-primary">{formatDate(date)}</span>
+          </EditableText>
         </MetaItem>
 
         <MetaItem icon={<DurationIcon />} labelCn="时长" labelEn="DURATION">
-          <MetaValue value={duration} />
+          <EditableText
+            value={duration}
+            entityType="interview"
+            entityId={interviewId}
+            field="duration"
+            as="span"
+            className="text-base text-text-primary"
+            placeholder="时长(分钟)..."
+          >
+            {duration ? (
+              <span className="text-base text-text-primary">{duration}</span>
+            ) : (
+              <span className="text-base text-text-muted italic">暂无</span>
+            )}
+          </EditableText>
         </MetaItem>
       </div>
 

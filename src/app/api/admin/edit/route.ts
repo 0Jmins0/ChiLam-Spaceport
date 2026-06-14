@@ -18,6 +18,8 @@ const EDITABLE_FIELDS: Record<string, string[]> = {
     'duration',
     'summary',
     'embedUrl',
+    'proofreadStatus',
+    'date',
   ],
   album: ['title', 'titleEn', 'releaseYear', 'language', 'coverId'],
   magazine: ['title', 'issue', 'coverId'],
@@ -42,7 +44,7 @@ const INTEGER_FIELDS = new Set([
 ]);
 
 /** 需要 Date 解析的字段 */
-const DATE_FIELDS = new Set(['releaseDate', 'publishDate']);
+const DATE_FIELDS = new Set(['releaseDate', 'publishDate', 'date']);
 
 /** entityType → Prisma model accessor */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

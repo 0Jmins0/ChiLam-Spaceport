@@ -2,8 +2,11 @@
 
 import Image from 'next/image';
 import AudioPlayer from './AudioPlayer';
+import { EditableText } from '@/components/edit/EditableText';
+import { useEditMode } from '@/components/edit/EditModeProvider';
 
 interface InterviewMediaPanelProps {
+  interviewId: string;
   mediaType: string;
   proofreadStatus: string;
   embedUrl: string | null;
@@ -98,6 +101,7 @@ function MediaPlaceholder() {
 }
 
 export default function InterviewMediaPanel({
+  interviewId,
   mediaType,
   proofreadStatus,
   embedUrl,
@@ -106,16 +110,32 @@ export default function InterviewMediaPanel({
   summary,
   duration,
 }: InterviewMediaPanelProps) {
+  const { editMode } = useEditMode();
+
   const renderMedia = () => {
-    // VIDEO with embed URL
-    if (mediaType === 'VIDEO' && embedUrl) {
+    // VIDEO with embed URL (or editable placeholder)
+    if (mediaType === 'VIDEO') {
       return (
-        <iframe
-          src={embedUrl}
-          allowFullScreen
-          className="w-full aspect-video rounded-[var(--radius-card)]"
-          title="访谈视频"
-        />
+        <EditableText
+          value={embedUrl || ''}
+          entityType="interview"
+          entityId={interviewId}
+          field="embedUrl"
+          placeholder="视频嵌入地址..."
+          className="text-sm text-text-muted"
+        >
+          {embedUrl ? (
+            <div className="relative">
+              <iframe
+                src={embedUrl}
+                allowFullScreen
+                className="w-full aspect-video rounded-[var(--radius-card)]"
+                title="访谈视频"
+              />
+              {editMode && <div className="absolute inset-0 z-10 cursor-pointer" />}
+            </div>
+          ) : null}
+        </EditableText>
       );
     }
 
@@ -159,7 +179,16 @@ export default function InterviewMediaPanel({
     <div className="space-y-6">
       {/* Proofread Badge */}
       <div className="flex justify-end">
-        <ProofreadBadge status={proofreadStatus} />
+        <EditableText
+          value={proofreadStatus}
+          entityType="interview"
+          entityId={interviewId}
+          field="proofreadStatus"
+          className="text-sm"
+          placeholder="校对状态(PROOFREAD/UNPROOFREAD)..."
+        >
+          <ProofreadBadge status={proofreadStatus} />
+        </EditableText>
       </div>
 
       {/* Media Area */}
@@ -175,11 +204,37 @@ export default function InterviewMediaPanel({
           <p className="text-xs text-text-muted uppercase tracking-wider">Editor&apos;s Note</p>
         </div>
 
-        {summary ? (
-          <p className="text-sm text-text-secondary leading-relaxed">{summary}</p>
-        ) : (
-          <p className="text-sm text-text-muted italic">暂无编者备注</p>
-        )}
+        <EditableText
+          value={summary}
+          entityType="interview"
+          entityId={interviewId}
+          field="summary"
+          as="p"
+          multiline
+          className="text-sm text-text-secondary leading-relaxed"
+          placeholder="编辑笔记..."
+        >
+          {summary ? (
+            <span className="text-sm text-text-secondary leading-relaxed">{summary}</span>
+          ) : (
+            <span className="text-sm text-text-muted italic">暂无编者备注</span>
+          )}
+        </EditableText>
+
+        {/* Duration (editable) */}
+        <EditableText
+          value={duration}
+          entityType="interview"
+          entityId={interviewId}
+          field="duration"
+          as="p"
+          className="text-sm text-text-secondary"
+          placeholder="时长(分钟)..."
+        >
+          {duration ? (
+            <span className="text-sm text-text-secondary">{duration}</span>
+          ) : null}
+        </EditableText>
 
         {/* Decorative signature line */}
         <div className="flex justify-end pt-2">

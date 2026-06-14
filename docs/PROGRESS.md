@@ -45,6 +45,9 @@
   - 代言：分类、角色、开始年份、结束年份
   - 直播：平台、时长、原始链接、回放链接
 - **空字段处理**：编辑模式显示浅色占位提示，非编辑模式隐藏并自动处理分隔符排版
+- **访谈详情页完整编辑支持**：标题、英文标题、来源、主持人、地点、时长、日期、视频地址、编辑笔记、校对状态
+- **视频编辑 UX**：编辑模式下 iframe 上覆盖透明遮罩，点击可编辑嵌入地址
+- **修复 Hydration 错误**：解决 `<h1>`/`<p>` 标签嵌套导致的水合警告
 
 #### 技术变更
 - `prisma/schema.prisma`: 新增 `UserRole` 枚举，User 表加 `role` 字段
@@ -55,6 +58,8 @@
 - `src/app/api/auth/register/route.ts`: 返回 `role`
 - `src/app/api/auth/me/route.ts`: 返回 `role`
 - 6 个详情页：screens、performances、albums、magazines、endorsements、livestreams 元信息字段包裹 EditableText
+- 访谈详情页 3 个子组件：InterviewSidebar、InterviewTranscript、InterviewMediaPanel 全部添加编辑支持
+- `src/app/api/admin/edit/route.ts`: interview 白名单新增 `proofreadStatus`、`date`；DATE_FIELDS 新增 `date`
 
 ### 2026-06-13 - P6.6 前台编辑模式（已完成）
 

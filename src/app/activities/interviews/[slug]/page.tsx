@@ -45,6 +45,7 @@ export default async function InterviewDetailPage({
       {/* 移动端：媒体优先显示 */}
       <div className="lg:hidden mb-8">
         <InterviewMediaPanel
+          interviewId={interview.id}
           mediaType={interview.mediaType}
           proofreadStatus={interview.proofreadStatus}
           embedUrl={interview.embedUrl ?? null}
@@ -61,6 +62,7 @@ export default async function InterviewDetailPage({
         <div className="lg:w-[220px] shrink-0">
           <div className="lg:sticky lg:top-24">
             <InterviewSidebar
+              interviewId={interview.id}
               source={interview.source ?? null}
               host={interview.host ?? null}
               location={interview.location ?? null}
@@ -73,6 +75,7 @@ export default async function InterviewDetailPage({
         {/* 中栏 - Transcript */}
         <div className="flex-1 min-w-0">
           <InterviewTranscript
+            interviewId={interview.id}
             title={interview.title}
             date={interview.date}
             proofreadStatus={interview.proofreadStatus}
@@ -85,6 +88,7 @@ export default async function InterviewDetailPage({
         <div className="hidden lg:block lg:w-[350px] shrink-0">
           <div className="lg:sticky lg:top-24">
             <InterviewMediaPanel
+              interviewId={interview.id}
               mediaType={interview.mediaType}
               proofreadStatus={interview.proofreadStatus}
               embedUrl={interview.embedUrl ?? null}

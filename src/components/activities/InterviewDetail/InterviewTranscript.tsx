@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { EditableText } from '@/components/edit/EditableText';
 
 interface TranscriptSegment {
   speaker: string;
@@ -14,6 +15,7 @@ interface TranscriptData {
 }
 
 interface InterviewTranscriptProps {
+  interviewId: string;
   title: string;
   titleEn?: string;
   date: Date;
@@ -105,6 +107,7 @@ function SegmentList({ segments }: { segments: TranscriptSegment[] }) {
 }
 
 export default function InterviewTranscript({
+  interviewId,
   title,
   titleEn,
   date,
@@ -166,10 +169,28 @@ export default function InterviewTranscript({
 
       {/* Title area */}
       <div className="space-y-3">
-        <h1 className="font-heading text-2xl md:text-3xl lg:text-4xl text-text-primary font-semibold">
-          {title}
-        </h1>
-        {titleEn && <p className="text-base text-text-secondary italic mt-2">{titleEn}</p>}
+        <EditableText
+          value={title}
+          entityType="interview"
+          entityId={interviewId}
+          field="title"
+          className="font-heading text-2xl md:text-3xl lg:text-4xl text-text-primary font-semibold"
+          placeholder="标题..."
+        >
+          <h1 className="font-heading text-2xl md:text-3xl lg:text-4xl text-text-primary font-semibold">
+            {title}
+          </h1>
+        </EditableText>
+        <EditableText
+          value={titleEn || ''}
+          entityType="interview"
+          entityId={interviewId}
+          field="titleEn"
+          className="text-base text-text-secondary italic mt-2"
+          placeholder="英文标题..."
+        >
+          {titleEn ? <span className="text-base text-text-secondary italic mt-2">{titleEn}</span> : null}
+        </EditableText>
         <div className="flex items-center gap-3 flex-wrap">
           <span className="text-sm text-text-muted">{formatDate(date)}</span>
           <span className="text-text-muted/30">|</span>
