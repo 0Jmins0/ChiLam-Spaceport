@@ -29,25 +29,32 @@
 
 ## 详细记录
 
-### 2026-06-14 - P6.6 前台编辑模式 — 认证统一（已完成）
+### 2026-06-14 - P6.6 前台编辑模式 — 认证统一 + 元信息可编辑（已完成）
 
 #### 完成内容
 - **合并管理员认证到 User 表**：User 表新增 `role` 字段（枚举 `USER` / `ADMIN`），取消独立的 Admin 认证体系
 - **统一 Token 验证**：`verifyAdmin()` 改用 `USER_JWT_SECRET` 验证用户 token + 检查 `role === ADMIN`，不再使用单独的 `ADMIN_JWT_SECRET`
 - **EditModeProvider 重写**：从 `useAuth()` 获取用户角色，`admin_token` 替换为 `user_token`，管理员登录后自动获得编辑权限
+- **未登录保护**：非管理员点编辑按钮弹出登录弹窗，不进入编辑模式
 - **修复 login/register API**：返回 `role` 字段，确保登录后即可识别管理员身份
-- **修复图片上传**：EditableImage 改用服务端中继上传（FormData → /api/upload）
-- **修复 slug 生成**：CreateEntryModal 剥离中文字符，使用 API 返回的 slug 跳转
-- **修复演出详情页**：简介为空时隐藏多余金线和标题
+- **6 个详情页元信息字段全部可编辑**：
+  - 影视：年份、角色、语言
+  - 演出：年份、场馆、城市、系列
+  - 专辑：发行年份、语言
+  - 杂志：期号
+  - 代言：分类、角色、开始年份、结束年份
+  - 直播：平台、时长、原始链接、回放链接
+- **空字段处理**：编辑模式显示浅色占位提示，非编辑模式隐藏并自动处理分隔符排版
 
 #### 技术变更
 - `prisma/schema.prisma`: 新增 `UserRole` 枚举，User 表加 `role` 字段
 - `src/lib/auth.ts`: `verifyAdmin` 改用 user token + role 检查
-- `src/components/edit/EditModeProvider.tsx`: 重写，依赖 AuthProvider 的 user.role
+- `src/components/edit/EditModeProvider.tsx`: 重写，依赖 AuthProvider 的 user.role，未登录弹登录框
 - `src/components/auth/AuthProvider.tsx`: User 接口加 `role` 字段
 - `src/app/api/auth/login/route.ts`: 返回 `role`
 - `src/app/api/auth/register/route.ts`: 返回 `role`
 - `src/app/api/auth/me/route.ts`: 返回 `role`
+- 6 个详情页：screens、performances、albums、magazines、endorsements、livestreams 元信息字段包裹 EditableText
 
 ### 2026-06-13 - P6.6 前台编辑模式（已完成）
 

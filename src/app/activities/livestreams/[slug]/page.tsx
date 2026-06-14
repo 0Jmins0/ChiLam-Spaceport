@@ -63,7 +63,9 @@ export default async function LivestreamDetailPage({
       {/* Header section */}
       <div className="space-y-4 max-w-3xl">
         {/* Platform badge */}
-        <Tag active>{platformLabel}</Tag>
+        <EditableText value={livestream.platform} entityType="livestream" entityId={livestream.id} field="platform" placeholder="平台..." className="text-sm">
+          <Tag active>{platformLabel}</Tag>
+        </EditableText>
 
         {/* Title */}
         <EditableText value={livestream.title} entityType="livestream" entityId={livestream.id} field="title" className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
@@ -73,10 +75,12 @@ export default async function LivestreamDetailPage({
         </EditableText>
 
         {/* Meta info */}
-        <p className="text-sm text-text-muted">
-          {formatDate(livestream.date)}
-          {livestream.duration != null && <span> · {livestream.duration}分钟</span>}
-        </p>
+        <div className="flex items-center gap-2 text-sm text-text-muted">
+          <span>{formatDate(livestream.date)}</span>
+          <EditableText value={livestream.duration != null ? String(livestream.duration) : ''} entityType="livestream" entityId={livestream.id} field="duration" placeholder="时长(分钟)..." className="text-sm text-text-muted">
+            {livestream.duration != null ? <span>· {livestream.duration}分钟</span> : null}
+          </EditableText>
+        </div>
 
         {/* Gold line */}
         <div className="gold-line" />
@@ -88,20 +92,24 @@ export default async function LivestreamDetailPage({
 
         {/* Action buttons */}
         <div className="flex flex-wrap gap-3">
-          {livestream.originalUrl && (
-            <a href={livestream.originalUrl} target="_blank" rel="noopener noreferrer">
-              <Button variant="secondary" size="sm">
-                查看直播原链接 ↗
-              </Button>
-            </a>
-          )}
-          {livestream.replayUrl && (
-            <a href={livestream.replayUrl} target="_blank" rel="noopener noreferrer">
-              <Button variant="secondary" size="sm">
-                观看回放 ↗
-              </Button>
-            </a>
-          )}
+          <EditableText value={livestream.originalUrl ?? ''} entityType="livestream" entityId={livestream.id} field="originalUrl" placeholder="原始链接..." className="text-sm">
+            {livestream.originalUrl ? (
+              <a href={livestream.originalUrl} target="_blank" rel="noopener noreferrer">
+                <Button variant="secondary" size="sm">
+                  查看直播原链接 ↗
+                </Button>
+              </a>
+            ) : null}
+          </EditableText>
+          <EditableText value={livestream.replayUrl ?? ''} entityType="livestream" entityId={livestream.id} field="replayUrl" placeholder="回放链接..." className="text-sm">
+            {livestream.replayUrl ? (
+              <a href={livestream.replayUrl} target="_blank" rel="noopener noreferrer">
+                <Button variant="secondary" size="sm">
+                  观看回放 ↗
+                </Button>
+              </a>
+            ) : null}
+          </EditableText>
         </div>
 
         {/* Tags */}

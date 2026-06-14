@@ -2,6 +2,28 @@
 
 本文档覆盖项目用到的两个存储服务：**Supabase (PostgreSQL)** 和 **Cloudflare R2**。适合零基础开发者/维护者阅读，重点是"怎么操作"。
 
+# 维护
+1. 把用户添加为管理员 
+```
+UPDATE users SET role = 'ADMIN' WHERE
+  username = 'HiHi';
+```
+
+2. 本地启动
+```
+pnpm dev --hostname 0.0.0.0 --port 3001
+
+
+ipconfig getifaddr en0
+
+# 网址：http://10.135.216.53:3001
+```
+
+3. 数据库更新
+```
+unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY && npx prisma db push
+```
+
 ---
 
 ## 一、Supabase (PostgreSQL 数据库)

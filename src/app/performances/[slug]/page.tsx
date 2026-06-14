@@ -106,11 +106,40 @@ export default async function PerformanceDetailPage({
           </EditableText>
 
           {/* 元信息行 */}
-          <p className="text-sm text-text-muted">
-            {[performance.year, performance.venue, performance.city, performance.series]
-              .filter(Boolean)
-              .join(' · ')}
-          </p>
+          {(() => {
+            const metaFields = [
+              { value: performance.year?.toString() || '', field: 'year' as const, placeholder: '年份...' },
+              { value: performance.venue || '', field: 'venue' as const, placeholder: '场馆...' },
+              { value: performance.city || '', field: 'city' as const, placeholder: '城市...' },
+              { value: performance.series || '', field: 'series' as const, placeholder: '系列...' },
+            ];
+            const nonEmptyFields = metaFields.filter((f) => f.value);
+            return (
+              <div className="flex flex-wrap items-center gap-x-1 text-sm text-text-muted">
+                {metaFields.map((f, idx) => (
+                  <EditableText
+                    key={f.field}
+                    value={f.value}
+                    entityType="performance"
+                    entityId={performance.id}
+                    field={f.field}
+                    placeholder={f.placeholder}
+                    className="text-sm text-text-muted"
+                  >
+                    {f.value ? (
+                      <span>
+                        {f.value}
+                        {idx < metaFields.length - 1 &&
+                          nonEmptyFields.indexOf(f) < nonEmptyFields.length - 1 && (
+                            <span className="ml-1"> · </span>
+                          )}
+                      </span>
+                    ) : null}
+                  </EditableText>
+                ))}
+              </div>
+            );
+          })()}
 
           {/* 金线分隔 */}
           <div className="gold-line" />

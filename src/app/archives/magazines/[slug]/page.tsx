@@ -89,7 +89,11 @@ export default async function MagazineDetailPage({
 
           {/* Meta info */}
           <p className="text-sm text-text-muted">
-            {[magazine.issue, formatDate(magazine.date)].filter(Boolean).join(' · ')}
+            <EditableText value={magazine.issue || ''} entityType="magazine" entityId={magazine.id} field="issue" placeholder="期号..." className="inline">
+              {magazine.issue && <span>{magazine.issue}</span>}
+            </EditableText>
+            {magazine.issue && <span> · </span>}
+            <span>{formatDate(magazine.date)}</span>
           </p>
 
           {/* Gold line */}

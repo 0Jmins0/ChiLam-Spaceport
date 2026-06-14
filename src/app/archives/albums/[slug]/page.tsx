@@ -91,9 +91,15 @@ export default async function AlbumDetailPage({ params }: { params: Promise<{ sl
           </EditableText>
 
           {/* Meta info */}
-          <p className="text-sm text-text-muted">
-            {[album.releaseYear, album.language].filter(Boolean).join(' · ')}
-          </p>
+          <div className="flex flex-wrap items-center gap-x-1 text-sm text-text-muted">
+            <EditableText value={album.releaseYear?.toString() || ''} entityType="album" entityId={album.id} field="releaseYear" placeholder="发行年份..." className="text-sm text-text-muted">
+              {album.releaseYear ? <span>{album.releaseYear}</span> : null}
+            </EditableText>
+            {album.releaseYear && album.language && <span>·</span>}
+            <EditableText value={album.language || ''} entityType="album" entityId={album.id} field="language" placeholder="语言..." className="text-sm text-text-muted">
+              {album.language ? <span>{album.language}</span> : null}
+            </EditableText>
+          </div>
 
           {/* Gold line */}
           <div className="gold-line" />

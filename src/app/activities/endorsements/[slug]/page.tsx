@@ -35,9 +35,8 @@ export default async function EndorsementDetailPage({
 
   if (!endorsement) notFound();
 
-  const yearRange = endorsement.endYear
-    ? `${endorsement.startYear}-${endorsement.endYear}`
-    : `${endorsement.startYear}-至今`;
+  const startYear = endorsement.startYear ? String(endorsement.startYear) : '';
+  const endYear = endorsement.endYear ? String(endorsement.endYear) : '';
 
   const firstMedia = endorsement.mediaUrls[0];
 
@@ -77,7 +76,9 @@ export default async function EndorsementDetailPage({
         {/* Right: info */}
         <div className="flex-1 space-y-4">
           {/* Category tag */}
-          {endorsement.category && <Tag active>{endorsement.category}</Tag>}
+          <EditableText value={endorsement.category || ''} entityType="endorsement" entityId={endorsement.id} field="category" placeholder="分类..." className="inline-block">
+            {endorsement.category ? <Tag active>{endorsement.category}</Tag> : null}
+          </EditableText>
 
           {/* Brand name */}
           <EditableText value={endorsement.brand} entityType="endorsement" entityId={endorsement.id} field="brand" className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
@@ -87,9 +88,19 @@ export default async function EndorsementDetailPage({
           </EditableText>
 
           {/* Meta info */}
-          <p className="text-sm text-text-muted">
-            {[endorsement.role, yearRange].filter(Boolean).join(' · ')}
-          </p>
+          <div className="text-sm text-text-muted flex flex-wrap items-center gap-1">
+            <EditableText value={endorsement.role || ''} entityType="endorsement" entityId={endorsement.id} field="role" placeholder="角色..." className="inline">
+              {endorsement.role ? <span>{endorsement.role}</span> : null}
+            </EditableText>
+            {endorsement.role && startYear && <span> · </span>}
+            <EditableText value={startYear} entityType="endorsement" entityId={endorsement.id} field="startYear" placeholder="开始年份..." className="inline">
+              {startYear ? <span>{startYear}</span> : null}
+            </EditableText>
+            {startYear && <span>-</span>}
+            <EditableText value={endYear} entityType="endorsement" entityId={endorsement.id} field="endYear" placeholder="结束年份..." className="inline">
+              {endYear ? <span>{endYear}</span> : <span>至今</span>}
+            </EditableText>
+          </div>
 
           {/* Gold line */}
           <div className="gold-line" />

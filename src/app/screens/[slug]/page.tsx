@@ -100,9 +100,19 @@ export default async function ScreenDetailPage({ params }: { params: Promise<{ s
           </EditableText>
 
           {/* 元信息行 */}
-          <p className="text-sm text-text-muted">
-            {[production.year, production.role, production.language].filter(Boolean).join(' · ')}
-          </p>
+          <div className="flex flex-wrap items-center gap-x-1 text-sm text-text-muted">
+            <EditableText value={production.year?.toString() || ''} entityType="production" entityId={production.id} field="year" placeholder="年份..." className="text-sm text-text-muted">
+              {production.year ? <span>{production.year}</span> : null}
+            </EditableText>
+            {production.year && (production.role || production.language) && <span>·</span>}
+            <EditableText value={production.role || ''} entityType="production" entityId={production.id} field="role" placeholder="角色..." className="text-sm text-text-muted">
+              {production.role ? <span>{production.role}</span> : null}
+            </EditableText>
+            {production.role && production.language && <span>·</span>}
+            <EditableText value={production.language || ''} entityType="production" entityId={production.id} field="language" placeholder="语言..." className="text-sm text-text-muted">
+              {production.language ? <span>{production.language}</span> : null}
+            </EditableText>
+          </div>
 
           {/* 综艺额外信息 */}
           {production.type === 'VARIETY_SHOW' &&

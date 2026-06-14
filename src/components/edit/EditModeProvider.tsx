@@ -33,9 +33,16 @@ export function EditModeProvider({ children }: { children: ReactNode }) {
   // Use user_token for admin API calls
   const adminToken = isAdmin ? (typeof window !== 'undefined' ? localStorage.getItem('user_token') : null) : null;
 
+  const { openLogin } = useAuth();
+
   const toggleEditMode = useCallback(() => {
+    if (!isAdmin) {
+      // 未登录或非管理员，提示登录
+      openLogin();
+      return;
+    }
     setEditMode((prev) => !prev);
-  }, []);
+  }, [isAdmin, openLogin]);
 
   const isPublic = process.env.NEXT_PUBLIC_EDIT_MODE_PUBLIC === 'true';
   const canShowEditButton = isPublic || isAdmin;
