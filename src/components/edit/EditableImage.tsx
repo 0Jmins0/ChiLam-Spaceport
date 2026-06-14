@@ -55,64 +55,29 @@ export function EditableImage({
     setErrorMsg('');
 
     try {
-      // Step 1: Get presigned URL
-      const presignRes = await fetch('/api/upload/presign', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${adminToken}`,
-        },
-        body: JSON.stringify({
-          filename: file.name,
-          mimeType: file.type,
-          fileSize: file.size,
-        }),
-      });
+      // Step 1: Upload file via server-side relay (FormData → R2)
+      const formData = new FormData();
+      formData.append('file', file);
+      if (alt) formData.append('alt', alt);
 
-      if (!presignRes.ok) {
-        throw new Error('获取上传地址失败');
-      }
-
-      const { key, uploadUrl, publicUrl } = await presignRes.json();
-      setProgress(20);
-
-      // Step 2: Upload file to presigned URL
-      const uploadRes = await fetch(uploadUrl, {
-        method: 'PUT',
-        body: file,
-        headers: { 'Content-Type': file.type },
-      });
-
-      if (!uploadRes.ok) {
-        throw new Error('文件上传失败');
-      }
-      setProgress(60);
-
-      // Step 3: Create Media record
-      setStatus('saving');
       const mediaRes = await fetch('/api/upload', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${adminToken}`,
-        },
-        body: JSON.stringify({
-          url: publicUrl,
-          key,
-          filename: file.name,
-          mimeType: file.type,
-          alt: alt || file.name,
-        }),
+        body: formData,
       });
 
       if (!mediaRes.ok) {
-        throw new Error('创建媒体记录失败');
+        const errData = await mediaRes.json().catch(() => null);
+        throw new Error(errData?.error || '上传失败');
       }
 
       const mediaData = await mediaRes.json();
-      setProgress(80);
+      setProgress(60);
 
-      // Step 4: Update entity field with new media ID
+      // Step 2: Update entity field with new media ID
+      setStatus('saving');
+      const mediaId = mediaData.media?.id;
+      if (!mediaId) throw new Error('未获取到媒体 ID');
+
       const editRes = await fetch('/api/admin/edit', {
         method: 'PATCH',
         headers: {
@@ -123,12 +88,13 @@ export function EditableImage({
           entityType,
           entityId,
           field,
-          value: mediaData.data?.id ?? mediaData.id,
+          value: mediaId,
         }),
       });
 
       if (!editRes.ok) {
-        throw new Error('更新关联失败');
+        const errData = await editRes.json().catch(() => null);
+        throw new Error(errData?.error || '更新关联失败');
       }
 
       setProgress(100);

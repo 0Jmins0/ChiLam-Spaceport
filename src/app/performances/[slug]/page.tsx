@@ -125,9 +125,9 @@ export default async function PerformanceDetailPage({
           )}
 
           {/* 简介 */}
-          <div className="gold-line" />
+          {performance.summary && <div className="gold-line" />}
           <div>
-            <h2 className="font-heading text-base text-text-primary mb-2">简介</h2>
+            {performance.summary && <h2 className="font-heading text-base text-text-primary mb-2">简介</h2>}
             <EditableText value={performance.summary} entityType="performance" entityId={performance.id} field="summary" multiline placeholder="添加简介..." className="text-sm text-text-secondary leading-relaxed whitespace-pre-line">
               {performance.summary ? (
                 <p className="text-sm text-text-secondary leading-relaxed whitespace-pre-line">

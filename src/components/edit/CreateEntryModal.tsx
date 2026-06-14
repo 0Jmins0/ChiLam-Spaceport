@@ -167,10 +167,13 @@ function getFieldConfigs(entityType: string): FieldConfig[] {
 // --- Helpers ---
 
 function generateSlug(text: string): string {
+  // Only keep ASCII letters, digits, hyphens — strip Chinese and special chars
   const base = text
     .toLowerCase()
     .replace(/[\s]+/g, '-')
-    .replace(/[^a-z0-9\u4e00-\u9fff-]/g, '')
+    .replace(/[^a-z0-9-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
     .slice(0, 50);
   const suffix = Date.now().toString(36);
   return `${base || 'entry'}-${suffix}`;
@@ -261,15 +264,19 @@ export function CreateEntryModal({
         body: JSON.stringify(body),
       });
 
+      const resData = await res.json().catch(() => null);
+
       if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        throw new Error(data?.error || `创建失败 (${res.status})`);
+        throw new Error(resData?.error || `创建失败 (${res.status})`);
       }
+
+      // Use slug from API response if available, otherwise use generated one
+      const finalSlug = resData?.data?.slug || resData?.slug || slug;
 
       // Navigate to detail page
       const detailRoute = DETAIL_ROUTES[entityType];
       if (detailRoute) {
-        router.push(detailRoute(slug));
+        router.push(detailRoute(finalSlug));
         router.refresh();
       }
       onClose();
