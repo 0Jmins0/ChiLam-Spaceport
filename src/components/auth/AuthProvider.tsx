@@ -7,6 +7,7 @@ interface User {
   username: string;
   displayName: string | null;
   avatar: string | null;
+  role: string;
 }
 
 interface AuthContextType {

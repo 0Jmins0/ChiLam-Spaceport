@@ -74,6 +74,11 @@ enum GuestbookTab {
   FEEDBACK
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
 // ─────────────────────────────────────────────
 // 模型定义 (20 张表)
 // ─────────────────────────────────────────────
@@ -610,6 +615,7 @@ model User {
   displayName           String?    @map("display_name")
   avatar                String?
   isActive              Boolean    @default(true)  @map("is_active")
+  role                  UserRole   @default(USER)
 
   // 互动统计（冗余计数，写入时维护）
   postsCount            Int        @default(0) @map("posts_count")

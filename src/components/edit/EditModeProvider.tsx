@@ -4,10 +4,10 @@ import {
   createContext,
   useContext,
   useState,
-  useEffect,
   useCallback,
   type ReactNode,
 } from 'react';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 interface EditModeContextType {
   isAdmin: boolean;
@@ -26,20 +26,12 @@ export function useEditMode() {
 }
 
 export function EditModeProvider({ children }: { children: ReactNode }) {
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [adminToken, setAdminToken] = useState<string | null>(null);
+  const { user } = useAuth();
   const [editMode, setEditMode] = useState(false);
 
-  useEffect(() => {
-    const token = localStorage.getItem('admin_token');
-    if (token) {
-      // Use microtask to avoid synchronous setState in effect body
-      Promise.resolve().then(() => {
-        setIsAdmin(true);
-        setAdminToken(token);
-      });
-    }
-  }, []);
+  const isAdmin = user?.role === 'ADMIN';
+  // Use user_token for admin API calls
+  const adminToken = isAdmin ? (typeof window !== 'undefined' ? localStorage.getItem('user_token') : null) : null;
 
   const toggleEditMode = useCallback(() => {
     setEditMode((prev) => !prev);

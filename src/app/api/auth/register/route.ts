@@ -67,6 +67,7 @@ export async function POST(request: Request) {
             username: user.username,
             displayName: user.displayName,
             avatar: user.avatar,
+            role: user.role,
           },
         },
       },

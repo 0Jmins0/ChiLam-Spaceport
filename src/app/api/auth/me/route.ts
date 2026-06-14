@@ -19,6 +19,7 @@ export async function GET(request: Request) {
         username: true,
         displayName: true,
         avatar: true,
+        role: true,
         postsCount: true,
         receivedLikesCount: true,
         receivedCommentsCount: true,
