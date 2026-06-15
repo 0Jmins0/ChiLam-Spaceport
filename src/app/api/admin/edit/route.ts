@@ -52,6 +52,7 @@ const EDITABLE_FIELDS: Record<string, string[]> = {
     'embedUrl',
     'proofreadStatus',
     'date',
+    'coverImageId',
   ],
   album: ['title', 'titleEn', 'releaseYear', 'language', 'coverId', 'releaseDate'],
   magazine: ['title', 'issue', 'coverId'],

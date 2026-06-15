@@ -70,6 +70,7 @@ export default async function InterviewDetailPage({
               location={interview.location ?? null}
               date={interview.date}
               duration={interview.duration ?? null}
+              coverImageUrl={interview.coverImageUrl ?? null}
             />
           </div>
         </div>

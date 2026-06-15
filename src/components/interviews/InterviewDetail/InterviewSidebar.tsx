@@ -1,7 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { EditableText } from '@/components/edit/EditableText';
+import { EditableImage } from '@/components/edit/EditableImage';
+import { useEditMode } from '@/components/edit/EditModeProvider';
 
 interface InterviewSidebarProps {
   interviewId: string;
@@ -10,6 +13,7 @@ interface InterviewSidebarProps {
   location: string | null;
   date: Date;
   duration: string | null;
+  coverImageUrl: string | null;
 }
 
 function formatDate(date: Date): string {
@@ -134,9 +138,41 @@ export default function InterviewSidebar({
   location,
   date,
   duration,
+  coverImageUrl,
 }: InterviewSidebarProps) {
+  const { editMode } = useEditMode();
+
   return (
     <div>
+      {/* 封面图 — 仅编辑模式下显示 */}
+      {editMode && (
+        <div className="mb-4">
+          <EditableImage
+            src={coverImageUrl}
+            entityType="interview"
+            entityId={interviewId}
+            field="coverImageId"
+            alt="访谈封面"
+          >
+            <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-card)] bg-bg-darker">
+              {coverImageUrl ? (
+                <Image
+                  src={coverImageUrl}
+                  alt="访谈封面"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 50vw, 220px"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center">
+                  <span className="text-sm text-text-muted/50">封面图</span>
+                </div>
+              )}
+            </div>
+          </EditableImage>
+        </div>
+      )}
+
       {/* Desktop: vertical list / Mobile: 2-col grid */}
       <div className="grid grid-cols-2 gap-x-4 gap-y-0 lg:grid-cols-1 lg:gap-0">
         <MetaItem icon={<SourceIcon />} labelCn="来源" labelEn="SOURCE">

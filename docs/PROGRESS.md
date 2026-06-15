@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.5 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 + P6.13 + P6.15 + P6.16 + P6.17 + P6.19 + P6.20 + P6.21 + P6.22 + P6.23 已完成）
+## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.5 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 + P6.13 + P6.15 + P6.16 + P6.17 + P6.19 + P6.20 + P6.21 + P6.22 + P6.23 + P6.24 已完成）
 
 ---
 
@@ -15,7 +15,7 @@
 | 影视模块 | ✅ 已完成 | 2026-06-06 |
 | 演出模块 | ✅ 已完成 | 2026-06-06 |
 | 活动模块 | ✅ 已完成（代言+直播，封面+媒体上传，访谈已独立） | 2026-06-15 |
-| 霖言霖语模块 | ✅ 已完成（独立栏目 + UI 精细化） | 2026-06-16 |
+| 霖言霖语模块 | ✅ 已完成（独立栏目 + UI 精细化 + 封面上传） | 2026-06-16 |
 | 资料库模块 | ✅ 已完成 | 2026-06-07 |
 | 留言板 | ✅ 已完成（含故事 tag 筛选 + 登录权限 + 精选/图片上传 + 卡片布局优化） | 2026-06-16 |
 | 用户系统 | ✅ 已完成（注册/登录/权限） | 2026-06-10 |
@@ -30,6 +30,28 @@
 ---
 
 ## 详细记录
+
+### 2026-06-16 - P6.24 霖言霖语封面上传 + 卡片图片展示（已完成）
+
+#### 完成内容
+- **Schema 扩展**：Interview 模型新增 `coverImageId` + `coverImage` 关系（直接 FK 到 Media）
+- **封面上传**：详情页 Sidebar 编辑模式下显示封面上传区（EditableImage），普通浏览不可见
+- **列表卡片图片**：InterviewCard 有封面图时右侧 45% 融合背景展示（渐变蒙版），参考留言板风格
+- **上传映射**：`interview:cover` 注册到 DIRECT_FK_MAP，支持前台编辑模式直传
+- **编辑支持**：`coverImageId` 加入 admin/edit 可编辑字段
+
+#### 涉及文件
+- `prisma/schema.prisma` — Interview 新增 coverImageId + coverImage 关系
+- `src/app/api/upload/confirm/route.ts` — DIRECT_FK_MAP 新增 interview:cover
+- `src/app/api/admin/edit/route.ts` — interview 可编辑字段加入 coverImageId
+- `src/lib/types.ts` — InterviewItem 新增 coverImageUrl
+- `src/lib/queries/interviews.ts` — 列表+详情查询包含 coverImage
+- `src/components/interviews/InterviewCard.tsx` — 融合背景图模式
+- `src/components/interviews/InterviewDetail/InterviewSidebar.tsx` — 编辑模式封面上传区
+- `src/app/interviews/page.tsx` — 传递 coverImageUrl
+- `src/app/interviews/[slug]/page.tsx` — 传递 coverImageUrl 给 Sidebar
+
+---
 
 ### 2026-06-16 - P6.23 留言板卡片布局优化（已完成）
 

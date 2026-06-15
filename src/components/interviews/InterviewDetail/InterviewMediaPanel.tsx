@@ -374,7 +374,7 @@ export default function InterviewMediaPanel({
                 fontWeight: 300,
               }}
             >
-              Haster
+              HiHi
             </span>
             <div className="w-20 h-px bg-gradient-to-l from-accent/40 via-accent/20 to-transparent" />
           </div>

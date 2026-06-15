@@ -238,6 +238,7 @@ export interface InterviewItem {
   mediaType: string; // InterviewMediaType enum
   originalUrl: string | null;
   tags: { name: string; slug: string }[];
+  coverImageUrl: string | null;
 }
 
 // 访谈详情页用

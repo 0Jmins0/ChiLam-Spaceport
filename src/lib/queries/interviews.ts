@@ -32,6 +32,7 @@ export async function getInterviews(options?: {
       take: pageSize,
       include: {
         tags: tagSelect,
+        coverImage: { select: { url: true } },
       },
     }),
     prisma.interview.count({ where }),
@@ -52,6 +53,7 @@ export async function getInterviews(options?: {
     mediaType: rest.mediaType,
     originalUrl: rest.originalUrl,
     tags: rest.tags,
+    coverImageUrl: rest.coverImage?.url ?? null,
   }));
 
   return {
@@ -69,6 +71,7 @@ export async function getInterviewBySlug(slug: string): Promise<InterviewDetail 
     where: { slug },
     include: {
       tags: tagSelect,
+      coverImage: { select: { url: true } },
       originalMedia: { select: { url: true } },
       gallery: { select: { id: true, url: true, alt: true, type: true } },
     },
@@ -76,7 +79,7 @@ export async function getInterviewBySlug(slug: string): Promise<InterviewDetail 
 
   if (!raw) return null;
 
-  const { originalMedia, gallery, ...rest } = raw;
+  const { coverImage, originalMedia, gallery, ...rest } = raw;
 
   return {
     id: rest.id,
@@ -91,6 +94,7 @@ export async function getInterviewBySlug(slug: string): Promise<InterviewDetail 
     mediaType: rest.mediaType,
     originalUrl: rest.originalUrl,
     tags: rest.tags,
+    coverImageUrl: coverImage?.url ?? null,
     transcriptCantonese: rest.transcriptCantonese,
     transcriptMandarin: rest.transcriptMandarin,
     proofreadStatus: rest.proofreadStatus,

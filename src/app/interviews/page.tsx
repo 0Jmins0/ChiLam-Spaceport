@@ -56,6 +56,7 @@ export default async function InterviewsPage({
               source={interview.source ?? undefined}
               date={interview.date}
               mediaType={interview.mediaType}
+              coverImageUrl={interview.coverImageUrl ?? undefined}
             />
           ))}
         </div>

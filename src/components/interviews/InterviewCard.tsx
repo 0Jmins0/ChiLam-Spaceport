@@ -10,6 +10,7 @@ interface InterviewCardProps {
   source?: string;
   date: Date;
   mediaType: string; // VIDEO | AUDIO | TEXT
+  coverImageUrl?: string;
   className?: string;
 }
 
@@ -30,28 +31,54 @@ export function InterviewCard({
   source,
   date,
   mediaType,
+  coverImageUrl,
   className,
 }: InterviewCardProps) {
   const typeLabel = mediaTypeLabels[mediaType] || mediaType;
+  const hasBackground = !!coverImageUrl;
 
   return (
     <Link href={`/interviews/${slug}`} className={cn('block', className)}>
-      <Card className="p-4">
-        {/* Media type badge */}
-        <div className="mb-3">
-          <Tag active>{typeLabel}</Tag>
+      <Card
+        className={cn(
+          'flex flex-col gap-3 p-4 h-full',
+          hasBackground && 'relative overflow-hidden',
+        )}
+      >
+        {/* 融合模式背景图 — 参考留言板 GuestbookCard */}
+        {hasBackground && (
+          <div
+            className="absolute inset-y-0 right-0 w-[45%] pointer-events-none"
+            style={{
+              backgroundImage: `url(${coverImageUrl})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              maskImage:
+                'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.8) 70%, black 100%)',
+              WebkitMaskImage:
+                'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.8) 70%, black 100%)',
+            }}
+          />
+        )}
+
+        {/* 内容区 */}
+        <div className={cn(hasBackground && 'w-[55%] relative z-10', 'flex flex-col gap-3')}>
+          {/* Media type badge */}
+          <div>
+            <Tag active>{typeLabel}</Tag>
+          </div>
+
+          {/* Title */}
+          <h3 className="line-clamp-2 font-heading text-sm leading-snug text-text-primary">
+            {title}
+          </h3>
+
+          {/* Source + Date */}
+          <p className="text-xs text-text-muted">
+            {source && <span>{source} · </span>}
+            {formatDate(date)}
+          </p>
         </div>
-
-        {/* Title */}
-        <h3 className="line-clamp-2 font-heading text-sm leading-snug text-text-primary">
-          {title}
-        </h3>
-
-        {/* Source + Date */}
-        <p className="mt-2 text-xs text-text-muted">
-          {source && <span>{source} · </span>}
-          {formatDate(date)}
-        </p>
       </Card>
     </Link>
   );

@@ -184,6 +184,7 @@ model Media {
   coverOfAlbums         Album[]            @relation("AlbumCover")
   coverOfMagazines      Magazine[]         @relation("MagazineCover")
   originalOfInterviews  Interview[]        @relation("InterviewOriginalMedia")
+  coverOfInterviews     Interview[]        @relation("InterviewCover")
   coverOfLivestreams    Livestream[]       @relation("LivestreamCover")
   coverOfEndorsements   Endorsement[]      @relation("EndorsementCover")
   performanceMediaFiles PerformanceMedia[] @relation("PerformanceMediaFile")
@@ -410,6 +411,10 @@ model Interview {
   transcriptCantonese Json?           @map("transcript_cantonese")
   transcriptMandarin  Json?           @map("transcript_mandarin")
   proofreadStatus     ProofreadStatus @default(PENDING) @map("proofread_status")
+
+  // 封面图 (直接FK)
+  coverImageId String?  @map("cover_image_id")
+  coverImage   Media?   @relation("InterviewCover", fields: [coverImageId], references: [id])
 
   // 图片集 (多对多)
   gallery     Media[]  @relation("InterviewGallery")

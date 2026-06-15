@@ -35,6 +35,7 @@ const DIRECT_FK_MAP: Record<string, DirectFKConfig> = {
   'album:cover': { model: 'album', fkField: 'coverId' },
   'magazine:cover': { model: 'magazine', fkField: 'coverId' },
   'interview:media': { model: 'interview', fkField: 'originalMediaId' },
+  'interview:cover': { model: 'interview', fkField: 'coverImageId' },
   'livestream:cover': { model: 'livestream', fkField: 'coverImageId' },
   'endorsement:cover': { model: 'endorsement', fkField: 'coverImageId' },
 };
