@@ -190,7 +190,8 @@ model Media {
 
   // 多对多反向关系
   interviewGalleries  Interview[]   @relation("InterviewGallery")
-  productionGalleries Production[]  @relation("ProductionGallery")
+  productionGalleries   Production[]  @relation("ProductionGallery")
+  performanceGalleries  Performance[] @relation("PerformanceGallery")
   socialPosts         SocialPost[]  @relation("SocialPostMedia")
   fanShots            FanShot[]     @relation("FanShotMedia")
   endorsements        Endorsement[] @relation("EndorsementMedia")
@@ -290,6 +291,9 @@ model Performance {
   // 一对多
   officialMedia PerformanceMedia[]
   fanShots      FanShot[]
+
+  // 图册 (多对多)
+  gallery Media[] @relation("PerformanceGallery")
 
   // 标签 (多对多)
   tags Tag[]

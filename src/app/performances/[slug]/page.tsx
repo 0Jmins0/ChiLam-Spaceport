@@ -5,9 +5,10 @@ import Image from 'next/image';
 import { getPerformanceBySlug } from '@/lib/queries/performances';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Tag } from '@/components/ui/Tag';
-import { Button } from '@/components/ui/Button';
 import { EditableText } from '@/components/edit/EditableText';
 import { EditableImage } from '@/components/edit/EditableImage';
+import { EditableMediaGallery } from '@/components/edit/EditableMediaGallery';
+import { LinkedProduction } from '@/components/performances/LinkedProduction';
 import MarkdownContent from '@/components/ui/MarkdownContent';
 
 const typeLabels: Record<string, string> = {
@@ -52,6 +53,12 @@ export default async function PerformanceDetailPage({
 
   if (!performance) notFound();
 
+  const isStage = performance.type === 'STAGE';
+
+  // 按 mediaTag 分组 gallery
+  const officialMedia = performance.gallery.filter((m) => m.mediaTag !== 'fanshot');
+  const fanshotMedia = performance.gallery.filter((m) => m.mediaTag === 'fanshot');
+
   return (
     <PageContainer>
       {/* 返回按钮 */}
@@ -64,9 +71,9 @@ export default async function PerformanceDetailPage({
         </Link>
       </div>
 
-      {/* 主内容区 */}
+      {/* 主内容区：左封面 + 右信息 */}
       <div className="flex flex-col md:flex-row gap-8">
-        {/* 左侧海报 */}
+        {/* 左侧封面 */}
         <div className="w-full md:w-[300px] shrink-0">
           <EditableImage
             src={performance.posterUrl}
@@ -74,13 +81,15 @@ export default async function PerformanceDetailPage({
             entityId={performance.id}
             field="posterId"
           >
-            <div className="relative aspect-[2/3] overflow-hidden rounded-[var(--radius-card)]">
+            <div
+              className={`relative ${isStage ? 'aspect-video' : 'aspect-[2/3]'} overflow-hidden rounded-[var(--radius-card)]`}
+            >
               {performance.posterUrl ? (
                 <Image
                   src={performance.posterUrl}
                   alt={performance.title}
                   fill
-                  className="object-contain"
+                  className={isStage ? 'object-cover' : 'object-contain'}
                   sizes="(max-width: 768px) 100vw, 300px"
                 />
               ) : (
@@ -94,10 +103,8 @@ export default async function PerformanceDetailPage({
 
         {/* 右侧信息 */}
         <div className="flex-1 space-y-4">
-          {/* 类型标签 */}
           <Tag active>{typeLabels[performance.type]}</Tag>
 
-          {/* 标题 */}
           <EditableText
             value={performance.title}
             entityType="performance"
@@ -110,7 +117,6 @@ export default async function PerformanceDetailPage({
             </h1>
           </EditableText>
 
-          {/* 英文标题 */}
           <EditableText
             value={performance.titleEn}
             entityType="performance"
@@ -124,7 +130,6 @@ export default async function PerformanceDetailPage({
             )}
           </EditableText>
 
-          {/* 元信息行 */}
           {(() => {
             const metaFields = [
               {
@@ -164,10 +169,16 @@ export default async function PerformanceDetailPage({
             );
           })()}
 
-          {/* 金线分隔 */}
+          {/* 关联综艺（仅 STAGE） */}
+          {isStage && (
+            <LinkedProduction
+              performanceSlug={performance.slug}
+              linkedProduction={performance.linkedProduction}
+            />
+          )}
+
           <div className="gold-line" />
 
-          {/* 标签列表 */}
           {performance.tags.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {performance.tags.map((tag) => (
@@ -176,7 +187,6 @@ export default async function PerformanceDetailPage({
             </div>
           )}
 
-          {/* 简介 */}
           {performance.tags.length > 0 && performance.summary && <div className="gold-line" />}
           <div>
             {performance.summary && (
@@ -202,8 +212,8 @@ export default async function PerformanceDetailPage({
         </div>
       </div>
 
-      {/* 歌单区 */}
-      {performance.setlist && performance.setlist.length > 0 && (
+      {/* 歌单区（STAGE 不显示） */}
+      {!isStage && performance.setlist && performance.setlist.length > 0 && (
         <div className="mt-8">
           <h2 className="font-heading text-lg text-text-primary mb-4">歌单</h2>
           <ol className="list-decimal list-inside space-y-1">
@@ -216,59 +226,29 @@ export default async function PerformanceDetailPage({
         </div>
       )}
 
-      {/* 官摄区 */}
+      {/* 官摄素材（EditableMediaGallery） */}
       <div className="mt-8">
         <h2 className="font-heading text-lg text-text-primary mb-4">官摄素材</h2>
-        {performance.officialMedia.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {performance.officialMedia.map((media) => (
-              <div
-                key={media.id}
-                className="rounded-[var(--radius-card)] border border-border-gold/30 p-4"
-              >
-                <p className="text-sm text-text-primary">{media.title || '未命名素材'}</p>
-                <p className="text-xs text-text-muted mt-1">{media.mediaType}</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-sm text-text-muted">官摄素材整理中，敬请期待</p>
-        )}
+        <EditableMediaGallery
+          media={officialMedia}
+          entityType="performance"
+          entityId={performance.id}
+          relation="gallery"
+        />
       </div>
 
-      {/* 饭拍区 */}
-      <div className="mt-8">
-        <h2 className="font-heading text-lg text-text-primary mb-4">饭拍</h2>
-        {performance.fanShots.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {performance.fanShots.map((shot) => (
-              <div
-                key={shot.id}
-                className="rounded-[var(--radius-card)] border border-border-gold/30 p-4"
-              >
-                <p className="text-sm text-text-primary">{shot.title || '未命名饭拍'}</p>
-                <p className="text-xs text-text-muted mt-1">by {shot.authorName}</p>
-                {shot.summary && (
-                  <p className="text-xs text-text-secondary mt-1 line-clamp-2">{shot.summary}</p>
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-sm text-text-muted">暂无饭拍投稿</p>
-        )}
-        <div className="mt-4">
-          <Button variant="secondary" size="sm" disabled title="投稿功能即将上线">
-            我要投稿饭拍
-          </Button>
+      {/* 饭拍（有数据才显示） */}
+      {fanshotMedia.length > 0 && (
+        <div className="mt-8">
+          <h2 className="font-heading text-lg text-text-primary mb-4">饭拍</h2>
+          <EditableMediaGallery
+            media={fanshotMedia}
+            entityType="performance"
+            entityId={performance.id}
+            relation="gallery"
+          />
         </div>
-      </div>
-
-      {/* 相关资讯占位 */}
-      <div className="mt-8">
-        <h2 className="font-heading text-lg text-text-primary mb-4">相关资讯</h2>
-        <p className="text-sm text-text-muted">即将上线，敬请期待</p>
-      </div>
+      )}
     </PageContainer>
   );
 }

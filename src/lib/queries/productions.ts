@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/db';
 import { ProductionType } from '@/generated/prisma/client';
 import type { ProductionWhereInput } from '@/generated/prisma/models/Production';
-import type { PaginatedResponse, ProductionItem, ProductionDetail } from '@/lib/types';
+import type { PaginatedResponse, ProductionItem, ProductionDetail, LinkedStage } from '@/lib/types';
 
 const PAGE_SIZE = 20;
 
@@ -83,12 +83,49 @@ export async function getProductionBySlug(slug: string): Promise<ProductionDetai
     where: { slug },
     include: {
       poster: { select: { url: true, alt: true, width: true, height: true } },
-      gallery: { select: { url: true, alt: true } },
+      gallery: {
+        select: { id: true, url: true, type: true, alt: true, width: true, height: true },
+      },
       tags: tagSelect,
     },
   });
 
   if (!raw) return null;
+
+  // 查关联的舞台演出
+  const stageRelations = await prisma.contentRelation.findMany({
+    where: {
+      targetType: 'production',
+      targetId: raw.id,
+      sourceType: 'performance',
+    },
+  });
+
+  let linkedStages: LinkedStage[] = [];
+  if (stageRelations.length > 0) {
+    linkedStages = await prisma.performance.findMany({
+      where: {
+        id: { in: stageRelations.map((r) => r.sourceId) },
+        type: 'STAGE',
+      },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        gallery: {
+          select: {
+            id: true,
+            url: true,
+            type: true,
+            alt: true,
+            width: true,
+            height: true,
+            mediaTag: true,
+          },
+        },
+      },
+    });
+  }
 
   const { poster, gallery, watchLinks, ...rest } = raw;
 
@@ -111,6 +148,7 @@ export async function getProductionBySlug(slug: string): Promise<ProductionDetai
     tags: rest.tags,
     gallery,
     watchLinks: watchLinks as { platform: string; url: string }[] | null,
+    linkedStages,
   };
 }
 

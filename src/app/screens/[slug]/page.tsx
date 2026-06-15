@@ -8,6 +8,7 @@ import { Tag } from '@/components/ui/Tag';
 import { Button } from '@/components/ui/Button';
 import { EditableText } from '@/components/edit/EditableText';
 import { EditableImage } from '@/components/edit/EditableImage';
+import { EditableMediaGallery } from '@/components/edit/EditableMediaGallery';
 import MarkdownContent from '@/components/ui/MarkdownContent';
 
 const typeLabels: Record<string, string> = {
@@ -226,27 +227,63 @@ export default async function ScreenDetailPage({ params }: { params: Promise<{ s
       </div>
 
       {/* 图册区 */}
-      {production.gallery.length > 0 && (
-        <div className="mt-8">
-          <h2 className="font-heading text-lg text-text-primary mb-4">图册</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {production.gallery.map((img, i) => (
-              <div
-                key={i}
-                className="relative aspect-video overflow-hidden rounded-[var(--radius-card)]"
-              >
-                <Image
-                  src={img.url}
-                  alt={img.alt || ''}
-                  fill
-                  className="object-contain"
-                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                />
-              </div>
-            ))}
+      <div className="mt-8">
+        <h2 className="font-heading text-lg text-text-primary mb-4">图册</h2>
+        <EditableMediaGallery
+          media={production.gallery}
+          entityType="production"
+          entityId={production.id}
+          relation="gallery"
+        />
+      </div>
+
+      {/* 舞台片段 */}
+      {production.type === 'VARIETY_SHOW' &&
+        production.linkedStages &&
+        production.linkedStages.length > 0 && (
+          <div className="mt-8">
+            <h2 className="font-heading text-lg text-text-primary mb-4">舞台片段</h2>
+            <div className="space-y-6">
+              {production.linkedStages.map((stage) => (
+                <div key={stage.id}>
+                  <Link
+                    href={`/performances/${stage.slug}`}
+                    className="text-base text-text-primary hover:text-accent transition-colors"
+                  >
+                    {stage.title} →
+                  </Link>
+                  {stage.gallery.length > 0 && (
+                    <div className="mt-3 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {stage.gallery.map((item) => (
+                        <div
+                          key={item.id}
+                          className="relative aspect-video overflow-hidden rounded-[var(--radius-card)]"
+                        >
+                          {item.type === 'VIDEO' ? (
+                            <video
+                              src={item.url}
+                              controls
+                              preload="metadata"
+                              className="h-full w-full object-contain"
+                            />
+                          ) : (
+                            <Image
+                              src={item.url}
+                              alt={item.alt || ''}
+                              fill
+                              className="object-contain"
+                              sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                            />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* 相关资讯占位 */}
       <div className="mt-8">

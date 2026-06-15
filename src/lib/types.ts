@@ -89,10 +89,34 @@ export interface ProductionItem {
   tags: { name: string; slug: string }[];
 }
 
-// 影视作品详情页用（含 gallery + watchLinks）
+// 关联的舞台演出简要信息（含 gallery）
+export interface LinkedStage {
+  id: string;
+  title: string;
+  slug: string;
+  gallery: {
+    id: string;
+    url: string;
+    type: string;
+    alt: string | null;
+    width: number | null;
+    height: number | null;
+    mediaTag: string | null;
+  }[];
+}
+
+// 影视作品详情页用（含 gallery + watchLinks + linkedStages）
 export interface ProductionDetail extends ProductionItem {
   watchLinks: { platform: string; url: string }[] | null;
-  gallery: { url: string; alt: string | null }[];
+  gallery: {
+    id: string;
+    url: string;
+    type: string;
+    alt: string | null;
+    width: number | null;
+    height: number | null;
+  }[];
+  linkedStages: LinkedStage[];
 }
 
 // ─── 演出模块 ───
@@ -137,12 +161,34 @@ export interface FanShotItem {
   authorName: string;
 }
 
+// 画廊媒体项（用于 performance gallery）
+export interface GalleryMediaItem {
+  id: string;
+  url: string;
+  type: string;
+  alt: string | null;
+  width: number | null;
+  height: number | null;
+  mimeType: string | null;
+  mediaTag: string | null;
+}
+
+// 关联的影视作品简要信息
+export interface LinkedProduction {
+  id: string;
+  title: string;
+  slug: string;
+  type: string;
+}
+
 // 演出详情页用
 export interface PerformanceDetail extends PerformanceItem {
   summary: string | null;
   setlist: string[] | null;
   officialMedia: OfficialMediaItem[];
   fanShots: FanShotItem[];
+  gallery: GalleryMediaItem[];
+  linkedProduction: LinkedProduction | null;
 }
 
 // ─── 活动模块 ───

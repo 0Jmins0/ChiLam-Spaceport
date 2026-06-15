@@ -1,7 +1,13 @@
 import { prisma } from '@/lib/db';
 import { PerformanceType } from '@/generated/prisma/client';
 import type { PerformanceWhereInput } from '@/generated/prisma/models/Performance';
-import type { PaginatedResponse, PerformanceItem, PerformanceDetail } from '@/lib/types';
+import type {
+  PaginatedResponse,
+  PerformanceItem,
+  PerformanceDetail,
+  GalleryMediaItem,
+  LinkedProduction,
+} from '@/lib/types';
 
 const PAGE_SIZE = 20;
 
@@ -93,12 +99,41 @@ export async function getPerformanceBySlug(slug: string): Promise<PerformanceDet
         where: { status: { not: 'REJECTED' } },
         orderBy: { createdAt: 'desc' },
       },
+      gallery: {
+        select: {
+          id: true,
+          url: true,
+          type: true,
+          alt: true,
+          width: true,
+          height: true,
+          mimeType: true,
+          mediaTag: true,
+        },
+      },
     },
   });
 
   if (!raw) return null;
 
-  const { poster, officialMedia, fanShots, setlist, ...rest } = raw;
+  // 查关联综艺
+  const relations = await prisma.contentRelation.findMany({
+    where: {
+      sourceType: 'performance',
+      sourceId: raw.id,
+      targetType: 'production',
+    },
+  });
+
+  let linkedProduction: LinkedProduction | null = null;
+  if (relations.length > 0) {
+    linkedProduction = await prisma.production.findUnique({
+      where: { id: relations[0].targetId },
+      select: { id: true, title: true, slug: true, type: true },
+    });
+  }
+
+  const { poster, officialMedia, fanShots, gallery, setlist, ...rest } = raw;
 
   return {
     id: rest.id,
@@ -132,6 +167,8 @@ export async function getPerformanceBySlug(slug: string): Promise<PerformanceDet
       thumbnailUrl: fs.thumbnailUrl,
       authorName: fs.authorName,
     })),
+    gallery: gallery as GalleryMediaItem[],
+    linkedProduction,
   };
 }
 

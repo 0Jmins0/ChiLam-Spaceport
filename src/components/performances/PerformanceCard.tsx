@@ -35,12 +35,18 @@ export function PerformanceCard({
   className,
 }: PerformanceCardProps) {
   const typeLabel = typeLabels[type] || type;
+  const isStage = type === 'STAGE';
 
   return (
     <Link href={`/performances/${slug}`} className={cn('block', className)}>
       <Card className="p-0 overflow-hidden">
         {/* Poster */}
-        <div className="relative aspect-[2/3] w-full bg-bg-darker overflow-hidden">
+        <div
+          className={cn(
+            'relative w-full bg-bg-darker overflow-hidden',
+            isStage ? 'aspect-video' : 'aspect-[2/3]',
+          )}
+        >
           {posterUrl ? (
             <Image
               src={posterUrl}

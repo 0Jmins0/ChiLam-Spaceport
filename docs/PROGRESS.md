@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.5 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 + P6.13 + P6.15 + P6.16 + P6.17 + P6.19 + P6.20 已完成）
+## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.5 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 + P6.13 + P6.15 + P6.16 + P6.17 + P6.19 + P6.20 + P6.21 + P6.22 已完成）
 
 ---
 
@@ -30,6 +30,47 @@
 ---
 
 ## 详细记录
+
+### 2026-06-16 - P6.22 影视详情页媒体上传（已完成）
+
+#### 完成内容
+- **图册可上传**：影视详情页图册区接入 `EditableMediaGallery` 组件，编辑模式下可直接上传剧照/视频
+- **gallery 类型扩展**：`ProductionDetail.gallery` 补充 `id, type, width, height` 字段，支持灯箱预览
+- **空图册可见**：移除 `gallery.length > 0` 条件，编辑模式下空图册也显示上传按钮
+
+#### 涉及文件
+- `src/app/screens/[slug]/page.tsx` — 静态图册网格 → EditableMediaGallery 组件
+- `src/lib/queries/productions.ts` — gallery select 补充 id, type, width, height
+- `src/lib/types.ts` — ProductionDetail.gallery 类型扩展
+
+---
+
+### 2026-06-16 - P6.21 舞台详情页改造 + 综艺关联（已完成）
+
+#### 完成内容
+- **STAGE 列表卡片 16:9**：舞台类型卡片使用 `aspect-video` 横版比例，演唱会/音乐剧保持 2:3 竖版
+- **STAGE 详情页封面 16:9**：左栏封面 STAGE 类型用 16:9 + `object-cover`，其他类型保持 2:3
+- **官摄素材媒体区**：接入 `EditableMediaGallery` 组件替代静态文字卡片，支持图片/视频上传+灯箱预览
+- **饭拍区条件渲染**：无饭拍数据时不显示该区域
+- **STAGE 无歌单**：舞台类型不渲染歌单区
+- **关联综艺功能**：STAGE 可关联综艺节目（搜索选择 + 点击跳转 + 解除关联），通过 ContentRelation 多态表
+- **综艺详情页舞台片段**：综艺详情页新增「舞台片段」区，展示关联 STAGE 的官摄媒体，按舞台分组
+- **Performance gallery 多对多**：Schema 新增 `gallery Media[]` 隐式多对多，复用现有上传体系
+
+#### 涉及文件
+- `prisma/schema.prisma` — Performance 加 gallery 关系，Media 加反向关系
+- `src/app/api/upload/confirm/route.ts` — 加 performance:gallery 映射
+- `src/app/api/performances/[slug]/relation/route.ts` — 新增关联综艺 API
+- `src/app/api/productions/search/route.ts` — 新增综艺搜索 API
+- `src/lib/queries/performances.ts` — 查询附带 gallery + 关联综艺
+- `src/lib/queries/productions.ts` — 综艺查询附带关联 STAGE 及媒体
+- `src/lib/types.ts` — 新增 GalleryMediaItem、LinkedProduction、LinkedStage 类型
+- `src/app/performances/[slug]/page.tsx` — STAGE 条件布局 + EditableMediaGallery + LinkedProduction
+- `src/components/performances/PerformanceCard.tsx` — STAGE 卡片 16:9
+- `src/components/performances/LinkedProduction.tsx` — 新增关联综艺客户端组件
+- `src/app/screens/[slug]/page.tsx` — 综艺详情页新增舞台片段区
+
+---
 
 ### 2026-06-16 - P6.20 霖言霖语详情页 UI 精细化（已完成）
 
