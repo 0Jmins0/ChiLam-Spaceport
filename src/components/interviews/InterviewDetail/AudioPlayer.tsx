@@ -86,20 +86,34 @@ const ForwardIcon = () => (
 
 const PLAYBACK_RATES = [0.75, 1, 1.25, 1.5, 2];
 
-const AudioPlayer = forwardRef<HTMLAudioElement, AudioPlayerProps>(
-  function AudioPlayer({ src, duration, onExternalTimeUpdate }, forwardedRef) {
+// Fixed waveform bars (0-1 range, ~70 bars, bell-curve-ish with natural variation)
+const WAVEFORM_BARS = [
+  0.18, 0.25, 0.22, 0.3, 0.35, 0.28, 0.4, 0.45, 0.38, 0.5, 0.42, 0.55, 0.48, 0.6, 0.52, 0.65, 0.7,
+  0.58, 0.75, 0.68, 0.8, 0.72, 0.85, 0.78, 0.9, 0.82, 0.88, 0.95, 0.85, 0.92, 0.98, 0.9, 1.0, 0.95,
+  0.88, 0.92, 0.85, 0.98, 0.9, 0.82, 0.95, 0.88, 0.8, 0.85, 0.75, 0.82, 0.7, 0.78, 0.65, 0.72, 0.6,
+  0.68, 0.55, 0.62, 0.5, 0.58, 0.45, 0.52, 0.4, 0.48, 0.35, 0.42, 0.3, 0.38, 0.25, 0.32, 0.2, 0.28,
+  0.22, 0.18,
+];
+
+const AudioPlayer = forwardRef<HTMLAudioElement, AudioPlayerProps>(function AudioPlayer(
+  { src, duration, onExternalTimeUpdate },
+  forwardedRef,
+) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
 
   // 合并外部 ref 和内部 audioRef
-  const setAudioRef = useCallback((node: HTMLAudioElement | null) => {
-    (audioRef as React.MutableRefObject<HTMLAudioElement | null>).current = node;
-    if (typeof forwardedRef === 'function') {
-      forwardedRef(node);
-    } else if (forwardedRef) {
-      (forwardedRef as React.MutableRefObject<HTMLAudioElement | null>).current = node;
-    }
-  }, [forwardedRef]);
+  const setAudioRef = useCallback(
+    (node: HTMLAudioElement | null) => {
+      (audioRef as React.MutableRefObject<HTMLAudioElement | null>).current = node;
+      if (typeof forwardedRef === 'function') {
+        forwardedRef(node);
+      } else if (forwardedRef) {
+        (forwardedRef as React.MutableRefObject<HTMLAudioElement | null>).current = node;
+      }
+    },
+    [forwardedRef],
+  );
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [audioDuration, setAudioDuration] = useState(0);
@@ -200,22 +214,35 @@ const AudioPlayer = forwardRef<HTMLAudioElement, AudioPlayerProps>(
         </p>
       </div>
 
-      {/* Progress Bar */}
+      {/* Waveform + Progress */}
       <div
         ref={progressRef}
-        className="relative h-1 bg-white/10 rounded-full cursor-pointer group"
+        className="relative cursor-pointer group select-none"
         onMouseDown={handleMouseDown}
       >
-        {/* Played portion */}
-        <div
-          className="absolute top-0 left-0 h-full bg-accent rounded-full transition-[width] duration-100"
-          style={{ width: `${progress}%` }}
-        />
-        {/* Drag handle */}
-        <div
-          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 bg-accent rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
-          style={{ left: `${progress}%` }}
-        />
+        {/* Waveform bars */}
+        <div className="flex items-end justify-between h-12 gap-[2px]">
+          {WAVEFORM_BARS.map((height, i) => {
+            const barPercent = ((i + 0.5) / WAVEFORM_BARS.length) * 100;
+            const isPlayed = barPercent <= progress;
+            return (
+              <div
+                key={i}
+                className={`flex-1 min-w-[2px] max-w-[4px] rounded-sm transition-colors duration-150 ${
+                  isPlayed ? 'bg-accent' : 'bg-white/10'
+                }`}
+                style={{ height: `${Math.max(4, height * 40)}px` }}
+              />
+            );
+          })}
+        </div>
+        {/* Thin progress line underneath */}
+        <div className="relative h-0.5 bg-white/5 mt-1 rounded-full">
+          <div
+            className="absolute top-0 left-0 h-full bg-accent rounded-full transition-[width] duration-100"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
       </div>
 
       {/* Transport Controls */}

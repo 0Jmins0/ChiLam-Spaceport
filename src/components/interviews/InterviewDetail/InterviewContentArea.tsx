@@ -83,7 +83,6 @@ export default function InterviewContentArea({
           <InterviewMediaPanel
             interviewId={interviewId}
             mediaType={mediaType}
-            proofreadStatus={proofreadStatus}
             embedUrl={embedUrl}
             originalMediaUrl={originalMediaUrl}
             galleryImages={galleryImages}

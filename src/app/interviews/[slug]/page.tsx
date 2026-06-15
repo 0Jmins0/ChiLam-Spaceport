@@ -4,6 +4,7 @@ import { getInterviewBySlug } from '@/lib/queries/interviews';
 import InterviewSidebar from '@/components/interviews/InterviewDetail/InterviewSidebar';
 import InterviewMediaPanel from '@/components/interviews/InterviewDetail/InterviewMediaPanel';
 import InterviewContentArea from '@/components/interviews/InterviewDetail/InterviewContentArea';
+import ShareButton from '@/components/interviews/InterviewDetail/ShareButton';
 
 export async function generateMetadata({
   params,
@@ -49,7 +50,6 @@ export default async function InterviewDetailPage({
         <InterviewMediaPanel
           interviewId={interview.id}
           mediaType={interview.mediaType}
-          proofreadStatus={interview.proofreadStatus}
           embedUrl={interview.embedUrl ?? null}
           originalMediaUrl={interview.originalMediaUrl ?? null}
           galleryImages={galleryImages}
@@ -89,6 +89,11 @@ export default async function InterviewDetailPage({
           summary={interview.summary ?? null}
           duration={interview.duration ?? null}
         />
+      </div>
+
+      {/* Share */}
+      <div className="flex justify-end mt-8 pt-6 border-t border-white/5">
+        <ShareButton />
       </div>
     </div>
   );

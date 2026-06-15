@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.5 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 + P6.13 + P6.15 + P6.16 + P6.17 + P6.19 已完成）
+## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.5 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 + P6.13 + P6.15 + P6.16 + P6.17 + P6.19 + P6.20 已完成）
 
 ---
 
@@ -15,7 +15,7 @@
 | 影视模块 | ✅ 已完成 | 2026-06-06 |
 | 演出模块 | ✅ 已完成 | 2026-06-06 |
 | 活动模块 | ✅ 已完成（代言+直播，封面+媒体上传，访谈已独立） | 2026-06-15 |
-| 霖言霖语模块 | ✅ 已完成（从活动独立为顶级栏目） | 2026-06-15 |
+| 霖言霖语模块 | ✅ 已完成（独立栏目 + UI 精细化） | 2026-06-16 |
 | 资料库模块 | ✅ 已完成 | 2026-06-07 |
 | 留言板 | ✅ 已完成（含故事 tag 筛选 + 登录权限 + 精选/图片上传） | 2026-06-11 |
 | 用户系统 | ✅ 已完成（注册/登录/权限） | 2026-06-10 |
@@ -30,6 +30,29 @@
 ---
 
 ## 详细记录
+
+### 2026-06-16 - P6.20 霖言霖语详情页 UI 精细化（已完成）
+
+#### 完成内容
+- **语言切换 Toggle**：两个小按钮 → 滑动式胶囊 toggle，金色滑块动画，`max-w-md` 紧凑尺寸
+- **对话时间线重做**：Drop-cap 首字下沉排版 — 左侧细时间线 + 发光圆点，大号衬线字母浮动，正文自然环绕
+- **段落框线**：每段对话带左实线 + 上下渐隐框线，框与框紧挨，圆点在框左边缘居中
+- **发光效果**：活跃段落文字白字金光（`drop-shadow` 金色光晕），非活跃段落暗淡
+- **音频波形**：AudioPlayer 增加 CSS 模拟波形可视化（70 根竖条，已播放金色着色）
+- **编者备注**：增加边框卡片 + Haster 手写签名（Cormorant Garamond 斜体）
+- **分享按钮**：页面底部 "分享此頁 SHARE" 按钮，点击复制 URL
+- **蜡封章移除**：删除不协调的 ProofreadBadge，校对状态保留在标题区标签
+- **标题缩小**：`text-2xl/1.75rem/2rem`，与整体布局更协调
+
+#### 涉及文件
+- `src/components/interviews/InterviewDetail/InterviewTranscript.tsx` — Toggle + 时间线 + 标题
+- `src/components/interviews/InterviewDetail/InterviewMediaPanel.tsx` — 移除蜡封章 + 编者备注
+- `src/components/interviews/InterviewDetail/AudioPlayer.tsx` — 波形可视化
+- `src/components/interviews/InterviewDetail/ShareButton.tsx` — 新建分享按钮
+- `src/components/interviews/InterviewDetail/InterviewContentArea.tsx` — 移除 proofreadStatus prop
+- `src/app/interviews/[slug]/page.tsx` — 集成分享按钮 + 清理 props
+
+---
 
 ### 2026-06-15 - P6.19 霖言霖语文字-媒体联动（已完成）
 
