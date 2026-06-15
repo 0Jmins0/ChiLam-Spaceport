@@ -32,6 +32,8 @@ const EDITABLE_FIELDS: Record<string, string[]> = {
     'replayUrl',
     'coverImageId',
   ],
+  media: ['caption', 'alt', 'mediaTag', 'searchNote'],
+  mediaCollection: ['title', 'description', 'coverId'],
 };
 
 /** 需要 parseInt 的整数字段 */
@@ -57,6 +59,8 @@ function getPrismaModel(entityType: string): any {
     album: prisma.album,
     magazine: prisma.magazine,
     livestream: prisma.livestream,
+    media: prisma.media,
+    mediaCollection: prisma.mediaCollection,
   };
   return models[entityType] || null;
 }

@@ -347,3 +347,40 @@ export interface SearchPreviewResult {
   }[];
   totalCount: number;
 }
+
+// ═══════ 相册 (Gallery) ═══════
+export type GalleryTab = 'all' | 'image' | 'video' | 'audio' | 'collection';
+
+export interface GalleryItem {
+  id: string;
+  type: string; // MediaType enum
+  category: string | null; // MediaCategory enum
+  mediaTag: string | null;
+  url: string;
+  thumbnailUrl: string | null;
+  filename: string | null;
+  width: number | null;
+  height: number | null;
+  duration: number | null;
+  alt: string | null;
+  caption: string | null;
+  createdAt: string;
+  // 关联来源（反查）
+  source: { type: string; title: string; slug: string } | null;
+}
+
+export interface GalleryCollectionItem {
+  id: string;
+  slug: string;
+  title: string;
+  description: string | null;
+  date: string | null;
+  coverUrl: string | null;
+  itemCount: number;
+}
+
+export interface GalleryCollectionDetail extends GalleryCollectionItem {
+  items: GalleryItem[];
+  relatedType: string | null;
+  relatedId: string | null;
+}

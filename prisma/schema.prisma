@@ -79,8 +79,37 @@ enum UserRole {
   ADMIN
 }
 
+enum MediaCategory {
+  IMAGE
+  VIDEO
+  AUDIO
+}
+
+enum ImageTag {
+  POSTER
+  EVENT
+  PORTRAIT
+  SCREENSHOT
+  SOCIAL
+  MESSAGE
+  OTHER
+}
+
+enum VideoTag {
+  EVENT
+  BEHIND
+  SIGHTING
+  OTHER
+}
+
+enum AudioTag {
+  SONG
+  INTERVIEW
+  OTHER
+}
+
 // ─────────────────────────────────────────────
-// 模型定义 (20 张表)
+// 模型定义 (21 张表)
 // ─────────────────────────────────────────────
 
 /// 4.1 栏目树
@@ -143,6 +172,10 @@ model Media {
   duration     Float?
   alt          String?
   caption      String?
+  category    MediaCategory?  @map("category")
+  mediaTag    String?         @map("media_tag")
+  searchNote  String?         @map("search_note")
+  uploadedBy  String?         @map("uploaded_by")
   createdAt    DateTime  @default(now()) @map("created_at")
 
   // 直接 FK 反向关系 (不产生数据库列)
@@ -166,6 +199,10 @@ model Media {
   magazineScans       Magazine[]    @relation("MagazineScans")
   livestreamMedia      Livestream[]  @relation("LivestreamMedia")
   newsArticles        NewsArticle[] @relation("NewsArticleMedia")
+
+  // 相册集关联
+  collections      MediaCollection[] @relation("CollectionMedia")
+  collectionCovers MediaCollection[] @relation("CollectionCover")
 
   @@map("media")
 }
@@ -683,6 +720,32 @@ model Admin {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("admins")
+}
+
+/// 相册集
+model MediaCollection {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  title       String
+  description String?
+  date        DateTime?
+
+  // 包含的 Media（多对多）
+  items Media[] @relation("CollectionMedia")
+
+  // 内容关联（可选）
+  relatedType String? @map("related_type")
+  relatedId   String? @map("related_id")
+
+  // 封面
+  coverId String? @map("cover_id")
+  cover   Media?  @relation("CollectionCover", fields: [coverId], references: [id])
+
+  isVisible Boolean  @default(true) @map("is_visible")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("media_collections")
 }
 
 /// 4.21 编辑历史（支持一次撤销）

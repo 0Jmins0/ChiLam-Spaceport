@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 + P6.13 已完成）
+## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.5 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 + P6.13 已完成）
 
 ---
 
@@ -23,12 +23,37 @@
 | 公告模块 | ✅ 已完成 | 2026-06-07 |
 | 后台管理(API) | ✅ 已完成 | 2026-06-07 |
 | R2 存储配置 | ✅ 已完成 | 2026-06-07 |
+| 相册模块 | ✅ 已完成（图片/视频/音频/合集 + Tag 筛选 + Lightbox + 相册集） | 2026-06-15 |
 | 全站检索 | ✅ 已完成 | 2026-06-10 |
 | 部署上线 | 未开始 | - |
 
 ---
 
 ## 详细记录
+
+### 2026-06-15 - P6.5 相册模块（已完成）
+
+#### 完成内容
+- **相册模块**：新增 `/gallery` 路由，支持图片、视频、音频、合集四个分类 Tab
+- **二级 Tag 筛选**：图片（海报/活动照/写真/剧照等）、视频（活动/幕后/路透）、音频（歌曲/访谈）
+- **Tag 样式统一**：使用全站共享 `<Tag>` 组件，与其他模块风格一致
+- **Lightbox 查看器**：点击图片全屏预览，支持左右切换
+- **相册集功能**：支持创建、查看相册集，含封面和描述
+- **来源反查**：自动关联媒体来源（影视/演出/专辑/杂志/代言/访谈）
+- **Schema 扩展**：新增 `MediaCollection`、`MediaCollectionItem` 模型，Media 增加 `mediaTag` 字段
+
+#### 涉及文件
+- `prisma/schema.prisma` — 新增相册集模型 + Media 字段扩展
+- `src/app/gallery/` — 相册页面（列表 + 相册集详情）
+- `src/app/api/gallery/` — 相册 CRUD API
+- `src/components/gallery/` — 6 个组件（FilterBar, Grid, Card, Lightbox, CollectionCard, CreateCollectionModal）
+- `src/lib/queries/gallery.ts` — 查询层
+- `src/lib/types.ts` — 类型定义
+- `src/config/navigation.ts` — 导航栏新增相册入口
+- `src/app/api/upload/route.ts` — 上传 API 适配
+- `src/app/api/admin/edit/route.ts` — 编辑 API 适配
+
+---
 
 ### 2026-06-15 - P6.13 详情页图片完整显示（已完成）
 

@@ -12,6 +12,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: '活动', labelEn: 'Activities', href: '/activities' },
   { label: '资料库', labelEn: 'Archives', href: '/archives' },
   { label: '霖言霖语', labelEn: 'Interviews', href: '/interviews' },
+  { label: '相册', labelEn: 'Gallery', href: '/gallery' },
   { label: '留言板', labelEn: 'Guestbook', href: '/messages' },
   // { label: '公告', labelEn: 'Announcements', href: '/announcements' },
 ];

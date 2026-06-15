@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { uploadFile, ALLOWED_TYPES, SIZE_LIMITS, getSizeCategory } from '@/lib/r2';
 import { prisma } from '@/lib/db';
-import { MediaType } from '@/generated/prisma/client';
+import { MediaType, MediaCategory } from '@/generated/prisma/client';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,6 +10,13 @@ function getMediaType(mimeType: string): MediaType {
   if (mimeType.startsWith('video/')) return MediaType.VIDEO;
   if (mimeType.startsWith('audio/')) return MediaType.AUDIO;
   return MediaType.FILE;
+}
+
+function getMediaCategory(mimeType: string): MediaCategory {
+  if (mimeType.startsWith('image/')) return 'IMAGE';
+  if (mimeType.startsWith('video/')) return 'VIDEO';
+  if (mimeType.startsWith('audio/')) return 'AUDIO';
+  return 'IMAGE';
 }
 
 type DirectFKConfig = {
@@ -58,6 +65,7 @@ export async function POST(request: NextRequest) {
     const relation = formData.get('relation') as string | null;
     const alt = formData.get('alt') as string | null;
     const caption = formData.get('caption') as string | null;
+    const mediaTag = formData.get('mediaTag') as string | null;
 
     if (!file) {
       return NextResponse.json({ error: '未提供文件' }, { status: 400 });
@@ -111,6 +119,8 @@ export async function POST(request: NextRequest) {
       const media = await prisma.media.create({
         data: {
           type: getMediaType(file.type),
+          category: getMediaCategory(file.type),
+          mediaTag: mediaTag || undefined,
           url: result.url,
           filename: file.name,
           mimeType: file.type,
@@ -132,6 +142,8 @@ export async function POST(request: NextRequest) {
       const created = await tx.media.create({
         data: {
           type: getMediaType(file.type),
+          category: getMediaCategory(file.type),
+          mediaTag: mediaTag || undefined,
           url: result.url,
           filename: file.name,
           mimeType: file.type,

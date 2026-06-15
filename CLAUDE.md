@@ -5,8 +5,8 @@
 
 ## 当前进度
 - **阶段**: P6 用户反馈迭代进行中
-- **已完成**: P0~P4 全部、UI 调整阶段一~五、P5.0 海报/封面填充、P6.1 体验修复、P6.8 演出详情页优化、P6.2 访谈详情页重做、P6.3 瀑布流布局改版、P6.4 留言板增强、P6.6 前台编辑模式、P6.10 全站时间排序、P6.11 网格布局统一、P6.12 霖言霖语独立模块、P6.13 详情页图片完整显示
-- **下一步**: P6.5 相册模块 → P6.7 → P6.9
+- **已完成**: P0~P4 全部、UI 调整阶段一~五、P5.0 海报/封面填充、P6.1 体验修复、P6.8 演出详情页优化、P6.2 访谈详情页重做、P6.3 瀑布流布局改版、P6.4 留言板增强、P6.5 相册模块、P6.6 前台编辑模式、P6.10 全站时间排序、P6.11 网格布局统一、P6.12 霖言霖语独立模块、P6.13 详情页图片完整显示
+- **下一步**: P6.7 → P6.9
 - **详细进度**: 查看 `/docs/PROGRESS.md`
 
 ## 技术栈
@@ -38,6 +38,7 @@
 │   │   ├── screens/                                 # 影视模块（列表 + 详情页）
 │   │   ├── activities/                              # 活动模块（列表 + 代言详情 + 直播详情）
 │   │   ├── interviews/                              # 霖言霖语模块（列表 + 详情页，原活动子模块独立）
+│   │   ├── gallery/                                 # 相册模块（列表 + 相册集详情）
 │   │   ├── archives/                                # 资料库模块（列表 + 专辑详情 + 杂志详情）
 │   │   ├── messages/                                # 留言板（列表 + 详情页）
 │   │   ├── announcements/                           # 公告（列表 + 详情页）
@@ -48,6 +49,7 @@
 │   │   ├── api/performances/                        # 演出 CRUD API
 │   │   ├── api/activities/                          # 活动 CRUD API（代言+直播）
 │   │   ├── api/interviews/                          # 霖言霖语 CRUD API
+│   │   ├── api/gallery/                             # 相册 CRUD API（媒体+相册集）
 │   │   ├── api/archives/                            # 资料库 CRUD API（专辑+杂志）
 │   │   ├── api/messages/                            # 留言板 CRUD + 点赞 + 评论 API
 │   │   ├── api/announcements/                       # 公告 CRUD API
@@ -67,6 +69,7 @@
 │   │   ├── performances/                            # 演出组件（PerformanceCard, PerformancesFilterBar）
 │   │   ├── activities/                              # 活动组件（EndorsementCard, LivestreamCard, ActivitiesFilterBar）
 │   │   ├── interviews/                              # 霖言霖语组件（InterviewCard, InterviewsFilterBar, InterviewDetail/）
+│   │   ├── gallery/                                 # 相册组件（GalleryCard, GalleryGrid, FilterBar, Lightbox, CollectionCard）
 │   │   ├── archives/                                # 资料库组件（AlbumCard, MagazineCard, ArchivesFilterBar）
 │   │   ├── guestbook/                               # 留言板组件（GuestbookCard, GuestbookGrid, Form, LikeButton, CommentSection, CardActions 等）
 │   │   ├── announcements/                           # 公告组件（AnnouncementCard, FilterBar）
@@ -134,6 +137,7 @@
 | 演出 | `/performances` | 演唱会、舞台、音乐剧 |
 | 活动 | `/activities` | 广告代言、直播 |
 | 资料库 | `/archives` | 杂志、专辑 |
+| 相册 | `/gallery` | 图片、视频、音频、合集 |
 | 霖言霖语 | `/interviews` | 视频访谈、音频访谈、图文访谈 |
 | 留言 | `/messages` | 我想对你说、故事分享、冷知识、建议反馈 |
 | 公告 | `/announcements` | 网站公告、规则、更新通知 |
