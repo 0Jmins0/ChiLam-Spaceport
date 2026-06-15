@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { EditableText } from '@/components/edit/EditableText';
 
 interface TranscriptSegment {
@@ -22,6 +22,8 @@ interface InterviewTranscriptProps {
   proofreadStatus: string;
   transcriptCantonese: unknown;
   transcriptMandarin: unknown;
+  currentTime?: number;
+  onTimestampClick?: (seconds: number) => void;
 }
 
 type LangTab = 'cantonese' | 'mandarin';
@@ -52,6 +54,15 @@ function formatDate(date: Date): string {
   return `${y}.${m}.${day}`;
 }
 
+/** 将 "00:00" / "02:15" / "1:30:00" 格式的时间戳解析为秒数 */
+function parseTimestampToSeconds(ts: string): number {
+  const parts = ts.split(':').map(Number);
+  if (parts.some(isNaN)) return 0;
+  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  if (parts.length === 2) return parts[0] * 60 + parts[1];
+  return 0;
+}
+
 function SpeakerBadge({ speaker }: { speaker: string }) {
   const letter = speaker.charAt(0).toUpperCase();
 
@@ -77,31 +88,108 @@ function SpeakerBadge({ speaker }: { speaker: string }) {
   );
 }
 
-function SegmentList({ segments }: { segments: TranscriptSegment[] }) {
+function SegmentList({
+  segments,
+  currentTime,
+  onTimestampClick,
+}: {
+  segments: TranscriptSegment[];
+  currentTime?: number;
+  onTimestampClick?: (seconds: number) => void;
+}) {
+  const segmentRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  const activeSegmentIndex = useMemo(() => {
+    if (currentTime === undefined || currentTime < 0) return -1;
+    let activeIdx = -1;
+    for (let i = 0; i < segments.length; i++) {
+      if (segments[i].timestamp) {
+        const ts = parseTimestampToSeconds(segments[i].timestamp!);
+        if (ts <= currentTime) {
+          activeIdx = i;
+        } else {
+          break;
+        }
+      }
+    }
+    return activeIdx;
+  }, [segments, currentTime]);
+
+  useEffect(() => {
+    if (activeSegmentIndex >= 0 && segmentRefs.current[activeSegmentIndex]) {
+      segmentRefs.current[activeSegmentIndex]?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+  }, [activeSegmentIndex]);
+
   return (
     <div className="relative space-y-6 pl-14">
       {/* Timeline vertical line */}
       <div className="absolute left-5 top-0 bottom-0 w-px bg-accent/20" />
 
-      {segments.map((seg, i) => (
-        <div key={i} className="relative">
-          {/* Speaker badge positioned on the timeline */}
-          <div className="absolute -left-14 top-0">
-            <SpeakerBadge speaker={seg.speaker} />
-          </div>
+      {segments.map((seg, i) => {
+        const hasTimestamp = !!seg.timestamp;
+        const isActive = i === activeSegmentIndex;
+        const isClickable = hasTimestamp && !!onTimestampClick;
 
-          {/* Content */}
-          <div className="pt-1">
-            {seg.speakerLabel && (
-              <p className="text-xs text-accent/70 font-medium mb-1 uppercase tracking-wide">
-                {seg.speakerLabel}
-              </p>
-            )}
-            <p className="text-base text-text-primary leading-relaxed">{seg.text}</p>
-            {seg.timestamp && <p className="text-xs text-text-muted mt-1">{seg.timestamp}</p>}
+        return (
+          <div
+            key={i}
+            ref={(el) => {
+              segmentRefs.current[i] = el;
+            }}
+            className={`relative transition-colors duration-300 rounded-lg -ml-2 pl-2 py-1 ${
+              isActive
+                ? 'bg-accent/8 border-l-[3px] border-accent -ml-[11px] pl-[11px]'
+                : isClickable
+                  ? 'hover:bg-white/5 cursor-pointer'
+                  : ''
+            }`}
+            onClick={() => {
+              if (isClickable) {
+                onTimestampClick!(parseTimestampToSeconds(seg.timestamp!));
+              }
+            }}
+          >
+            {/* Speaker badge positioned on the timeline */}
+            <div className="absolute -left-14 top-0">
+              <SpeakerBadge speaker={seg.speaker} />
+            </div>
+
+            {/* Content */}
+            <div className="pt-1">
+              {seg.speakerLabel && (
+                <p className="text-xs text-accent/70 font-medium mb-1 uppercase tracking-wide">
+                  {seg.speakerLabel}
+                </p>
+              )}
+              <p className="text-base text-text-primary leading-relaxed">{seg.text}</p>
+              {seg.timestamp && (
+                <p
+                  className={`text-xs mt-1 flex items-center gap-1 ${
+                    isActive ? 'text-accent' : 'text-text-muted'
+                  }`}
+                >
+                  {isClickable && (
+                    <svg
+                      width="10"
+                      height="10"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className="shrink-0"
+                    >
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  )}
+                  {seg.timestamp}
+                </p>
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -114,6 +202,8 @@ export default function InterviewTranscript({
   proofreadStatus,
   transcriptCantonese,
   transcriptMandarin,
+  currentTime,
+  onTimestampClick,
 }: InterviewTranscriptProps) {
   const parsedCantonese = parseTranscript(transcriptCantonese);
   const parsedMandarin = parseTranscript(transcriptMandarin);
@@ -216,7 +306,11 @@ export default function InterviewTranscript({
             {activeTranscript}
           </div>
         ) : (
-          <SegmentList segments={activeTranscript.segments} />
+          <SegmentList
+            segments={activeTranscript.segments}
+            currentTime={currentTime}
+            onTimestampClick={onTimestampClick}
+          />
         )}
       </div>
     </div>

@@ -1,10 +1,11 @@
 'use client';
 
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback, forwardRef } from 'react';
 
 interface AudioPlayerProps {
   src: string;
   duration?: string;
+  onExternalTimeUpdate?: (time: number) => void;
 }
 
 function formatTime(seconds: number): string {
@@ -85,9 +86,20 @@ const ForwardIcon = () => (
 
 const PLAYBACK_RATES = [0.75, 1, 1.25, 1.5, 2];
 
-export default function AudioPlayer({ src, duration }: AudioPlayerProps) {
+const AudioPlayer = forwardRef<HTMLAudioElement, AudioPlayerProps>(
+  function AudioPlayer({ src, duration, onExternalTimeUpdate }, forwardedRef) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
+
+  // 合并外部 ref 和内部 audioRef
+  const setAudioRef = useCallback((node: HTMLAudioElement | null) => {
+    (audioRef as React.MutableRefObject<HTMLAudioElement | null>).current = node;
+    if (typeof forwardedRef === 'function') {
+      forwardedRef(node);
+    } else if (forwardedRef) {
+      (forwardedRef as React.MutableRefObject<HTMLAudioElement | null>).current = node;
+    }
+  }, [forwardedRef]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [audioDuration, setAudioDuration] = useState(0);
@@ -99,7 +111,10 @@ export default function AudioPlayer({ src, duration }: AudioPlayerProps) {
     if (!audio) return;
 
     const onTimeUpdate = () => {
-      if (!isDragging) setCurrentTime(audio.currentTime);
+      if (!isDragging) {
+        setCurrentTime(audio.currentTime);
+        onExternalTimeUpdate?.(audio.currentTime);
+      }
     };
     const onLoadedMetadata = () => setAudioDuration(audio.duration);
     const onEnded = () => setIsPlaying(false);
@@ -113,7 +128,7 @@ export default function AudioPlayer({ src, duration }: AudioPlayerProps) {
       audio.removeEventListener('loadedmetadata', onLoadedMetadata);
       audio.removeEventListener('ended', onEnded);
     };
-  }, [isDragging]);
+  }, [isDragging, onExternalTimeUpdate]);
 
   const togglePlay = useCallback(() => {
     const audio = audioRef.current;
@@ -173,7 +188,7 @@ export default function AudioPlayer({ src, duration }: AudioPlayerProps) {
 
   return (
     <div className="space-y-5">
-      <audio ref={audioRef} src={src} preload="metadata" />
+      <audio ref={setAudioRef} src={src} preload="metadata" />
 
       {/* Current Playback Label + Time */}
       <div className="flex items-center justify-between">
@@ -260,4 +275,6 @@ export default function AudioPlayer({ src, duration }: AudioPlayerProps) {
       </div>
     </div>
   );
-}
+});
+
+export default AudioPlayer;

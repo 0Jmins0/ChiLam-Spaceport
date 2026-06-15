@@ -6,6 +6,79 @@
 
 ---
 
+## 霖言霖语 — 文稿 JSON 格式参考
+
+访谈的 `transcriptCantonese`（粤语原文）和 `transcriptMandarin`（国语翻译）字段使用以下 JSON 结构：
+
+```json
+{
+  "segments": [
+    {
+      "speaker": "J",
+      "speakerLabel": "智霖",
+      "timestamp": "00:01:23",
+      "text": "对话内容文本……"
+    },
+    {
+      "speaker": "H",
+      "speakerLabel": "主持人",
+      "timestamp": "00:02:05",
+      "text": "主持人的提问或回应……"
+    },
+    {
+      "speaker": "J",
+      "text": "也可以省略 speakerLabel 和 timestamp"
+    }
+  ]
+}
+```
+
+### 字段说明
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `segments` | 数组 | 是 | 对话片段列表 |
+| `segments[].speaker` | string | 是 | 说话人标识，首字母会显示为头像（J=智霖 金色, H=主持人 灰色） |
+| `segments[].speakerLabel` | string | 否 | 说话人显示名称（如 "智霖"、"主持人"） |
+| `segments[].timestamp` | string | 否 | 时间戳（如 "00:01:23"） |
+| `segments[].text` | string | 是 | 对话内容 |
+
+### 上传示例（PUT 更新文稿）
+
+```bash
+curl -X PUT http://localhost:3000/api/interviews/访谈slug \
+  -H "Content-Type: application/json" \
+  -d '{
+    "transcriptCantonese": {
+      "segments": [
+        { "speaker": "H", "speakerLabel": "主持人", "text": "今日好開心請到智霖" },
+        { "speaker": "J", "speakerLabel": "智霖", "text": "大家好，我係張智霖" }
+      ]
+    },
+    "transcriptMandarin": {
+      "segments": [
+        { "speaker": "H", "speakerLabel": "主持人", "text": "今天很开心请到智霖" },
+        { "speaker": "J", "speakerLabel": "智霖", "text": "大家好，我是张智霖" }
+      ]
+    },
+    "proofreadStatus": "PROOFREAD"
+  }'
+```
+
+> **备注**: 也支持传纯文本字符串（非 JSON），会以纯文本格式展示，不带说话人头像和时间轴。
+
+### 时间戳联动功能
+
+当访谈有配套音频/视频（原生上传，非 iframe 嵌入）且文稿段落包含 `timestamp` 字段时，自动启用以下交互：
+
+- **播放高亮**：播放音频/视频时，当前对应段落实时高亮（金色左边框 + 浅色背景）
+- **点击跳转**：点击任意有时间戳的段落，播放器跳转到该时间点并自动播放
+- **自动滚动**：高亮段落变化时自动平滑滚动到可视区域
+
+> **重要**：`timestamp` 格式支持 `MM:SS`（如 `02:15`）和 `HH:MM:SS`（如 `01:30:00`）。请确保段落按时间顺序排列，否则高亮逻辑可能跳跃。
+
+---
+
 ## 目录
 
 1. [环境准备](#1-环境准备)

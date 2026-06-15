@@ -19,6 +19,8 @@ interface InterviewMediaPanelProps {
   galleryImages: { id: string; url: string; alt: string | null; type: string }[];
   summary: string | null;
   duration: string | null;
+  onTimeUpdate?: (time: number) => void;
+  mediaRef?: React.RefObject<HTMLVideoElement | HTMLAudioElement | null>;
 }
 
 function ProofreadBadge({ status }: { status: string }) {
@@ -114,6 +116,8 @@ export default function InterviewMediaPanel({
   galleryImages,
   summary,
   duration,
+  onTimeUpdate,
+  mediaRef,
 }: InterviewMediaPanelProps) {
   const { editMode } = useEditMode();
   const [activeIndex, setActiveIndex] = useState(0);
@@ -154,15 +158,18 @@ export default function InterviewMediaPanel({
       const videoContent = hasGalleryVideos ? (
         <div className="space-y-3">
           {/* Main video player */}
-          <div className="relative cursor-pointer group" onClick={() => setLightboxOpen(true)}>
+          <div className="relative group">
             {allGalleryMedia[safeIndex]?.type === 'VIDEO' ? (
               <video
                 key={allGalleryMedia[safeIndex].id}
                 src={allGalleryMedia[safeIndex].url}
+                ref={mediaRef as React.RefObject<HTMLVideoElement>}
                 controls
-                preload="metadata"
+                playsInline
+                preload="auto"
                 className="w-full aspect-video rounded-[var(--radius-card)]"
                 onClick={(e) => e.stopPropagation()}
+                onTimeUpdate={(e) => onTimeUpdate?.((e.target as HTMLVideoElement).currentTime)}
               />
             ) : (
               <div className="relative aspect-video rounded-[var(--radius-card)] overflow-hidden">
@@ -175,8 +182,14 @@ export default function InterviewMediaPanel({
                 />
               </div>
             )}
-            {/* Fullscreen hint overlay */}
-            <div className="absolute top-2 right-2 bg-black/50 rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+            {/* 放大按钮 — 点击打开灯箱 */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setLightboxOpen(true);
+              }}
+              className="absolute bottom-2 right-2 z-10 bg-black/60 rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80 cursor-pointer"
+            >
               <svg
                 className="w-4 h-4 text-white"
                 fill="none"
@@ -190,7 +203,7 @@ export default function InterviewMediaPanel({
                   d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9m11.25-5.25v4.5m0-4.5h-4.5m4.5 0L15 9m-11.25 11.25v-4.5m0 4.5h4.5m-4.5 0L9 15m11.25 5.25v-4.5m0 4.5h-4.5m4.5 0L15 15"
                 />
               </svg>
-            </div>
+            </button>
           </div>
 
           {/* Thumbnail grid - only when ≥2 media items */}
@@ -285,7 +298,12 @@ export default function InterviewMediaPanel({
       return (
         <div className="space-y-5">
           <AudioPlaceholder />
-          <AudioPlayer src={originalMediaUrl} duration={duration || undefined} />
+          <AudioPlayer
+            ref={mediaRef as React.RefObject<HTMLAudioElement>}
+            src={originalMediaUrl}
+            duration={duration || undefined}
+            onExternalTimeUpdate={onTimeUpdate}
+          />
         </div>
       );
     }
@@ -393,7 +411,7 @@ export default function InterviewMediaPanel({
           entityType="interview"
           entityId={interviewId}
           field="summary"
-          as="p"
+          as="div"
           multiline
           className="text-sm text-text-secondary leading-relaxed"
           placeholder="编辑笔记..."

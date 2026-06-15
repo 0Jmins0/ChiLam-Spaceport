@@ -2,8 +2,8 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { getInterviewBySlug } from '@/lib/queries/interviews';
 import InterviewSidebar from '@/components/interviews/InterviewDetail/InterviewSidebar';
-import InterviewTranscript from '@/components/interviews/InterviewDetail/InterviewTranscript';
 import InterviewMediaPanel from '@/components/interviews/InterviewDetail/InterviewMediaPanel';
+import InterviewContentArea from '@/components/interviews/InterviewDetail/InterviewContentArea';
 
 export async function generateMetadata({
   params,
@@ -74,33 +74,21 @@ export default async function InterviewDetailPage({
           </div>
         </div>
 
-        {/* 中栏 - Transcript */}
-        <div className="flex-1 min-w-0">
-          <InterviewTranscript
-            interviewId={interview.id}
-            title={interview.title}
-            date={interview.date}
-            proofreadStatus={interview.proofreadStatus}
-            transcriptCantonese={interview.transcriptCantonese}
-            transcriptMandarin={interview.transcriptMandarin}
-          />
-        </div>
-
-        {/* 右栏 - MediaPanel（仅桌面端，移动端已在顶部显示） */}
-        <div className="hidden lg:block lg:w-[350px] shrink-0">
-          <div className="lg:sticky lg:top-24">
-            <InterviewMediaPanel
-              interviewId={interview.id}
-              mediaType={interview.mediaType}
-              proofreadStatus={interview.proofreadStatus}
-              embedUrl={interview.embedUrl ?? null}
-              originalMediaUrl={interview.originalMediaUrl ?? null}
-              galleryImages={galleryImages}
-              summary={interview.summary ?? null}
-              duration={interview.duration ?? null}
-            />
-          </div>
-        </div>
+        {/* 中栏 + 右栏 - 由 InterviewContentArea 管理联动 */}
+        <InterviewContentArea
+          interviewId={interview.id}
+          title={interview.title}
+          date={interview.date}
+          proofreadStatus={interview.proofreadStatus}
+          transcriptCantonese={interview.transcriptCantonese}
+          transcriptMandarin={interview.transcriptMandarin}
+          mediaType={interview.mediaType}
+          embedUrl={interview.embedUrl ?? null}
+          originalMediaUrl={interview.originalMediaUrl ?? null}
+          galleryImages={galleryImages}
+          summary={interview.summary ?? null}
+          duration={interview.duration ?? null}
+        />
       </div>
     </div>
   );

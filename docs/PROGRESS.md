@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.5 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 + P6.13 + P6.15 + P6.16 + P6.17 已完成）
+## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.5 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 + P6.13 + P6.15 + P6.16 + P6.17 + P6.19 已完成）
 
 ---
 
@@ -30,6 +30,25 @@
 ---
 
 ## 详细记录
+
+### 2026-06-15 - P6.19 霖言霖语文字-媒体联动（已完成）
+
+#### 完成内容
+- **播放高亮**：音频/视频播放时，对应的文字段落实时高亮（accent 左边框 + 浅色背景），切换段落时平滑过渡
+- **点击跳转**：点击任意有时间戳的段落，播放器跳转到该时间点并自动播放，时间戳旁显示播放图标提示可点击
+- **自动滚动**：高亮段落变化时自动平滑滚动到可视区域中央
+- **状态桥接**：新建 InterviewContentArea 客户端组件，管理 Transcript 和 MediaPanel 之间的共享播放状态
+- **AudioPlayer forwardRef**：改为 forwardRef 模式，暴露 audio 元素 ref 和 onExternalTimeUpdate 回调
+- **智能启用**：仅原生 VIDEO/AUDIO 启用联动，iframe 嵌入和 TEXT 类型不受影响，移动端保持独立布局
+
+#### 涉及文件
+- `src/components/interviews/InterviewDetail/InterviewContentArea.tsx` — **新建**，客户端包装组件，管理 currentTime + mediaRef
+- `src/components/interviews/InterviewDetail/InterviewTranscript.tsx` — 高亮逻辑、点击跳转、自动滚动
+- `src/components/interviews/InterviewDetail/InterviewMediaPanel.tsx` — 暴露 onTimeUpdate + mediaRef props
+- `src/components/interviews/InterviewDetail/AudioPlayer.tsx` — forwardRef + onExternalTimeUpdate
+- `src/app/interviews/[slug]/page.tsx` — 用 InterviewContentArea 替换中栏+右栏
+
+---
 
 ### 2026-06-15 - P6.18 媒体画廊视频交互修复（已完成）
 
