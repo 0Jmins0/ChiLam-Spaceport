@@ -116,9 +116,9 @@ export function EditableMediaGallery({
               className={cn(
                 'group relative overflow-hidden rounded-[var(--radius-card)] bg-white/5 transition-all',
                 isRemoving && 'pointer-events-none opacity-50',
-                !editMode && 'cursor-pointer',
+                !editMode && !isVideo && 'cursor-pointer',
               )}
-              onClick={!editMode ? () => setLightboxIndex(index) : undefined}
+              onClick={!editMode && !isVideo ? () => setLightboxIndex(index) : undefined}
             >
               {/* 编辑模式：删除按钮 */}
               {editMode && onRemove && (
@@ -138,9 +138,15 @@ export function EditableMediaGallery({
                 </button>
               )}
 
-              {/* 非编辑模式：放大提示图标 */}
+              {/* 非编辑模式：放大按钮 */}
               {!editMode && (
-                <div className="pointer-events-none absolute right-1.5 top-1.5 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLightboxIndex(index);
+                  }}
+                  className="absolute right-1.5 top-1.5 z-10 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-black/70"
+                >
                   <svg
                     className="h-3.5 w-3.5"
                     fill="none"
@@ -154,7 +160,7 @@ export function EditableMediaGallery({
                       d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"
                     />
                   </svg>
-                </div>
+                </button>
               )}
 
               {isVideo ? (

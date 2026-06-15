@@ -111,7 +111,6 @@ export function LightboxViewer({ items, currentIndex, onClose, onNavigate }: Lig
             key={current.id}
             src={current.url}
             controls
-            autoPlay
             className="max-h-[85vh] max-w-[90vw] rounded"
           />
         ) : current.type === 'AUDIO' || current.category === 'AUDIO' ? (
