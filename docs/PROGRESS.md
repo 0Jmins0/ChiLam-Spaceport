@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.5 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 + P6.13 + P6.15 + P6.16 已完成）
+## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.5 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 + P6.13 + P6.15 + P6.16 + P6.17 已完成）
 
 ---
 
@@ -30,6 +30,34 @@
 ---
 
 ## 详细记录
+
+### 2026-06-15 - P6.17 Markdown 富文本渲染 + 编辑自动刷新（已完成）
+
+#### 完成内容
+- **MarkdownContent 通用组件**：新建 `src/components/ui/MarkdownContent.tsx`，基于 `react-markdown` v10，支持段落、加粗、斜体、列表、链接、标题、引用等 Markdown 语法，暗色主题适配
+- **EditableText 保存自动刷新**：保存成功后调用 `router.refresh()` 重新获取服务端数据，无需手动刷新页面
+- **全站 11 个详情页统一升级**：描述/简介/内容字段从纯文本 `<p>` 替换为 `MarkdownContent` 渲染
+  - 影视详情页（synopsis）、代言详情页（description）、直播详情页（summary）
+  - 相册集详情页（description）、演出详情页（summary）、公告详情页（content）
+  - 霖言霖语编者备注（summary）、新闻详情页（contentText）、社交媒体详情页（contentText）、路透详情页（content）
+- **向后兼容**：纯文本内容正常换行显示，Markdown 语法可选使用
+
+#### 涉及文件
+- `src/components/ui/MarkdownContent.tsx` — 新建 Markdown 渲染组件
+- `src/components/edit/EditableText.tsx` — 加 useRouter + router.refresh()
+- `src/app/screens/[slug]/page.tsx` — synopsis 升级 MarkdownContent
+- `src/app/activities/endorsements/[slug]/page.tsx` — description 升级
+- `src/app/activities/livestreams/[slug]/page.tsx` — summary 升级
+- `src/app/gallery/collections/[slug]/page.tsx` — description 升级
+- `src/app/performances/[slug]/page.tsx` — summary 升级
+- `src/app/announcements/[id]/page.tsx` — content 升级
+- `src/components/interviews/InterviewDetail/InterviewMediaPanel.tsx` — summary 升级
+- `src/app/updates/news/[slug]/page.tsx` — contentText 升级
+- `src/app/updates/social/[id]/page.tsx` — contentText 升级
+- `src/app/updates/sightings/[slug]/page.tsx` — content 升级
+- `package.json` — 新增 react-markdown 依赖
+
+---
 
 ### 2026-06-15 - P6.16 活动模块封面+媒体上传（已完成）
 

@@ -6,6 +6,7 @@ import { getNewsArticleBySlug } from '@/lib/queries/updates';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Tag } from '@/components/ui/Tag';
 import { Button } from '@/components/ui/Button';
+import MarkdownContent from '@/components/ui/MarkdownContent';
 
 // Next.js 16: params 是 Promise
 export async function generateMetadata({
@@ -83,11 +84,10 @@ export default async function NewsArticleDetailPage({
 
         {/* 概要/内容 */}
         {(article.contentText || article.summary) && (
-          <div className="prose prose-invert max-w-none">
-            <p className="text-text-secondary leading-relaxed whitespace-pre-wrap">
-              {article.contentText || article.summary}
-            </p>
-          </div>
+          <MarkdownContent
+            content={article.contentText || article.summary}
+            className="text-text-secondary leading-relaxed"
+          />
         )}
 
         {/* 标签 */}

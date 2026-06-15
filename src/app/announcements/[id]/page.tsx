@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { getAnnouncementById } from '@/lib/queries/announcements';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Tag } from '@/components/ui/Tag';
+import MarkdownContent from '@/components/ui/MarkdownContent';
 import type { AnnouncementTab } from '@/lib/types';
 
 const typeLabels: Record<AnnouncementTab, string> = {
@@ -78,9 +79,10 @@ export default async function AnnouncementDetailPage({
         <div className="gold-line mb-6" />
 
         {/* Body */}
-        <div className="prose prose-invert max-w-none text-text-secondary leading-relaxed whitespace-pre-wrap">
-          {announcement.content}
-        </div>
+        <MarkdownContent
+          content={announcement.content}
+          className="text-text-secondary leading-relaxed"
+        />
       </article>
     </PageContainer>
   );

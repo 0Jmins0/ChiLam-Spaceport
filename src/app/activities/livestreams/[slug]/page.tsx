@@ -6,6 +6,7 @@ import { getLivestreamBySlug } from '@/lib/queries/activities';
 import { EditableText } from '@/components/edit/EditableText';
 import { EditableImage } from '@/components/edit/EditableImage';
 import { EditableMediaGallery } from '@/components/edit/EditableMediaGallery';
+import MarkdownContent from '@/components/ui/MarkdownContent';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Tag } from '@/components/ui/Tag';
 import { Button } from '@/components/ui/Button';
@@ -157,10 +158,13 @@ export default async function LivestreamDetailPage({
             field="summary"
             multiline
             placeholder="添加简介..."
-            className="text-text-secondary leading-relaxed"
+            className="text-text-secondary leading-relaxed whitespace-pre-line"
           >
             {livestream.summary ? (
-              <p className="text-text-secondary leading-relaxed">{livestream.summary}</p>
+              <MarkdownContent
+                content={livestream.summary}
+                className="text-text-secondary leading-relaxed"
+              />
             ) : null}
           </EditableText>
 

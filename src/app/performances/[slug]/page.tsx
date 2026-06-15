@@ -8,6 +8,7 @@ import { Tag } from '@/components/ui/Tag';
 import { Button } from '@/components/ui/Button';
 import { EditableText } from '@/components/edit/EditableText';
 import { EditableImage } from '@/components/edit/EditableImage';
+import MarkdownContent from '@/components/ui/MarkdownContent';
 
 const typeLabels: Record<string, string> = {
   CONCERT: '演唱会',
@@ -67,7 +68,12 @@ export default async function PerformanceDetailPage({
       <div className="flex flex-col md:flex-row gap-8">
         {/* 左侧海报 */}
         <div className="w-full md:w-[300px] shrink-0">
-          <EditableImage src={performance.posterUrl} entityType="performance" entityId={performance.id} field="posterId">
+          <EditableImage
+            src={performance.posterUrl}
+            entityType="performance"
+            entityId={performance.id}
+            field="posterId"
+          >
             <div className="relative aspect-[2/3] overflow-hidden rounded-[var(--radius-card)]">
               {performance.posterUrl ? (
                 <Image
@@ -92,14 +98,27 @@ export default async function PerformanceDetailPage({
           <Tag active>{typeLabels[performance.type]}</Tag>
 
           {/* 标题 */}
-          <EditableText value={performance.title} entityType="performance" entityId={performance.id} field="title" className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
+          <EditableText
+            value={performance.title}
+            entityType="performance"
+            entityId={performance.id}
+            field="title"
+            className="font-heading text-2xl md:text-3xl font-semibold text-text-primary"
+          >
             <h1 className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
               {performance.title}
             </h1>
           </EditableText>
 
           {/* 英文标题 */}
-          <EditableText value={performance.titleEn} entityType="performance" entityId={performance.id} field="titleEn" placeholder="英文标题..." className="text-lg text-text-secondary">
+          <EditableText
+            value={performance.titleEn}
+            entityType="performance"
+            entityId={performance.id}
+            field="titleEn"
+            placeholder="英文标题..."
+            className="text-lg text-text-secondary"
+          >
             {performance.titleEn && (
               <p className="text-lg text-text-secondary">{performance.titleEn}</p>
             )}
@@ -108,7 +127,11 @@ export default async function PerformanceDetailPage({
           {/* 元信息行 */}
           {(() => {
             const metaFields = [
-              { value: performance.year?.toString() || '', field: 'year' as const, placeholder: '年份...' },
+              {
+                value: performance.year?.toString() || '',
+                field: 'year' as const,
+                placeholder: '年份...',
+              },
               { value: performance.venue || '', field: 'venue' as const, placeholder: '场馆...' },
               { value: performance.city || '', field: 'city' as const, placeholder: '城市...' },
               { value: performance.series || '', field: 'series' as const, placeholder: '系列...' },
@@ -156,12 +179,23 @@ export default async function PerformanceDetailPage({
           {/* 简介 */}
           {performance.tags.length > 0 && performance.summary && <div className="gold-line" />}
           <div>
-            {performance.summary && <h2 className="font-heading text-base text-text-primary mb-2">简介</h2>}
-            <EditableText value={performance.summary} entityType="performance" entityId={performance.id} field="summary" multiline placeholder="添加简介..." className="text-sm text-text-secondary leading-relaxed whitespace-pre-line">
+            {performance.summary && (
+              <h2 className="font-heading text-base text-text-primary mb-2">简介</h2>
+            )}
+            <EditableText
+              value={performance.summary}
+              entityType="performance"
+              entityId={performance.id}
+              field="summary"
+              multiline
+              placeholder="添加简介..."
+              className="text-sm text-text-secondary leading-relaxed whitespace-pre-line"
+            >
               {performance.summary ? (
-                <p className="text-sm text-text-secondary leading-relaxed whitespace-pre-line">
-                  {performance.summary}
-                </p>
+                <MarkdownContent
+                  content={performance.summary}
+                  className="text-sm text-text-secondary leading-relaxed"
+                />
               ) : null}
             </EditableText>
           </div>

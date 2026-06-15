@@ -6,6 +6,7 @@ import { getEndorsementBySlug } from '@/lib/queries/activities';
 import { EditableText } from '@/components/edit/EditableText';
 import { EditableImage } from '@/components/edit/EditableImage';
 import { EditableMediaGallery } from '@/components/edit/EditableMediaGallery';
+import MarkdownContent from '@/components/ui/MarkdownContent';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Tag } from '@/components/ui/Tag';
 
@@ -157,10 +158,13 @@ export default async function EndorsementDetailPage({
             field="description"
             multiline
             placeholder="添加描述..."
-            className="text-text-secondary leading-relaxed"
+            className="text-text-secondary leading-relaxed whitespace-pre-line"
           >
             {endorsement.description ? (
-              <p className="text-text-secondary leading-relaxed">{endorsement.description}</p>
+              <MarkdownContent
+                content={endorsement.description}
+                className="text-text-secondary leading-relaxed"
+              />
             ) : null}
           </EditableText>
 

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import AudioPlayer from './AudioPlayer';
 import { EditableText } from '@/components/edit/EditableText';
 import { EditableMediaGallery } from '@/components/edit/EditableMediaGallery';
+import MarkdownContent from '@/components/ui/MarkdownContent';
 import { LightboxViewer } from '@/components/gallery/LightboxViewer';
 import { useEditMode } from '@/components/edit/EditModeProvider';
 import type { GalleryItem } from '@/lib/types';
@@ -398,7 +399,10 @@ export default function InterviewMediaPanel({
           placeholder="编辑笔记..."
         >
           {summary ? (
-            <span className="text-sm text-text-secondary leading-relaxed">{summary}</span>
+            <MarkdownContent
+              content={summary}
+              className="text-sm text-text-secondary leading-relaxed"
+            />
           ) : (
             <span className="text-sm text-text-muted italic">暂无编者备注</span>
           )}

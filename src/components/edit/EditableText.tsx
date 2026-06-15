@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, type ReactNode, type ElementType } from 'react';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/cn';
 import { useEditMode } from './EditModeProvider';
 
@@ -29,6 +30,7 @@ export function EditableText({
   placeholder = '点击输入...',
   children,
 }: EditableTextProps) {
+  const router = useRouter();
   const { editMode, adminToken } = useEditMode();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value ?? '');
@@ -89,6 +91,7 @@ export function EditableText({
       setDisplayValue(draft);
       setStatus('saved');
       setEditing(false);
+      router.refresh();
       setTimeout(() => setStatus('idle'), 2000);
     } catch (err) {
       setStatus('error');
@@ -151,9 +154,7 @@ export function EditableText({
             </button>
           </div>
         )}
-        {status === 'error' && (
-          <p className="mt-1 text-xs text-red-400">{errorMsg}</p>
-        )}
+        {status === 'error' && <p className="mt-1 text-xs text-red-400">{errorMsg}</p>}
       </div>
     );
   }
@@ -177,7 +178,13 @@ export function EditableText({
 
       {/* Pencil icon on hover */}
       <span className="pointer-events-none absolute -right-5 top-0 text-accent/0 transition-all duration-200 group-hover/editable:text-accent/60">
-        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+        <svg
+          className="h-3.5 w-3.5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+        >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -191,7 +198,9 @@ export function EditableText({
         <span className="absolute -right-5 top-0 text-green-400 text-xs">&#10003;</span>
       )}
       {status === 'error' && (
-        <span className="absolute -right-5 top-0 text-red-400 text-xs" title={errorMsg}>!</span>
+        <span className="absolute -right-5 top-0 text-red-400 text-xs" title={errorMsg}>
+          !
+        </span>
       )}
     </div>
   );

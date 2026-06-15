@@ -8,6 +8,7 @@ import { Tag } from '@/components/ui/Tag';
 import { Button } from '@/components/ui/Button';
 import { EditableText } from '@/components/edit/EditableText';
 import { EditableImage } from '@/components/edit/EditableImage';
+import MarkdownContent from '@/components/ui/MarkdownContent';
 
 const typeLabels: Record<string, string> = {
   MOVIE: '电影',
@@ -61,7 +62,12 @@ export default async function ScreenDetailPage({ params }: { params: Promise<{ s
       <div className="flex flex-col md:flex-row gap-8">
         {/* 左侧海报 */}
         <div className="w-full md:w-[300px] shrink-0">
-          <EditableImage src={production.posterUrl} entityType="production" entityId={production.id} field="posterId">
+          <EditableImage
+            src={production.posterUrl}
+            entityType="production"
+            entityId={production.id}
+            field="posterId"
+          >
             <div className="relative aspect-[2/3] overflow-hidden rounded-[var(--radius-card)]">
               {production.posterUrl ? (
                 <Image
@@ -86,14 +92,27 @@ export default async function ScreenDetailPage({ params }: { params: Promise<{ s
           <Tag active>{typeLabels[production.type]}</Tag>
 
           {/* 标题 */}
-          <EditableText value={production.title} entityType="production" entityId={production.id} field="title" className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
+          <EditableText
+            value={production.title}
+            entityType="production"
+            entityId={production.id}
+            field="title"
+            className="font-heading text-2xl md:text-3xl font-semibold text-text-primary"
+          >
             <h1 className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
               {production.title}
             </h1>
           </EditableText>
 
           {/* 英文标题 */}
-          <EditableText value={production.titleEn} entityType="production" entityId={production.id} field="titleEn" placeholder="英文标题..." className="text-lg text-text-secondary">
+          <EditableText
+            value={production.titleEn}
+            entityType="production"
+            entityId={production.id}
+            field="titleEn"
+            placeholder="英文标题..."
+            className="text-lg text-text-secondary"
+          >
             {production.titleEn && (
               <p className="text-lg text-text-secondary">{production.titleEn}</p>
             )}
@@ -101,15 +120,36 @@ export default async function ScreenDetailPage({ params }: { params: Promise<{ s
 
           {/* 元信息行 */}
           <div className="flex flex-wrap items-center gap-x-1 text-sm text-text-muted">
-            <EditableText value={production.year?.toString() || ''} entityType="production" entityId={production.id} field="year" placeholder="年份..." className="text-sm text-text-muted">
+            <EditableText
+              value={production.year?.toString() || ''}
+              entityType="production"
+              entityId={production.id}
+              field="year"
+              placeholder="年份..."
+              className="text-sm text-text-muted"
+            >
               {production.year ? <span>{production.year}</span> : null}
             </EditableText>
             {production.year && (production.role || production.language) && <span>·</span>}
-            <EditableText value={production.role || ''} entityType="production" entityId={production.id} field="role" placeholder="角色..." className="text-sm text-text-muted">
+            <EditableText
+              value={production.role || ''}
+              entityType="production"
+              entityId={production.id}
+              field="role"
+              placeholder="角色..."
+              className="text-sm text-text-muted"
+            >
               {production.role ? <span>{production.role}</span> : null}
             </EditableText>
             {production.role && production.language && <span>·</span>}
-            <EditableText value={production.language || ''} entityType="production" entityId={production.id} field="language" placeholder="语言..." className="text-sm text-text-muted">
+            <EditableText
+              value={production.language || ''}
+              entityType="production"
+              entityId={production.id}
+              field="language"
+              placeholder="语言..."
+              className="text-sm text-text-muted"
+            >
               {production.language ? <span>{production.language}</span> : null}
             </EditableText>
           </div>
@@ -125,9 +165,7 @@ export default async function ScreenDetailPage({ params }: { params: Promise<{ s
               placeholder={production.type === 'VARIETY_SHOW' ? '常驻/飞行...' : '主演/客串...'}
               className="text-sm text-accent"
             >
-              {production.roleType ? (
-                <Tag active>{production.roleType}</Tag>
-              ) : null}
+              {production.roleType ? <Tag active>{production.roleType}</Tag> : null}
             </EditableText>
           </div>
 
@@ -143,9 +181,20 @@ export default async function ScreenDetailPage({ params }: { params: Promise<{ s
           <div className="gold-line" />
 
           {/* 简介 */}
-          <EditableText value={production.synopsis} entityType="production" entityId={production.id} field="synopsis" multiline placeholder="添加简介..." className="text-text-secondary leading-relaxed">
+          <EditableText
+            value={production.synopsis}
+            entityType="production"
+            entityId={production.id}
+            field="synopsis"
+            multiline
+            placeholder="添加简介..."
+            className="text-text-secondary leading-relaxed whitespace-pre-line"
+          >
             {production.synopsis ? (
-              <p className="text-text-secondary leading-relaxed">{production.synopsis}</p>
+              <MarkdownContent
+                content={production.synopsis}
+                className="text-text-secondary leading-relaxed"
+              />
             ) : null}
           </EditableText>
 

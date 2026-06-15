@@ -6,6 +6,7 @@ import { getSocialPostById } from '@/lib/queries/updates';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Tag } from '@/components/ui/Tag';
 import { Button } from '@/components/ui/Button';
+import MarkdownContent from '@/components/ui/MarkdownContent';
 
 // Next.js 16: params 是 Promise
 export async function generateMetadata({
@@ -94,11 +95,10 @@ export default async function SocialPostDetailPage({
 
         {/* 概要/内容 */}
         {(post.contentText || post.summary) && (
-          <div className="prose prose-invert max-w-none">
-            <p className="text-text-secondary leading-relaxed whitespace-pre-wrap">
-              {post.contentText || post.summary}
-            </p>
-          </div>
+          <MarkdownContent
+            content={post.contentText || post.summary}
+            className="text-text-secondary leading-relaxed"
+          />
         )}
 
         {/* 标签 */}

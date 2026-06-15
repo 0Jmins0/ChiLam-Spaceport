@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { GalleryGrid } from '@/components/gallery/GalleryGrid';
+import MarkdownContent from '@/components/ui/MarkdownContent';
 import { getCollectionBySlug } from '@/lib/queries/gallery';
 
 export const dynamic = 'force-dynamic';
@@ -53,7 +54,7 @@ export default async function CollectionDetailPage({
           {collection.title}
         </h1>
         {collection.description && (
-          <p className="mt-2 text-text-secondary">{collection.description}</p>
+          <MarkdownContent content={collection.description} className="mt-2 text-text-secondary" />
         )}
         <p className="mt-1 text-sm text-text-muted">
           {collection.itemCount} 项
