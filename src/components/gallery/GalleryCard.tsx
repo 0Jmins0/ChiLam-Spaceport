@@ -69,13 +69,14 @@ export function GalleryCard({
 
       {/* 图片/视频缩略图 */}
       {!isAudio ? (
-        <div className="relative aspect-[4/3] w-full overflow-hidden">
+        <div className="relative w-full overflow-hidden">
           <Image
             src={item.thumbnailUrl || item.url}
             alt={item.alt || item.caption || '媒体文件'}
-            fill
+            width={item.width || 400}
+            height={item.height || 300}
             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="h-auto w-full transition-transform duration-300 group-hover:scale-105"
             priority={priority}
           />
           {/* 视频播放图标叠层 */}

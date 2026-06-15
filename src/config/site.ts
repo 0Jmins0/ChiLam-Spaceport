@@ -16,5 +16,5 @@ export const siteConfig = {
     { label: '隐私政策', href: '/privacy' },
     { label: '使用条款', href: '/terms' },
   ],
-  contactEmail: 'business@chilamishere.com',
+  contactEmail: 'Chilamishere@163.com',
 };

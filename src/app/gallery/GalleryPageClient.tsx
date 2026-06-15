@@ -6,7 +6,7 @@ import { GalleryFilterBar } from '@/components/gallery/GalleryFilterBar';
 import { GalleryGrid } from '@/components/gallery/GalleryGrid';
 import { CollectionCard } from '@/components/gallery/CollectionCard';
 import { CreateCollectionModal } from '@/components/gallery/CreateCollectionModal';
-import { MasonryLayout } from '@/components/ui/MasonryLayout';
+import { WaterfallLayout } from '@/components/ui/WaterfallLayout';
 import { useEditMode } from '@/components/edit/EditModeProvider';
 import type { GalleryItem, GalleryCollectionItem } from '@/lib/types';
 
@@ -73,11 +73,11 @@ export function GalleryPageClient({
             </div>
           )}
           {collections.length > 0 ? (
-            <MasonryLayout>
+            <WaterfallLayout>
               {collections.map((c) => (
                 <CollectionCard key={c.id} collection={c} />
               ))}
-            </MasonryLayout>
+            </WaterfallLayout>
           ) : (
             <div className="flex items-center justify-center py-20">
               <p className="text-text-muted">暂无相册集</p>

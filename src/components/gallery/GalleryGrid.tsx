@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { MasonryLayout } from '@/components/ui/MasonryLayout';
+import { WaterfallLayout } from '@/components/ui/WaterfallLayout';
 import { GalleryCard } from './GalleryCard';
 import { LightboxViewer } from './LightboxViewer';
 import type { GalleryItem } from '@/lib/types';
@@ -35,7 +35,7 @@ export function GalleryGrid({ items }: GalleryGridProps) {
 
   return (
     <>
-      <MasonryLayout>
+      <WaterfallLayout>
         {items.map((item, index) => (
           <GalleryCard
             key={item.id}
@@ -45,7 +45,7 @@ export function GalleryGrid({ items }: GalleryGridProps) {
             onDelete={() => handleDelete(item.id)}
           />
         ))}
-      </MasonryLayout>
+      </WaterfallLayout>
 
       {lightboxIndex !== null && (
         <LightboxViewer

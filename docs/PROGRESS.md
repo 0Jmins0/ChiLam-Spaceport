@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.5 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 + P6.13 已完成）
+## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.5 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 + P6.13 + P6.15 已完成）
 
 ---
 
@@ -30,6 +30,22 @@
 ---
 
 ## 详细记录
+
+### 2026-06-15 - P6.15 相册瀑布流布局（已完成）
+
+#### 完成内容
+- **WaterfallLayout 通用组件**：新建 `src/components/ui/WaterfallLayout.tsx`，CSS `columns` 真瀑布流，固定列宽、自适应高度
+- **GalleryCard 自适应比例**：去掉 `aspect-[4/3]` 固定裁剪，改用 `width/height` 保持图片原始纵横比
+- **双布局体系**：`MasonryLayout`（等高网格）+ `WaterfallLayout`（瀑布流），任何模块可按需切换
+- **相册模块切换**：Gallery 列表和合集区域改用 WaterfallLayout，其他模块不受影响
+
+#### 涉及文件
+- `src/components/ui/WaterfallLayout.tsx` — 新建瀑布流布局组件
+- `src/components/gallery/GalleryCard.tsx` — 图片自适应比例
+- `src/components/gallery/GalleryGrid.tsx` — 引用 WaterfallLayout
+- `src/app/gallery/GalleryPageClient.tsx` — 合集区域引用 WaterfallLayout
+
+---
 
 ### 2026-06-15 - P6.5 相册模块（已完成）
 
