@@ -153,7 +153,9 @@ export default function InterviewTranscript({
           className="text-base text-text-secondary italic mt-2"
           placeholder="英文标题..."
         >
-          {titleEn ? <span className="text-base text-text-secondary italic mt-2">{titleEn}</span> : null}
+          {titleEn ? (
+            <span className="text-base text-text-secondary italic mt-2">{titleEn}</span>
+          ) : null}
         </EditableText>
         <div className="flex items-center gap-3 flex-wrap">
           <span className="text-sm text-text-muted">{formatDate(date)}</span>
@@ -185,9 +187,7 @@ export default function InterviewTranscript({
               }`}
             >
               粤语原文
-              <span className="uppercase text-[9px] tracking-wider opacity-70 ml-1">
-                Cantonese
-              </span>
+              <span className="uppercase text-[9px] tracking-wider opacity-70 ml-1">Cantonese</span>
             </button>
             <button
               onClick={() => setActiveTab('mandarin')}
@@ -198,9 +198,7 @@ export default function InterviewTranscript({
               }`}
             >
               国语翻译
-              <span className="uppercase text-[9px] tracking-wider opacity-70 ml-1">
-                Mandarin
-              </span>
+              <span className="uppercase text-[9px] tracking-wider opacity-70 ml-1">Mandarin</span>
             </button>
           </div>
         </div>

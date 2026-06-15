@@ -32,7 +32,11 @@ export async function getProductions(options?: {
   const [rawItems, totalCount] = await Promise.all([
     prisma.production.findMany({
       where,
-      orderBy: [{ releaseDate: { sort: 'desc', nulls: 'last' } }, { year: 'desc' }, { createdAt: 'desc' }],
+      orderBy: [
+        { releaseDate: { sort: 'desc', nulls: 'last' } },
+        { year: 'desc' },
+        { createdAt: 'desc' },
+      ],
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: {

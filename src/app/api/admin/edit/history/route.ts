@@ -33,26 +33,17 @@ export async function GET(request: Request) {
 
     // 验证参数
     if (!entityType || !ALLOWED_ENTITY_TYPES.includes(entityType)) {
-      return NextResponse.json(
-        { error: '无效的 entityType 参数' },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: '无效的 entityType 参数' }, { status: 400 });
     }
 
     if (!entityIdStr) {
-      return NextResponse.json(
-        { error: '缺少 entityId 参数' },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: '缺少 entityId 参数' }, { status: 400 });
     }
 
     const entityId = entityIdStr;
 
     if (!field) {
-      return NextResponse.json(
-        { error: '缺少 field 参数' },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: '缺少 field 参数' }, { status: 400 });
     }
 
     // 查找最近一条编辑历史
@@ -76,9 +67,6 @@ export async function GET(request: Request) {
     });
   } catch (err) {
     console.error('[Admin Edit History] Error:', err);
-    return NextResponse.json(
-      { error: '查询编辑历史失败' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: '查询编辑历史失败' }, { status: 500 });
   }
 }

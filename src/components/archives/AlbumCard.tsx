@@ -25,10 +25,7 @@ export function AlbumCard({
   className,
 }: AlbumCardProps) {
   return (
-    <Link
-      href={`/archives/albums/${slug}`}
-      className={cn('block', className)}
-    >
+    <Link href={`/archives/albums/${slug}`} className={cn('block', className)}>
       <Card className="p-0 overflow-hidden">
         {/* Cover */}
         <div className="relative aspect-square w-full bg-bg-darker overflow-hidden">

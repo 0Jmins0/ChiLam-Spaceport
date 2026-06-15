@@ -60,9 +60,7 @@ export async function POST(request: NextRequest) {
         date: date ? new Date(date) : null,
         relatedType: relatedType || null,
         relatedId: relatedId || null,
-        items: mediaIds?.length
-          ? { connect: mediaIds.map((id: string) => ({ id })) }
-          : undefined,
+        items: mediaIds?.length ? { connect: mediaIds.map((id: string) => ({ id })) } : undefined,
       },
       include: {
         _count: { select: { items: true } },

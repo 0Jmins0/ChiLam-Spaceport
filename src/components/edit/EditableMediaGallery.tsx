@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { cn } from '@/lib/cn';
 import { useEditMode } from './EditModeProvider';
+import { LightboxViewer } from '@/components/gallery/LightboxViewer';
+import type { GalleryItem } from '@/lib/types';
 
 interface MediaItem {
   id: string;
@@ -38,6 +40,8 @@ export function EditableMediaGallery({
   const [uploadStatus, setUploadStatus] = useState<UploadStatus>('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [playingSet, setPlayingSet] = useState<Set<string>>(new Set());
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
@@ -102,7 +106,7 @@ export function EditableMediaGallery({
   return (
     <div className={cn('w-full', className)}>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        {media.map((item) => {
+        {media.map((item, index) => {
           const isVideo = item.type === 'VIDEO';
           const isRemoving = removingId === item.id;
 
@@ -112,7 +116,9 @@ export function EditableMediaGallery({
               className={cn(
                 'group relative overflow-hidden rounded-[var(--radius-card)] bg-white/5 transition-all',
                 isRemoving && 'pointer-events-none opacity-50',
+                !editMode && 'cursor-pointer',
               )}
+              onClick={!editMode ? () => setLightboxIndex(index) : undefined}
             >
               {/* 编辑模式：删除按钮 */}
               {editMode && onRemove && (
@@ -132,6 +138,25 @@ export function EditableMediaGallery({
                 </button>
               )}
 
+              {/* 非编辑模式：放大提示图标 */}
+              {!editMode && (
+                <div className="pointer-events-none absolute right-1.5 top-1.5 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100">
+                  <svg
+                    className="h-3.5 w-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"
+                    />
+                  </svg>
+                </div>
+              )}
+
               {isVideo ? (
                 <div className="relative aspect-[4/3]">
                   <video
@@ -139,15 +164,31 @@ export function EditableMediaGallery({
                     preload="metadata"
                     controls
                     className="h-full w-full object-contain"
+                    onPlay={() =>
+                      setPlayingSet((prev) => {
+                        const next = new Set(prev);
+                        next.add(item.id);
+                        return next;
+                      })
+                    }
+                    onPause={() =>
+                      setPlayingSet((prev) => {
+                        const next = new Set(prev);
+                        next.delete(item.id);
+                        return next;
+                      })
+                    }
                   />
-                  {/* 播放图标覆盖层 */}
-                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm">
-                      <svg className="ml-0.5 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
+                  {/* 播放图标覆盖层 — 仅在未播放时显示 */}
+                  {!playingSet.has(item.id) && (
+                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm">
+                        <svg className="ml-0.5 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               ) : (
                 <div className="relative aspect-[4/3]">
@@ -248,6 +289,33 @@ export function EditableMediaGallery({
         onChange={handleFileChange}
         className="hidden"
       />
+
+      {/* Lightbox（非编辑模式） */}
+      {lightboxIndex !== null && !editMode && (
+        <LightboxViewer
+          items={media.map(
+            (item): GalleryItem => ({
+              id: item.id,
+              url: item.url,
+              type: item.type,
+              category: item.type === 'VIDEO' ? 'VIDEO' : null,
+              alt: item.alt ?? null,
+              caption: null,
+              thumbnailUrl: null,
+              filename: null,
+              width: item.width ?? null,
+              height: item.height ?? null,
+              duration: null,
+              createdAt: new Date().toISOString(),
+              source: null,
+              mediaTag: null,
+            }),
+          )}
+          currentIndex={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+          onNavigate={(index) => setLightboxIndex(index)}
+        />
+      )}
     </div>
   );
 }

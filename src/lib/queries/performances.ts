@@ -32,7 +32,11 @@ export async function getPerformances(options?: {
   const [rawItems, totalCount] = await Promise.all([
     prisma.performance.findMany({
       where,
-      orderBy: [{ startDate: { sort: 'desc', nulls: 'last' } }, { year: 'desc' }, { createdAt: 'desc' }],
+      orderBy: [
+        { startDate: { sort: 'desc', nulls: 'last' } },
+        { year: 'desc' },
+        { createdAt: 'desc' },
+      ],
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: {

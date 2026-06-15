@@ -132,13 +132,7 @@ export function LightboxViewer({ items, currentIndex, onClose, onNavigate }: Lig
             {current.filename && (
               <p className="max-w-sm truncate text-sm text-white/70">{current.filename}</p>
             )}
-            <audio
-              key={current.id}
-              src={current.url}
-              controls
-              autoPlay
-              className="w-80"
-            />
+            <audio key={current.id} src={current.url} controls autoPlay className="w-80" />
           </div>
         ) : (
           <Image

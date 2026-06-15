@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  type ReactNode,
-} from 'react';
+import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 
 interface EditModeContextType {
@@ -31,7 +25,11 @@ export function EditModeProvider({ children }: { children: ReactNode }) {
 
   const isAdmin = user?.role === 'ADMIN';
   // Use user_token for admin API calls
-  const adminToken = isAdmin ? (typeof window !== 'undefined' ? localStorage.getItem('user_token') : null) : null;
+  const adminToken = isAdmin
+    ? typeof window !== 'undefined'
+      ? localStorage.getItem('user_token')
+      : null
+    : null;
 
   const { openLogin } = useAuth();
 

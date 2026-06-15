@@ -31,10 +31,7 @@ export function MagazineCard({
   className,
 }: MagazineCardProps) {
   return (
-    <Link
-      href={`/archives/magazines/${slug}`}
-      className={cn('block', className)}
-    >
+    <Link href={`/archives/magazines/${slug}`} className={cn('block', className)}>
       <Card className="p-0 overflow-hidden">
         {/* Cover */}
         <div className="relative aspect-[3/4] w-full bg-bg-darker overflow-hidden">

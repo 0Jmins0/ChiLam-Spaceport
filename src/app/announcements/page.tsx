@@ -33,11 +33,7 @@ export default async function AnnouncementsPage({
 
   return (
     <PageContainer>
-      <PageHeader
-        title="公告"
-        titleEn="Announcements"
-        description="「停水停电不另行通知」板"
-      />
+      <PageHeader title="公告" titleEn="Announcements" description="「停水停电不另行通知」板" />
 
       <AnnouncementsFilterBar currentTab={type || 'notice'} counts={counts} />
 

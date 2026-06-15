@@ -5,13 +5,7 @@ import { prisma } from '@/lib/db';
 import { verifyAdmin } from '@/lib/auth';
 
 /** 需要 parseInt 的整数字段 */
-const INTEGER_FIELDS = new Set([
-  'year',
-  'startYear',
-  'endYear',
-  'releaseYear',
-  'duration',
-]);
+const INTEGER_FIELDS = new Set(['year', 'startYear', 'endYear', 'releaseYear', 'duration']);
 
 /** 需要 Date 解析的字段 */
 const DATE_FIELDS = new Set(['releaseDate', 'publishDate']);
@@ -82,10 +76,7 @@ export async function POST(request: Request) {
 
     // 验证参数
     if (!ALLOWED_ENTITY_TYPES.includes(entityType)) {
-      return NextResponse.json(
-        { error: `不支持的实体类型: ${entityType}` },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: `不支持的实体类型: ${entityType}` }, { status: 400 });
     }
 
     if (!entityId || typeof entityId !== 'string') {
@@ -103,27 +94,18 @@ export async function POST(request: Request) {
     });
 
     if (!history) {
-      return NextResponse.json(
-        { error: '无可撤销的编辑' },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: '无可撤销的编辑' }, { status: 404 });
     }
 
     const model = getPrismaModel(entityType);
     if (!model) {
-      return NextResponse.json(
-        { error: `不支持的实体类型: ${entityType}` },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: `不支持的实体类型: ${entityType}` }, { status: 400 });
     }
 
     // 确认实体存在
     const entity = await model.findUnique({ where: { id: entityId } });
     if (!entity) {
-      return NextResponse.json(
-        { error: `${entityType} #${entityId} 不存在` },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: `${entityType} #${entityId} 不存在` }, { status: 404 });
     }
 
     // 恢复旧值
@@ -145,9 +127,6 @@ export async function POST(request: Request) {
     });
   } catch (err) {
     console.error('[Admin Edit Undo] Error:', err);
-    return NextResponse.json(
-      { error: '撤销失败，请稍后重试' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: '撤销失败，请稍后重试' }, { status: 500 });
   }
 }

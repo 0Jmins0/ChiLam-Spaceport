@@ -234,7 +234,8 @@ export default function InterviewSidebar({
         >
           <span>&larr;</span>
           <span>
-            返回霖言霖语 / <span className="uppercase tracking-wider text-xs">Back to Interviews</span>
+            返回霖言霖语 /{' '}
+            <span className="uppercase tracking-wider text-xs">Back to Interviews</span>
           </span>
         </Link>
       </div>

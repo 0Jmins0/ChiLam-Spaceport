@@ -13,12 +13,7 @@ interface GalleryCardProps {
   priority?: boolean;
 }
 
-export function GalleryCard({
-  item,
-  onClick,
-  onDelete,
-  priority = false,
-}: GalleryCardProps) {
+export function GalleryCard({ item, onClick, onDelete, priority = false }: GalleryCardProps) {
   const { editMode } = useEditMode();
   const [deleting, setDeleting] = useState(false);
   const isVideo = item.category === 'VIDEO' || item.type === 'VIDEO';
@@ -26,12 +21,7 @@ export function GalleryCard({
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (
-      !confirm(
-        '确定删除此媒体文件？此操作不可撤销，R2 文件和所有关联引用都将被清除。',
-      )
-    )
-      return;
+    if (!confirm('确定删除此媒体文件？此操作不可撤销，R2 文件和所有关联引用都将被清除。')) return;
     setDeleting(true);
     onDelete?.();
   };
@@ -58,11 +48,7 @@ export function GalleryCard({
             strokeWidth={2.5}
             viewBox="0 0 24 24"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </div>
       )}
@@ -83,11 +69,7 @@ export function GalleryCard({
           {isVideo && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/20">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm">
-                <svg
-                  className="ml-1 h-5 w-5"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="ml-1 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
                 </svg>
               </div>

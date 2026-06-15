@@ -163,7 +163,14 @@ export function EditableImage({
           <div className="flex flex-col items-center gap-3">
             {/* Spinner */}
             <svg className="h-6 w-6 animate-spin text-accent" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="3"
+              />
               <path
                 className="opacity-75"
                 fill="currentColor"
@@ -185,7 +192,13 @@ export function EditableImage({
 
         {status === 'done' && (
           <div className="flex flex-col items-center gap-1 text-green-400">
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
             </svg>
             <span className="text-xs">已更新</span>

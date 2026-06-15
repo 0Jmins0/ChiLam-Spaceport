@@ -24,10 +24,7 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> },
-) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const admin = await verifyAdmin(request);
     if (!admin) {
@@ -36,7 +33,16 @@ export async function PUT(
 
     const { slug } = await params;
     const body = await request.json();
-    const { title, description, date, coverId, relatedType, relatedId, addMediaIds, removeMediaIds } = body;
+    const {
+      title,
+      description,
+      date,
+      coverId,
+      relatedType,
+      relatedId,
+      addMediaIds,
+      removeMediaIds,
+    } = body;
 
     const existing = await prisma.mediaCollection.findUnique({ where: { slug } });
     if (!existing) {

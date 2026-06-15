@@ -10,11 +10,7 @@ interface CreateEntryTriggerProps {
   label?: string;
 }
 
-export function CreateEntryTrigger({
-  entityType,
-  defaultValues,
-  label,
-}: CreateEntryTriggerProps) {
+export function CreateEntryTrigger({ entityType, defaultValues, label }: CreateEntryTriggerProps) {
   const [open, setOpen] = useState(false);
 
   return (

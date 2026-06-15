@@ -94,11 +94,7 @@ export function GalleryFilterBar({
       {secondaryTags && (
         <div className="flex flex-wrap gap-2">
           {secondaryTags.map((tag) => (
-            <Tag
-              key={tag.key}
-              active={currentTag === tag.key}
-              onClick={() => onTagChange(tag.key)}
-            >
+            <Tag key={tag.key} active={currentTag === tag.key} onClick={() => onTagChange(tag.key)}>
               {tag.label}
             </Tag>
           ))}

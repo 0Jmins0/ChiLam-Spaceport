@@ -53,7 +53,11 @@ export default async function PerformancesPage({
           counts={counts}
           className="flex-1"
         />
-        <CreateEntryTrigger entityType="performance" defaultValues={{ type: type || 'CONCERT' }} label="新增演出" />
+        <CreateEntryTrigger
+          entityType="performance"
+          defaultValues={{ type: type || 'CONCERT' }}
+          label="新增演出"
+        />
       </div>
 
       {data.items.length > 0 ? (

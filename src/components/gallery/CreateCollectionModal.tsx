@@ -10,10 +10,7 @@ interface CreateCollectionModalProps {
   onClose: () => void;
 }
 
-export function CreateCollectionModal({
-  isOpen,
-  onClose,
-}: CreateCollectionModalProps) {
+export function CreateCollectionModal({ isOpen, onClose }: CreateCollectionModalProps) {
   const router = useRouter();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -140,9 +137,7 @@ export function CreateCollectionModal({
 
         {/* 媒体选择 */}
         <div className="mt-6">
-          <p className="mb-2 text-sm text-white/60">
-            选择媒体（已选 {selectedIds.size} 项）
-          </p>
+          <p className="mb-2 text-sm text-white/60">选择媒体（已选 {selectedIds.size} 项）</p>
           <div className="grid max-h-60 grid-cols-5 gap-2 overflow-y-auto rounded border border-white/5 bg-white/[0.02] p-2">
             {mediaItems.map((item) => (
               <button
@@ -170,20 +165,14 @@ export function CreateCollectionModal({
                       strokeWidth={3}
                       viewBox="0 0 24 24"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M5 13l4 4L19 7"
-                      />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
                 )}
               </button>
             ))}
             {mediaItems.length === 0 && (
-              <p className="col-span-5 py-8 text-center text-sm text-white/30">
-                暂无可选媒体
-              </p>
+              <p className="col-span-5 py-8 text-center text-sm text-white/30">暂无可选媒体</p>
             )}
           </div>
         </div>
@@ -220,11 +209,7 @@ export function CreateCollectionModal({
             strokeWidth={2}
             viewBox="0 0 24 24"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>

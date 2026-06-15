@@ -59,7 +59,12 @@ export default async function MagazineDetailPage({
       <div className="flex flex-col md:flex-row gap-8">
         {/* Left: cover */}
         <div className="w-full md:w-[300px] shrink-0">
-          <EditableImage src={magazine.coverUrl} entityType="magazine" entityId={magazine.id} field="coverId">
+          <EditableImage
+            src={magazine.coverUrl}
+            entityType="magazine"
+            entityId={magazine.id}
+            field="coverId"
+          >
             <div className="relative aspect-[2/3] overflow-hidden rounded-[var(--radius-card)]">
               {magazine.coverUrl ? (
                 <Image
@@ -81,7 +86,13 @@ export default async function MagazineDetailPage({
         {/* Right: info */}
         <div className="flex-1 space-y-4">
           {/* Title */}
-          <EditableText value={magazine.title} entityType="magazine" entityId={magazine.id} field="title" className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
+          <EditableText
+            value={magazine.title}
+            entityType="magazine"
+            entityId={magazine.id}
+            field="title"
+            className="font-heading text-2xl md:text-3xl font-semibold text-text-primary"
+          >
             <h1 className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
               {magazine.title}
             </h1>
@@ -89,7 +100,14 @@ export default async function MagazineDetailPage({
 
           {/* Meta info */}
           <p className="text-sm text-text-muted">
-            <EditableText value={magazine.issue || ''} entityType="magazine" entityId={magazine.id} field="issue" placeholder="期号..." className="inline">
+            <EditableText
+              value={magazine.issue || ''}
+              entityType="magazine"
+              entityId={magazine.id}
+              field="issue"
+              placeholder="期号..."
+              className="inline"
+            >
               {magazine.issue && <span>{magazine.issue}</span>}
             </EditableText>
             {magazine.issue && <span> · </span>}

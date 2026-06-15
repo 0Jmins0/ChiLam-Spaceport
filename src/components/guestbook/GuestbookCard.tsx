@@ -70,20 +70,12 @@ export function GuestbookCard({ item, className, currentUserId }: GuestbookCardP
 
         {/* 内容（可能带缩略图） */}
         <div
-          className={cn(
-            'flex-1',
-            hasBackground && 'relative z-10',
-            hasThumbnail && 'flex gap-3',
-          )}
+          className={cn('flex-1', hasBackground && 'relative z-10', hasThumbnail && 'flex gap-3')}
         >
           {hasThumbnail && (
             <div className="flex-shrink-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={item.thumbnail!}
-                alt=""
-                className="h-16 w-16 rounded object-cover"
-              />
+              <img src={item.thumbnail!} alt="" className="h-16 w-16 rounded object-cover" />
             </div>
           )}
           <p className="text-sm leading-relaxed text-text-secondary">{truncatedContent}</p>

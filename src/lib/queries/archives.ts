@@ -28,7 +28,11 @@ export async function getAlbums(options?: {
   const [rawItems, totalCount] = await Promise.all([
     prisma.album.findMany({
       where,
-      orderBy: [{ releaseDate: { sort: 'desc', nulls: 'last' } }, { releaseYear: 'desc' }, { createdAt: 'desc' }],
+      orderBy: [
+        { releaseDate: { sort: 'desc', nulls: 'last' } },
+        { releaseYear: 'desc' },
+        { createdAt: 'desc' },
+      ],
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: {

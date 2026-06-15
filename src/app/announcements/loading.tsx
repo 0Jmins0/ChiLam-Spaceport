@@ -5,11 +5,7 @@ import { AnnouncementCardSkeleton } from '@/components/announcements/Announcemen
 export default function AnnouncementsLoading() {
   return (
     <PageContainer>
-      <PageHeader
-        title="公告"
-        titleEn="Announcements"
-        description="「停水停电不另行通知」板"
-      />
+      <PageHeader title="公告" titleEn="Announcements" description="「停水停电不另行通知」板" />
 
       {/* Tab skeleton */}
       <div className="mb-8 space-y-4">

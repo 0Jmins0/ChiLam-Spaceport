@@ -59,7 +59,12 @@ export default async function AlbumDetailPage({ params }: { params: Promise<{ sl
       <div className="flex flex-col md:flex-row gap-8">
         {/* Left: cover */}
         <div className="w-full md:w-[300px] shrink-0">
-          <EditableImage src={album.coverUrl} entityType="album" entityId={album.id} field="coverId">
+          <EditableImage
+            src={album.coverUrl}
+            entityType="album"
+            entityId={album.id}
+            field="coverId"
+          >
             <div className="relative aspect-[1/1] overflow-hidden rounded-[var(--radius-card)]">
               {album.coverUrl ? (
                 <Image
@@ -84,7 +89,13 @@ export default async function AlbumDetailPage({ params }: { params: Promise<{ sl
           {album.language && <Tag active>{album.language}</Tag>}
 
           {/* Title */}
-          <EditableText value={album.title} entityType="album" entityId={album.id} field="title" className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
+          <EditableText
+            value={album.title}
+            entityType="album"
+            entityId={album.id}
+            field="title"
+            className="font-heading text-2xl md:text-3xl font-semibold text-text-primary"
+          >
             <h1 className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
               {album.title}
             </h1>
@@ -92,11 +103,25 @@ export default async function AlbumDetailPage({ params }: { params: Promise<{ sl
 
           {/* Meta info */}
           <div className="flex flex-wrap items-center gap-x-1 text-sm text-text-muted">
-            <EditableText value={album.releaseYear?.toString() || ''} entityType="album" entityId={album.id} field="releaseYear" placeholder="发行年份..." className="text-sm text-text-muted">
+            <EditableText
+              value={album.releaseYear?.toString() || ''}
+              entityType="album"
+              entityId={album.id}
+              field="releaseYear"
+              placeholder="发行年份..."
+              className="text-sm text-text-muted"
+            >
               {album.releaseYear ? <span>{album.releaseYear}</span> : null}
             </EditableText>
             {album.releaseYear && album.language && <span>·</span>}
-            <EditableText value={album.language || ''} entityType="album" entityId={album.id} field="language" placeholder="语言..." className="text-sm text-text-muted">
+            <EditableText
+              value={album.language || ''}
+              entityType="album"
+              entityId={album.id}
+              field="language"
+              placeholder="语言..."
+              className="text-sm text-text-muted"
+            >
               {album.language ? <span>{album.language}</span> : null}
             </EditableText>
           </div>
