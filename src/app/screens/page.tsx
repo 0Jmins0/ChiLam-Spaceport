@@ -44,7 +44,7 @@ export default async function ScreensPage({
 
   return (
     <PageContainer>
-      <PageHeader title="影视综" titleEn="Screens" description="电影 · 电视剧 · 综艺" />
+      <PageHeader title="影视综" titleEn="Screens" description="感受光影之间，戏里戏外的每份真心" />
 
       <div className="flex items-center justify-between gap-4 mb-8">
         <ScreensFilterBar currentTab={tab} currentRoleType={roleType} counts={counts} className="flex-1" />

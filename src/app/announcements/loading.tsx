@@ -8,7 +8,7 @@ export default function AnnouncementsLoading() {
       <PageHeader
         title="公告"
         titleEn="Announcements"
-        description="网站公告 · 规则说明 · 更新通知"
+        description="「停水停电不另行通知」板"
       />
 
       {/* Tab skeleton */}

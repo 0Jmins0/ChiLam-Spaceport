@@ -6,7 +6,7 @@ import { MasonryGrid } from '@/components/updates/MasonryGrid';
 export default function UpdatesLoading() {
   return (
     <PageContainer>
-      <PageHeader title="动态" titleEn="Updates" description="社交媒体 · 新闻报道 · 路透" />
+      <PageHeader title="动态" titleEn="Updates" description="关注他的每一个日常" />
       {/* Tab bar skeleton */}
       <div className="mb-8 h-10 w-64 animate-pulse rounded bg-bg-darker" />
       <MasonryGrid>

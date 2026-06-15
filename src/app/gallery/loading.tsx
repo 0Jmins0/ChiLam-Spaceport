@@ -4,7 +4,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 export default function GalleryLoading() {
   return (
     <PageContainer>
-      <PageHeader title="相册" titleEn="Gallery" description="图片 · 视频 · 音频 · 合集" />
+      <PageHeader title="相册" titleEn="Gallery" description="留住每个精彩的瞬间" />
 
       {/* Tab 骨架 */}
       <div className="mb-8 space-y-4">

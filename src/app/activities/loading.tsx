@@ -5,7 +5,7 @@ import { ActivityCardSkeleton } from '@/components/activities/ActivityCardSkelet
 export default function ActivitiesLoading() {
   return (
     <PageContainer>
-      <PageHeader title="活动" titleEn="Activities" description="广告代言 · 访谈" />
+      <PageHeader title="活动" titleEn="Activities" description="捕捉台前幕后的每一次亮相" />
 
       {/* Tab skeleton */}
       <div className="mb-8 space-y-4">

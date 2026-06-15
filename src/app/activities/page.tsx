@@ -44,7 +44,7 @@ export default async function ActivitiesPage({
 
   return (
     <PageContainer>
-      <PageHeader title="活动" titleEn="Activities" description="广告代言 · 直播" />
+      <PageHeader title="活动" titleEn="Activities" description="捕捉台前幕后的每一次亮相" />
 
       <div className="flex items-center justify-between gap-4 mb-8">
         <ActivitiesFilterBar

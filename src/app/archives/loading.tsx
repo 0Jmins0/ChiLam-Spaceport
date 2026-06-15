@@ -5,7 +5,7 @@ import { ArchiveCardSkeleton } from '@/components/archives/ArchiveCardSkeleton';
 export default function ArchivesLoading() {
   return (
     <PageContainer>
-      <PageHeader title="资料库" titleEn="Archives" description="专辑 · 杂志" />
+      <PageHeader title="资料库" titleEn="Archives" description="珍藏岁月故事的每一页" />
 
       {/* Tab skeleton */}
       <div className="mb-8 space-y-4">

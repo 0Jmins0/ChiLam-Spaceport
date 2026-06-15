@@ -36,7 +36,7 @@ export default async function AnnouncementsPage({
       <PageHeader
         title="公告"
         titleEn="Announcements"
-        description="网站公告 · 规则说明 · 更新通知"
+        description="「停水停电不另行通知」板"
       />
 
       <AnnouncementsFilterBar currentTab={type || 'notice'} counts={counts} />

@@ -44,7 +44,7 @@ export default async function PerformancesPage({
 
   return (
     <PageContainer>
-      <PageHeader title="演出" titleEn="Performances" description="演唱会 · 舞台 · 音乐剧" />
+      <PageHeader title="演出" titleEn="Performances" description="凝望聚光灯下，永远闪耀的他" />
 
       <div className="flex items-center justify-between gap-4 mb-8">
         <PerformancesFilterBar

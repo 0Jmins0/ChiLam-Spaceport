@@ -28,7 +28,7 @@ export default async function GalleryPage({
 
     return (
       <PageContainer>
-        <PageHeader title="相册" titleEn="Gallery" description="图片 · 视频 · 音频 · 合集" />
+        <PageHeader title="相册" titleEn="Gallery" description="留住每个精彩的瞬间" />
 
         <GalleryPageClient
           tab={tab}
@@ -62,7 +62,7 @@ export default async function GalleryPage({
 
   return (
     <PageContainer>
-      <PageHeader title="相册" titleEn="Gallery" description="图片 · 视频 · 音频 · 合集" />
+      <PageHeader title="相册" titleEn="Gallery" description="留住每个精彩的瞬间" />
 
       <GalleryPageClient
         tab={tab}

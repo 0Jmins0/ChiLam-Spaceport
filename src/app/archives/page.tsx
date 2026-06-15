@@ -38,7 +38,7 @@ export default async function ArchivesPage({
 
   return (
     <PageContainer>
-      <PageHeader title="资料库" titleEn="Archives" description="专辑 · 杂志" />
+      <PageHeader title="资料库" titleEn="Archives" description="珍藏岁月故事的每一页" />
 
       <div className="flex items-center justify-between gap-4 mb-8">
         <ArchivesFilterBar

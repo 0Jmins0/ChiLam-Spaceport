@@ -8,7 +8,7 @@ export default function MessagesLoading() {
       <PageHeader
         title="留言板"
         titleEn="Guestbook"
-        description="我想对你说 · 故事分享 · 建议反馈"
+        description="说给你听的心意，和与你同行的幸福点滴"
       />
 
       {/* Tab skeleton */}

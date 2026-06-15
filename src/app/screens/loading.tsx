@@ -5,7 +5,7 @@ import { ProductionCardSkeleton } from '@/components/screens/ProductionCardSkele
 export default function ScreensLoading() {
   return (
     <PageContainer>
-      <PageHeader title="影视综" titleEn="Screens" description="电影 · 电视剧 · 综艺" />
+      <PageHeader title="影视综" titleEn="Screens" description="感受光影之间，戏里戏外的每份真心" />
 
       {/* Tab 骨架 */}
       <div className="mb-8 space-y-4">

@@ -5,7 +5,7 @@ import { PerformanceCardSkeleton } from '@/components/performances/PerformanceCa
 export default function PerformancesLoading() {
   return (
     <PageContainer>
-      <PageHeader title="演出" titleEn="Performances" description="演唱会 · 舞台 · 音乐剧" />
+      <PageHeader title="演出" titleEn="Performances" description="凝望聚光灯下，永远闪耀的他" />
 
       {/* Filter bar skeleton */}
       <div className="space-y-4">

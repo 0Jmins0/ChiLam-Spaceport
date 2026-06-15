@@ -157,7 +157,7 @@ export default async function UpdatesPage({
 
   return (
     <PageContainer>
-      <PageHeader title="动态" titleEn="Updates" description="社交媒体 · 新闻报道 · 路透" />
+      <PageHeader title="动态" titleEn="Updates" description="关注他的每一个日常" />
       <UpdatesFilterBar
         currentTab={tab}
         currentPlatform={platform}
