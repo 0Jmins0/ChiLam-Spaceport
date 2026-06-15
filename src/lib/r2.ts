@@ -11,6 +11,7 @@ function getR2Client() {
   return new S3Client({
     region: 'auto',
     endpoint: `https://${getEnv('R2_ACCOUNT_ID')}.r2.cloudflarestorage.com`,
+    forcePathStyle: true,
     credentials: {
       accessKeyId: getEnv('R2_ACCESS_KEY_ID'),
       secretAccessKey: getEnv('R2_SECRET_ACCESS_KEY'),
@@ -34,7 +35,7 @@ export const ALLOWED_TYPES = [
 // 文件大小限制（字节）
 export const SIZE_LIMITS: Record<string, number> = {
   image: 10 * 1024 * 1024, // 10MB
-  video: 100 * 1024 * 1024, // 100MB
+  video: 512 * 1024 * 1024, // 512MB
   audio: 50 * 1024 * 1024, // 50MB
   file: 20 * 1024 * 1024, // 20MB
 };

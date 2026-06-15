@@ -1,0 +1,11 @@
+# Local media files (videos/images should be on R2, not deployed)
+media/
+
+# Documentation
+docs/
+
+# Prisma migrations (not needed at runtime)
+# prisma/migrations/
+
+# Scripts
+scripts/

@@ -18,7 +18,7 @@
 
   /* === 字体 === */
   --font-heading: 'Playfair Display', 'Noto Serif SC', serif;
-  --font-body: 'Inter', 'Noto Sans SC', sans-serif;
+  --font-body: 'Noto Serif SC', 'Playfair Display', serif;
   --font-display: 'Cormorant Garamond', serif;
 
   /* === 间距 === */

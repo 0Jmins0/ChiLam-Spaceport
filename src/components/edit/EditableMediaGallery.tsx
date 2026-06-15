@@ -62,20 +62,69 @@ export function EditableMediaGallery({
     setErrorMsg('');
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('target', entityType);
-      formData.append('targetId', entityId);
-      formData.append('relation', relation);
-
-      const res = await fetch('/api/upload', {
+      // Step 1: 获取预签名 URL
+      const presignRes = await fetch('/api/upload/presign', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          filename: file.name,
+          mimeType: file.type,
+          fileSize: file.size,
+        }),
       });
 
-      if (!res.ok) {
-        const errData = await res.json().catch(() => null);
-        throw new Error(errData?.error || '上传失败');
+      if (!presignRes.ok) {
+        const errData = await presignRes.json().catch(() => null);
+        throw new Error(errData?.error || '获取上传链接失败');
+      }
+
+      const { uploadUrl, publicUrl, key } = await presignRes.json();
+
+      // Step 2: 直传 R2
+      console.log('[Upload] Step 2: PUT to R2', {
+        uploadUrl: uploadUrl.substring(0, 80) + '...',
+        fileSize: file.size,
+        fileType: file.type,
+      });
+      let uploadRes: Response;
+      try {
+        uploadRes = await fetch(uploadUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': file.type },
+          body: file,
+        });
+      } catch (networkErr) {
+        console.error('[Upload] Step 2 network error:', networkErr);
+        throw new Error(
+          `直传 R2 失败: ${networkErr instanceof Error ? networkErr.message : '网络错误'}`,
+        );
+      }
+
+      if (!uploadRes.ok) {
+        const errText = await uploadRes.text().catch(() => '');
+        console.error('[Upload] Step 2 response error:', uploadRes.status, errText);
+        throw new Error(`文件上传失败 (${uploadRes.status})`);
+      }
+
+      // Step 3: 确认并创建 Media 记录 + 绑定
+      const confirmRes = await fetch('/api/upload/confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          key,
+          url: publicUrl,
+          filename: file.name,
+          mimeType: file.type,
+          size: file.size,
+          target: entityType,
+          targetId: entityId,
+          relation: relation,
+        }),
+      });
+
+      if (!confirmRes.ok) {
+        const errData = await confirmRes.json().catch(() => null);
+        throw new Error(errData?.error || '确认上传失败');
       }
 
       setUploadStatus('done');
@@ -145,7 +194,10 @@ export function EditableMediaGallery({
                     e.stopPropagation();
                     setLightboxIndex(index);
                   }}
-                  className="absolute right-1.5 top-1.5 z-10 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-black/70"
+                  className={cn(
+                    'absolute right-1.5 top-1.5 z-20 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-black/50 text-white transition-opacity hover:bg-black/70',
+                    isVideo ? 'opacity-70' : 'opacity-0 group-hover:opacity-100',
+                  )}
                 >
                   <svg
                     className="h-3.5 w-3.5"
@@ -167,7 +219,8 @@ export function EditableMediaGallery({
                 <div className="relative aspect-[4/3]">
                   <video
                     src={item.url}
-                    preload="metadata"
+                    preload="auto"
+                    playsInline
                     controls
                     className="h-full w-full object-contain"
                     onPlay={() =>

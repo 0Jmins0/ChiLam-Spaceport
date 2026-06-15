@@ -10,7 +10,7 @@ interface EditableTextProps {
   entityType: string;
   entityId: string;
   field: string;
-  as?: 'h1' | 'h2' | 'p' | 'span';
+  as?: 'h1' | 'h2' | 'p' | 'span' | 'div';
   multiline?: boolean;
   className?: string;
   placeholder?: string;

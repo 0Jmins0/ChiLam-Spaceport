@@ -24,6 +24,14 @@ ipconfig getifaddr en0
 unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY && npx prisma db push
 ```
 
+
+4. 手动部署
+
+```bash
+vercel              # 部署到预览环境（生成临时链接，可先检查效果）
+vercel --prod       # 部署到生产环境
+```
+
 ---
 
 ## 一、Supabase (PostgreSQL 数据库)
