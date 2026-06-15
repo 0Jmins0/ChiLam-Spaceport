@@ -24,11 +24,18 @@ export async function getEndorsements(options?: {
   const [rawItems, totalCount] = await Promise.all([
     prisma.endorsement.findMany({
       where,
-      orderBy: [{ startDate: { sort: 'desc', nulls: 'last' } }, { startYear: 'desc' }, { createdAt: 'desc' }],
+      orderBy: [
+        { startDate: { sort: 'desc', nulls: 'last' } },
+        { startYear: 'desc' },
+        { createdAt: 'desc' },
+      ],
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: {
-        media: { select: { url: true, alt: true, width: true, height: true } },
+        coverImage: { select: { url: true } },
+        media: {
+          select: { id: true, url: true, type: true, alt: true, width: true, height: true },
+        },
         tags: tagSelect,
       },
     }),
@@ -37,7 +44,7 @@ export async function getEndorsements(options?: {
 
   const totalPages = Math.ceil(totalCount / pageSize);
 
-  const items: EndorsementItem[] = rawItems.map(({ media, ...rest }) => ({
+  const items: EndorsementItem[] = rawItems.map(({ media, coverImage, ...rest }) => ({
     id: rest.id,
     slug: rest.slug,
     brand: rest.brand,
@@ -46,6 +53,7 @@ export async function getEndorsements(options?: {
     description: rest.description,
     startYear: rest.startYear,
     endYear: rest.endYear,
+    coverImageUrl: coverImage?.url ?? null,
     mediaUrls: media,
     tags: rest.tags,
   }));
@@ -64,14 +72,15 @@ export async function getEndorsementBySlug(slug: string): Promise<EndorsementDet
   const raw = await prisma.endorsement.findUnique({
     where: { slug },
     include: {
-      media: { select: { url: true, alt: true, width: true, height: true } },
+      coverImage: { select: { url: true } },
+      media: { select: { id: true, url: true, type: true, alt: true, width: true, height: true } },
       tags: tagSelect,
     },
   });
 
   if (!raw) return null;
 
-  const { media, ...rest } = raw;
+  const { media, coverImage, ...rest } = raw;
 
   return {
     id: rest.id,
@@ -82,6 +91,7 @@ export async function getEndorsementBySlug(slug: string): Promise<EndorsementDet
     description: rest.description,
     startYear: rest.startYear,
     endYear: rest.endYear,
+    coverImageUrl: coverImage?.url ?? null,
     mediaUrls: media,
     tags: rest.tags,
   };
@@ -146,7 +156,7 @@ export async function getLivestreamBySlug(slug: string): Promise<LivestreamDetai
     where: { slug },
     include: {
       coverImage: { select: { url: true } },
-      media: { select: { url: true, type: true } },
+      media: { select: { id: true, url: true, type: true, alt: true, width: true, height: true } },
       tags: tagSelect,
     },
   });
@@ -165,7 +175,14 @@ export async function getLivestreamBySlug(slug: string): Promise<LivestreamDetai
     duration: raw.duration,
     coverImageUrl: raw.coverImage?.url ?? null,
     tags: raw.tags,
-    media: raw.media.map((m) => ({ url: m.url, type: m.type })),
+    media: raw.media.map((m) => ({
+      id: m.id,
+      url: m.url,
+      type: m.type,
+      alt: m.alt,
+      width: m.width,
+      height: m.height,
+    })),
   };
 }
 

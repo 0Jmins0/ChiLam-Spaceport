@@ -36,6 +36,7 @@ const DIRECT_FK_MAP: Record<string, DirectFKConfig> = {
   'magazine:cover': { model: 'magazine', fkField: 'coverId' },
   'interview:media': { model: 'interview', fkField: 'originalMediaId' },
   'livestream:cover': { model: 'livestream', fkField: 'coverImageId' },
+  'endorsement:cover': { model: 'endorsement', fkField: 'coverImageId' },
 };
 
 const MANY_TO_MANY_MAP: Record<string, ManyToManyConfig> = {
@@ -47,6 +48,7 @@ const MANY_TO_MANY_MAP: Record<string, ManyToManyConfig> = {
   'magazine:scans': { model: 'magazine', relationField: 'scans' },
   'livestream:media': { model: 'livestream', relationField: 'media' },
   'newsArticle:media': { model: 'newsArticle', relationField: 'mediaItems' },
+  'interview:gallery': { model: 'interview', relationField: 'gallery' },
 };
 
 async function findRecord(model: string, id: string) {

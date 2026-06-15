@@ -34,9 +34,11 @@ export default async function InterviewDetailPage({
   if (!interview) notFound();
 
   const galleryImages = (interview.galleryImages ?? []).map(
-    (img: { url: string; alt?: string | null }) => ({
+    (img: { id: string; url: string; alt?: string | null; type: string }) => ({
+      id: img.id,
       url: img.url,
       alt: img.alt ?? null,
+      type: img.type,
     }),
   );
 

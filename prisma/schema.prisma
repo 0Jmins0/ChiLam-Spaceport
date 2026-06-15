@@ -185,6 +185,7 @@ model Media {
   coverOfMagazines      Magazine[]         @relation("MagazineCover")
   originalOfInterviews  Interview[]        @relation("InterviewOriginalMedia")
   coverOfLivestreams    Livestream[]       @relation("LivestreamCover")
+  coverOfEndorsements   Endorsement[]      @relation("EndorsementCover")
   performanceMediaFiles PerformanceMedia[] @relation("PerformanceMediaFile")
 
   // 多对多反向关系
@@ -365,6 +366,10 @@ model Endorsement {
   startYear   Int       @map("start_year")
   endYear     Int?      @map("end_year")
   startDate   DateTime? @map("start_date")
+
+  // 封面图 (直接FK)
+  coverImage   Media?   @relation("EndorsementCover", fields: [coverImageId], references: [id])
+  coverImageId String?  @map("cover_image_id")
 
   // 素材 (多对多)
   media Media[] @relation("EndorsementMedia")

@@ -5,11 +5,7 @@ import { EndorsementCard } from '@/components/activities/EndorsementCard';
 import { LivestreamCard } from '@/components/activities/LivestreamCard';
 import { MasonryLayout } from '@/components/ui/MasonryLayout';
 import { Pagination } from '@/components/updates/Pagination';
-import {
-  getEndorsements,
-  getLivestreams,
-  getActivityCounts,
-} from '@/lib/queries/activities';
+import { getEndorsements, getLivestreams, getActivityCounts } from '@/lib/queries/activities';
 import { CreateEntryTrigger } from '@/components/edit/CreateEntryTrigger';
 
 export const metadata = { title: '活动' };
@@ -35,9 +31,7 @@ export default async function ActivitiesPage({
 
   const [counts, data] = await Promise.all([
     getActivityCounts(),
-    tab === 'livestream'
-      ? getLivestreams({ platform, page })
-      : getEndorsements({ page }),
+    tab === 'livestream' ? getLivestreams({ platform, page }) : getEndorsements({ page }),
   ]);
 
   const baseUrl = buildBaseUrl(tab, platform);
@@ -75,6 +69,7 @@ export default async function ActivitiesPage({
                   category={endorsement.category ?? undefined}
                   startYear={endorsement.startYear}
                   endYear={endorsement.endYear ?? undefined}
+                  coverImageUrl={endorsement.coverImageUrl ?? undefined}
                   mediaUrl={endorsement.mediaUrls[0]?.url}
                 />
               );
@@ -95,6 +90,7 @@ export default async function ActivitiesPage({
                   date={livestream.date}
                   duration={livestream.duration ?? undefined}
                   replayUrl={livestream.replayUrl ?? undefined}
+                  coverImageUrl={livestream.coverImageUrl ?? undefined}
                 />
               );
             })}

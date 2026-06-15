@@ -70,7 +70,7 @@ export async function getInterviewBySlug(slug: string): Promise<InterviewDetail 
     include: {
       tags: tagSelect,
       originalMedia: { select: { url: true } },
-      gallery: { select: { url: true, alt: true } },
+      gallery: { select: { id: true, url: true, alt: true, type: true } },
     },
   });
 

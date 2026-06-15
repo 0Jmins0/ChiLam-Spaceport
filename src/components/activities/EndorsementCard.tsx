@@ -12,6 +12,7 @@ interface EndorsementCardProps {
   category?: string;
   startYear: number;
   endYear?: number;
+  coverImageUrl?: string;
   mediaUrl?: string;
   className?: string;
 }
@@ -23,22 +24,20 @@ export function EndorsementCard({
   category,
   startYear,
   endYear,
+  coverImageUrl,
   mediaUrl,
   className,
 }: EndorsementCardProps) {
   const yearRange = endYear ? `${startYear}-${endYear}` : `${startYear}-至今`;
 
   return (
-    <Link
-      href={`/activities/endorsements/${slug}`}
-      className={cn('block', className)}
-    >
+    <Link href={`/activities/endorsements/${slug}`} className={cn('block', className)}>
       <Card className="p-0 overflow-hidden">
         {/* Image */}
         <div className="relative aspect-[4/3] w-full bg-bg-darker overflow-hidden">
-          {mediaUrl ? (
+          {coverImageUrl || mediaUrl ? (
             <Image
-              src={mediaUrl}
+              src={coverImageUrl || mediaUrl!}
               alt={brand}
               fill
               className="object-cover"

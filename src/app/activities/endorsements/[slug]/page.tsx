@@ -4,6 +4,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getEndorsementBySlug } from '@/lib/queries/activities';
 import { EditableText } from '@/components/edit/EditableText';
+import { EditableImage } from '@/components/edit/EditableImage';
+import { EditableMediaGallery } from '@/components/edit/EditableMediaGallery';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Tag } from '@/components/ui/Tag';
 
@@ -38,7 +40,7 @@ export default async function EndorsementDetailPage({
   const startYear = endorsement.startYear ? String(endorsement.startYear) : '';
   const endYear = endorsement.endYear ? String(endorsement.endYear) : '';
 
-  const firstMedia = endorsement.mediaUrls[0];
+  const coverUrl = endorsement.coverImageUrl || endorsement.mediaUrls[0]?.url || null;
 
   return (
     <PageContainer>
@@ -54,34 +56,55 @@ export default async function EndorsementDetailPage({
 
       {/* Main content */}
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Left: media */}
+        {/* Left: cover */}
         <div className="w-full md:w-[400px] shrink-0">
-          <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-card)]">
-            {firstMedia ? (
-              <Image
-                src={firstMedia.url}
-                alt={firstMedia.alt || endorsement.brand}
-                fill
-                className="object-contain"
-                sizes="(max-width: 768px) 100vw, 400px"
-              />
-            ) : (
-              <div className="absolute inset-0 bg-bg-darker flex items-center justify-center">
-                <span className="text-text-muted text-lg">{endorsement.brand}</span>
-              </div>
-            )}
-          </div>
+          <EditableImage
+            src={coverUrl}
+            entityType="endorsement"
+            entityId={endorsement.id}
+            field="coverImageId"
+            alt={endorsement.brand}
+          >
+            <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-card)]">
+              {coverUrl ? (
+                <Image
+                  src={coverUrl}
+                  alt={endorsement.brand}
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 768px) 100vw, 400px"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-bg-darker flex items-center justify-center">
+                  <span className="text-text-muted text-lg">{endorsement.brand}</span>
+                </div>
+              )}
+            </div>
+          </EditableImage>
         </div>
 
         {/* Right: info */}
         <div className="flex-1 space-y-4">
           {/* Category tag */}
-          <EditableText value={endorsement.category || ''} entityType="endorsement" entityId={endorsement.id} field="category" placeholder="分类..." className="inline-block">
+          <EditableText
+            value={endorsement.category || ''}
+            entityType="endorsement"
+            entityId={endorsement.id}
+            field="category"
+            placeholder="分类..."
+            className="inline-block"
+          >
             {endorsement.category ? <Tag active>{endorsement.category}</Tag> : null}
           </EditableText>
 
           {/* Brand name */}
-          <EditableText value={endorsement.brand} entityType="endorsement" entityId={endorsement.id} field="brand" className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
+          <EditableText
+            value={endorsement.brand}
+            entityType="endorsement"
+            entityId={endorsement.id}
+            field="brand"
+            className="font-heading text-2xl md:text-3xl font-semibold text-text-primary"
+          >
             <h1 className="font-heading text-2xl md:text-3xl font-semibold text-text-primary">
               {endorsement.brand}
             </h1>
@@ -89,15 +112,36 @@ export default async function EndorsementDetailPage({
 
           {/* Meta info */}
           <div className="text-sm text-text-muted flex flex-wrap items-center gap-1">
-            <EditableText value={endorsement.role || ''} entityType="endorsement" entityId={endorsement.id} field="role" placeholder="角色..." className="inline">
+            <EditableText
+              value={endorsement.role || ''}
+              entityType="endorsement"
+              entityId={endorsement.id}
+              field="role"
+              placeholder="角色..."
+              className="inline"
+            >
               {endorsement.role ? <span>{endorsement.role}</span> : null}
             </EditableText>
             {endorsement.role && startYear && <span> · </span>}
-            <EditableText value={startYear} entityType="endorsement" entityId={endorsement.id} field="startYear" placeholder="开始年份..." className="inline">
+            <EditableText
+              value={startYear}
+              entityType="endorsement"
+              entityId={endorsement.id}
+              field="startYear"
+              placeholder="开始年份..."
+              className="inline"
+            >
               {startYear ? <span>{startYear}</span> : null}
             </EditableText>
             {startYear && <span>-</span>}
-            <EditableText value={endYear} entityType="endorsement" entityId={endorsement.id} field="endYear" placeholder="结束年份..." className="inline">
+            <EditableText
+              value={endYear}
+              entityType="endorsement"
+              entityId={endorsement.id}
+              field="endYear"
+              placeholder="结束年份..."
+              className="inline"
+            >
               {endYear ? <span>{endYear}</span> : <span>至今</span>}
             </EditableText>
           </div>
@@ -106,8 +150,18 @@ export default async function EndorsementDetailPage({
           <div className="gold-line" />
 
           {/* Description */}
-          <EditableText value={endorsement.description} entityType="endorsement" entityId={endorsement.id} field="description" multiline placeholder="添加描述..." className="text-text-secondary leading-relaxed">
-            {endorsement.description ? <p className="text-text-secondary leading-relaxed">{endorsement.description}</p> : null}
+          <EditableText
+            value={endorsement.description}
+            entityType="endorsement"
+            entityId={endorsement.id}
+            field="description"
+            multiline
+            placeholder="添加描述..."
+            className="text-text-secondary leading-relaxed"
+          >
+            {endorsement.description ? (
+              <p className="text-text-secondary leading-relaxed">{endorsement.description}</p>
+            ) : null}
           </EditableText>
 
           {/* Tags */}
@@ -121,28 +175,16 @@ export default async function EndorsementDetailPage({
         </div>
       </div>
 
-      {/* Gallery */}
-      {endorsement.mediaUrls.length > 1 && (
-        <div className="mt-8">
-          <h2 className="font-heading text-lg text-text-primary mb-4">相关图片</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {endorsement.mediaUrls.slice(1).map((img, i) => (
-              <div
-                key={i}
-                className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-card)]"
-              >
-                <Image
-                  src={img.url}
-                  alt={img.alt || ''}
-                  fill
-                  className="object-contain"
-                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Media gallery */}
+      <div className="mt-8">
+        <h2 className="font-heading text-lg text-text-primary mb-4">相关媒体</h2>
+        <EditableMediaGallery
+          media={endorsement.mediaUrls}
+          entityType="endorsement"
+          entityId={endorsement.id}
+          relation="media"
+        />
+      </div>
 
       {/* Related info placeholder */}
       <div className="mt-8">

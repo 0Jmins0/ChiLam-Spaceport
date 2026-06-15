@@ -1,9 +1,13 @@
 'use client';
 
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import AudioPlayer from './AudioPlayer';
 import { EditableText } from '@/components/edit/EditableText';
+import { EditableMediaGallery } from '@/components/edit/EditableMediaGallery';
+import { LightboxViewer } from '@/components/gallery/LightboxViewer';
 import { useEditMode } from '@/components/edit/EditModeProvider';
+import type { GalleryItem } from '@/lib/types';
 
 interface InterviewMediaPanelProps {
   interviewId: string;
@@ -11,7 +15,7 @@ interface InterviewMediaPanelProps {
   proofreadStatus: string;
   embedUrl: string | null;
   originalMediaUrl: string | null;
-  galleryImages: { url: string; alt: string | null }[];
+  galleryImages: { id: string; url: string; alt: string | null; type: string }[];
   summary: string | null;
   duration: string | null;
 }
@@ -111,31 +115,167 @@ export default function InterviewMediaPanel({
   duration,
 }: InterviewMediaPanelProps) {
   const { editMode } = useEditMode();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
+  // Separate gallery videos and images
+  const galleryVideos = galleryImages.filter((m) => m.type === 'VIDEO');
+  const allGalleryMedia = galleryImages; // all items for thumbnails
+  const hasGalleryVideos = galleryVideos.length > 0;
+
+  // Clamp activeIndex to valid range
+  const safeIndex = useMemo(
+    () => (allGalleryMedia.length === 0 ? 0 : Math.min(activeIndex, allGalleryMedia.length - 1)),
+    [activeIndex, allGalleryMedia.length],
+  );
+
+  // Convert galleryImages to GalleryItem format for LightboxViewer
+  const lightboxItems: GalleryItem[] = allGalleryMedia.map((m) => ({
+    id: m.id,
+    type: m.type,
+    category: null,
+    mediaTag: null,
+    url: m.url,
+    thumbnailUrl: null,
+    filename: null,
+    width: null,
+    height: null,
+    duration: null,
+    alt: m.alt,
+    caption: m.alt,
+    createdAt: '',
+    source: null,
+  }));
 
   const renderMedia = () => {
-    // VIDEO with embed URL (or editable placeholder)
+    // VIDEO type
     if (mediaType === 'VIDEO') {
-      return (
-        <EditableText
-          value={embedUrl || ''}
-          entityType="interview"
-          entityId={interviewId}
-          field="embedUrl"
-          placeholder="视频嵌入地址..."
-          className="text-sm text-text-muted"
-        >
-          {embedUrl ? (
-            <div className="relative">
-              <iframe
-                src={embedUrl}
-                allowFullScreen
+      const videoContent = hasGalleryVideos ? (
+        <div className="space-y-3">
+          {/* Main video player */}
+          <div className="relative cursor-pointer group" onClick={() => setLightboxOpen(true)}>
+            {allGalleryMedia[safeIndex]?.type === 'VIDEO' ? (
+              <video
+                key={allGalleryMedia[safeIndex].id}
+                src={allGalleryMedia[safeIndex].url}
+                controls
+                preload="metadata"
                 className="w-full aspect-video rounded-[var(--radius-card)]"
-                title="访谈视频"
+                onClick={(e) => e.stopPropagation()}
               />
-              {editMode && <div className="absolute inset-0 z-10 cursor-pointer" />}
+            ) : (
+              <div className="relative aspect-video rounded-[var(--radius-card)] overflow-hidden">
+                <Image
+                  src={allGalleryMedia[safeIndex].url}
+                  alt={allGalleryMedia[safeIndex].alt || '图片'}
+                  fill
+                  className="object-contain"
+                  sizes="350px"
+                />
+              </div>
+            )}
+            {/* Fullscreen hint overlay */}
+            <div className="absolute top-2 right-2 bg-black/50 rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+              <svg
+                className="w-4 h-4 text-white"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9m11.25-5.25v4.5m0-4.5h-4.5m4.5 0L15 9m-11.25 11.25v-4.5m0 4.5h4.5m-4.5 0L9 15m11.25 5.25v-4.5m0 4.5h-4.5m4.5 0L15 15"
+                />
+              </svg>
             </div>
-          ) : null}
-        </EditableText>
+          </div>
+
+          {/* Thumbnail grid - only when ≥2 media items */}
+          {allGalleryMedia.length >= 2 && (
+            <div className="grid grid-cols-4 gap-1.5">
+              {allGalleryMedia.map((m, i) => (
+                <button
+                  key={m.id}
+                  onClick={() => setActiveIndex(i)}
+                  className={`relative aspect-video rounded overflow-hidden border-2 transition-colors ${
+                    i === safeIndex ? 'border-accent' : 'border-transparent hover:border-white/30'
+                  }`}
+                >
+                  {m.type === 'VIDEO' ? (
+                    <>
+                      <video
+                        src={m.url}
+                        preload="metadata"
+                        muted
+                        className="w-full h-full object-cover"
+                      />
+                      {/* Play icon overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
+                    </>
+                  ) : (
+                    <Image
+                      src={m.url}
+                      alt={m.alt || `缩略图 ${i + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="80px"
+                    />
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : embedUrl ? (
+        // Fallback to iframe when no gallery videos
+        <div className="relative">
+          <iframe
+            src={embedUrl}
+            allowFullScreen
+            className="w-full aspect-video rounded-[var(--radius-card)]"
+            title="访谈视频"
+          />
+          {editMode && <div className="absolute inset-0 z-10 cursor-pointer" />}
+        </div>
+      ) : (
+        <MediaPlaceholder />
+      );
+
+      return (
+        <div className="space-y-3">
+          {/* embedUrl editable (as fallback option for admin) */}
+          <EditableText
+            value={embedUrl || ''}
+            entityType="interview"
+            entityId={interviewId}
+            field="embedUrl"
+            placeholder="视频嵌入地址..."
+            className="text-sm text-text-muted"
+          >
+            {videoContent}
+          </EditableText>
+
+          {/* EditableMediaGallery for upload/delete */}
+          {editMode && (
+            <EditableMediaGallery
+              media={galleryImages.map((img) => ({
+                id: img.id,
+                url: img.url,
+                type: img.type,
+                alt: img.alt,
+              }))}
+              entityType="interview"
+              entityId={interviewId}
+              relation="gallery"
+            />
+          )}
+        </div>
       );
     }
 
@@ -152,21 +292,54 @@ export default function InterviewMediaPanel({
     // TEXT with gallery images
     if (mediaType === 'TEXT' && galleryImages.length > 0) {
       return (
-        <div className={`grid gap-3 ${galleryImages.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
-          {galleryImages.map((img, i) => (
-            <div
-              key={i}
-              className="relative aspect-[3/4] rounded-[var(--radius-card)] border border-border-gold/20 overflow-hidden"
-            >
-              <Image
-                src={img.url}
-                alt={img.alt || `图片 ${i + 1}`}
-                fill
-                className="object-contain"
-                sizes="(max-width: 768px) 50vw, 300px"
-              />
-            </div>
-          ))}
+        <div className="space-y-3">
+          <div
+            className={`grid gap-3 ${galleryImages.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}
+          >
+            {galleryImages.map((img, i) => (
+              <div
+                key={img.id}
+                className="relative aspect-[3/4] rounded-[var(--radius-card)] border border-border-gold/20 overflow-hidden"
+              >
+                <Image
+                  src={img.url}
+                  alt={img.alt || `图片 ${i + 1}`}
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 768px) 50vw, 300px"
+                />
+              </div>
+            ))}
+          </div>
+
+          {editMode && (
+            <EditableMediaGallery
+              media={galleryImages.map((img) => ({
+                id: img.id,
+                url: img.url,
+                type: img.type,
+                alt: img.alt,
+              }))}
+              entityType="interview"
+              entityId={interviewId}
+              relation="gallery"
+            />
+          )}
+        </div>
+      );
+    }
+
+    // TEXT with no images but in edit mode - still show EditableMediaGallery
+    if (mediaType === 'TEXT' && editMode) {
+      return (
+        <div className="space-y-3">
+          <MediaPlaceholder />
+          <EditableMediaGallery
+            media={[]}
+            entityType="interview"
+            entityId={interviewId}
+            relation="gallery"
+          />
         </div>
       );
     }
@@ -193,6 +366,16 @@ export default function InterviewMediaPanel({
 
       {/* Media Area */}
       <div>{renderMedia()}</div>
+
+      {/* Lightbox */}
+      {lightboxOpen && lightboxItems.length > 0 && (
+        <LightboxViewer
+          items={lightboxItems}
+          currentIndex={safeIndex}
+          onClose={() => setLightboxOpen(false)}
+          onNavigate={setActiveIndex}
+        />
+      )}
 
       {/* Divider */}
       <div className="h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
@@ -231,9 +414,7 @@ export default function InterviewMediaPanel({
           className="text-sm text-text-secondary"
           placeholder="时长(分钟)..."
         >
-          {duration ? (
-            <span className="text-sm text-text-secondary">{duration}</span>
-          ) : null}
+          {duration ? <span className="text-sm text-text-secondary">{duration}</span> : null}
         </EditableText>
 
         {/* Decorative signature line */}

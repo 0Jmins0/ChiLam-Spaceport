@@ -6,9 +6,41 @@ import { verifyAdmin } from '@/lib/auth';
 
 /** 可编辑字段白名单 */
 const EDITABLE_FIELDS: Record<string, string[]> = {
-  production: ['title', 'titleEn', 'synopsis', 'year', 'role', 'roleType', 'language', 'varietyRegion', 'varietyRole', 'posterId', 'releaseDate'],
-  performance: ['title', 'titleEn', 'summary', 'year', 'venue', 'city', 'series', 'posterId', 'startDate'],
-  endorsement: ['title', 'brand', 'category', 'description', 'role', 'startYear', 'endYear', 'startDate'],
+  production: [
+    'title',
+    'titleEn',
+    'synopsis',
+    'year',
+    'role',
+    'roleType',
+    'language',
+    'varietyRegion',
+    'varietyRole',
+    'posterId',
+    'releaseDate',
+  ],
+  performance: [
+    'title',
+    'titleEn',
+    'summary',
+    'year',
+    'venue',
+    'city',
+    'series',
+    'posterId',
+    'startDate',
+  ],
+  endorsement: [
+    'title',
+    'brand',
+    'category',
+    'description',
+    'role',
+    'startYear',
+    'endYear',
+    'startDate',
+    'coverImageId',
+  ],
   interview: [
     'title',
     'titleEn',
@@ -37,13 +69,7 @@ const EDITABLE_FIELDS: Record<string, string[]> = {
 };
 
 /** 需要 parseInt 的整数字段 */
-const INTEGER_FIELDS = new Set([
-  'year',
-  'startYear',
-  'endYear',
-  'releaseYear',
-  'duration',
-]);
+const INTEGER_FIELDS = new Set(['year', 'startYear', 'endYear', 'releaseYear', 'duration']);
 
 /** 需要 Date 解析的字段 */
 const DATE_FIELDS = new Set(['releaseDate', 'publishDate', 'date', 'startDate']);
@@ -108,18 +134,12 @@ export async function PATCH(request: Request) {
     // 验证 entityType
     const allowedFields = EDITABLE_FIELDS[entityType];
     if (!allowedFields) {
-      return NextResponse.json(
-        { error: `不支持的实体类型: ${entityType}` },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: `不支持的实体类型: ${entityType}` }, { status: 400 });
     }
 
     // 验证 field 在白名单中
     if (!allowedFields.includes(field)) {
-      return NextResponse.json(
-        { error: `字段 "${field}" 不允许编辑` },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: `字段 "${field}" 不允许编辑` }, { status: 400 });
     }
 
     // 验证 entityId
@@ -132,10 +152,7 @@ export async function PATCH(request: Request) {
     // 查找实体
     const entity = await model.findUnique({ where: { id: entityId } });
     if (!entity) {
-      return NextResponse.json(
-        { error: `${entityType} #${entityId} 不存在` },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: `${entityType} #${entityId} 不存在` }, { status: 404 });
     }
 
     // 转换值
@@ -143,10 +160,7 @@ export async function PATCH(request: Request) {
     try {
       convertedValue = convertValue(field, value);
     } catch (err) {
-      return NextResponse.json(
-        { error: (err as Error).message },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: (err as Error).message }, { status: 400 });
     }
 
     // 读取旧值
@@ -173,9 +187,6 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ success: true, data: updated });
   } catch (err) {
     console.error('[Admin Edit] Error:', err);
-    return NextResponse.json(
-      { error: '编辑失败，请稍后重试' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: '编辑失败，请稍后重试' }, { status: 500 });
   }
 }

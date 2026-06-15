@@ -163,7 +163,15 @@ export interface EndorsementItem {
   description: string | null;
   startYear: number;
   endYear: number | null;
-  mediaUrls: { url: string; alt: string | null; width: number | null; height: number | null }[];
+  coverImageUrl: string | null;
+  mediaUrls: {
+    id: string;
+    url: string;
+    type: string;
+    alt: string | null;
+    width: number | null;
+    height: number | null;
+  }[];
   tags: { name: string; slug: string }[];
 }
 
@@ -193,7 +201,7 @@ export interface InterviewDetail extends InterviewItem {
   proofreadStatus: string;
   originalMediaUrl: string | null;
   embedUrl: string | null;
-  galleryImages: { url: string; alt: string | null }[];
+  galleryImages: { id: string; url: string; alt: string | null; type: string }[];
 }
 
 // 直播卡片展示用
@@ -213,7 +221,14 @@ export interface LivestreamItem {
 
 // 直播详情页用
 export interface LivestreamDetail extends LivestreamItem {
-  media: { url: string; type: string }[];
+  media: {
+    id: string;
+    url: string;
+    type: string;
+    alt: string | null;
+    width: number | null;
+    height: number | null;
+  }[];
 }
 
 // ─── 资料库模块 ───

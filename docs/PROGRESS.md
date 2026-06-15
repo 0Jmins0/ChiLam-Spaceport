@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.5 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 + P6.13 + P6.15 已完成）
+## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.5 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 + P6.13 + P6.15 + P6.16 已完成）
 
 ---
 
@@ -14,7 +14,7 @@
 | 动态模块 | ✅ 已完成 | 2026-06-06 |
 | 影视模块 | ✅ 已完成 | 2026-06-06 |
 | 演出模块 | ✅ 已完成 | 2026-06-06 |
-| 活动模块 | ✅ 已完成（代言+直播，访谈已独立） | 2026-06-15 |
+| 活动模块 | ✅ 已完成（代言+直播，封面+媒体上传，访谈已独立） | 2026-06-15 |
 | 霖言霖语模块 | ✅ 已完成（从活动独立为顶级栏目） | 2026-06-15 |
 | 资料库模块 | ✅ 已完成 | 2026-06-07 |
 | 留言板 | ✅ 已完成（含故事 tag 筛选 + 登录权限 + 精选/图片上传） | 2026-06-11 |
@@ -30,6 +30,33 @@
 ---
 
 ## 详细记录
+
+### 2026-06-15 - P6.16 活动模块封面+媒体上传（已完成）
+
+#### 完成内容
+- **Schema 变更**：Endorsement 新增 `coverImageId` FK + `coverImage` 关系，与 Livestream 封面机制统一
+- **通用组件 EditableMediaGallery**：新建 `src/components/edit/EditableMediaGallery.tsx`，支持图片+视频混排展示、编辑模式上传、移除关联，全站任何模块可复用
+- **封面图上传**：代言和直播详情页封面区用 `EditableImage` 包裹，编辑模式可上传替换
+- **媒体区上传**：代言和直播详情页新增「相关媒体」区域，编辑模式下可上传图片/视频并自动关联（多对多）
+- **列表卡片封面**：LivestreamCard 新增封面图展示（16:9），EndorsementCard 优先使用 coverImage
+- **Upload API**：新增 `endorsement:cover` 绑定配置
+- **Admin Edit**：白名单新增 `endorsement.coverImageId`
+- **双向关联**：上传到活动的媒体在相册模块也能查到来源
+
+#### 涉及文件
+- `prisma/schema.prisma` — Endorsement 加 coverImageId + Media 加反向关系
+- `src/components/edit/EditableMediaGallery.tsx` — 新建通用媒体展示/上传组件
+- `src/app/api/upload/route.ts` — 加 endorsement:cover 绑定
+- `src/app/api/admin/edit/route.ts` — 白名单加 coverImageId
+- `src/lib/types.ts` — media 类型补全
+- `src/lib/queries/activities.ts` — 查询补全 coverImage + media 字段
+- `src/components/activities/LivestreamCard.tsx` — 封面图展示
+- `src/components/activities/EndorsementCard.tsx` — coverImage 优先
+- `src/app/activities/page.tsx` — 传 coverImageUrl
+- `src/app/activities/endorsements/[slug]/page.tsx` — EditableImage + EditableMediaGallery
+- `src/app/activities/livestreams/[slug]/page.tsx` — EditableImage + EditableMediaGallery
+
+---
 
 ### 2026-06-15 - P6.15 相册瀑布流布局（已完成）
 
