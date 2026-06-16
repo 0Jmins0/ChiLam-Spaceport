@@ -65,15 +65,11 @@ export function GuestbookCard({ item, className, currentUserId }: GuestbookCardP
           {/* 头部：昵称 + 时间 */}
           <div className="flex flex-col items-start gap-0.5">
             <span className="font-heading text-sm text-accent">{item.nickname}</span>
-            <span className="text-[11px] text-text-muted/70">
-              {timeStr}
-            </span>
+            <span className="text-[11px] text-text-muted/70">{timeStr}</span>
           </div>
 
           {/* 内容（可能带缩略图） */}
-          <div
-            className={cn('flex-1', hasThumbnail && 'flex gap-3')}
-          >
+          <div className={cn('flex-1', hasThumbnail && 'flex gap-3')}>
             <p className="text-sm leading-relaxed text-text-secondary">{truncatedContent}</p>
             {hasThumbnail && (
               <div className="flex-shrink-0 ml-auto">

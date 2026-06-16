@@ -6,6 +6,7 @@ import { NAV_ITEMS } from '@/config/navigation';
 import { siteConfig } from '@/config/site';
 import { cn } from '@/lib/cn';
 import { useAuth } from '@/components/auth/AuthProvider';
+import { useEditMode } from '@/components/edit/EditModeProvider';
 
 interface MobileNavProps {
   open: boolean;
@@ -15,6 +16,7 @@ interface MobileNavProps {
 export function MobileNav({ open, onClose }: MobileNavProps) {
   const pathname = usePathname();
   const { user, loading, openLogin, logout } = useAuth();
+  const { canShowEditButton, editMode, toggleEditMode } = useEditMode();
 
   return (
     <div
@@ -105,6 +107,37 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
             </button>
           )}
         </div>
+
+        {/* Edit Mode Toggle */}
+        {canShowEditButton && (
+          <div className="mt-4 pt-4 border-t border-border-gold/30">
+            <button
+              onClick={() => {
+                toggleEditMode();
+                onClose();
+              }}
+              className={cn(
+                'flex items-center gap-2 text-sm tracking-wide transition-all duration-200',
+                editMode ? 'text-accent' : 'text-text-muted hover:text-accent',
+              )}
+            >
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+                />
+              </svg>
+              {editMode ? '编辑模式 · 已开启' : '编辑模式'}
+            </button>
+          </div>
+        )}
 
         {/* Logo at bottom */}
         <div className="absolute bottom-8 left-8">
