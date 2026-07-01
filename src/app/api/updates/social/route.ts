@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     const post = await prisma.socialPost.create({
       data: {
         platform: body.platform,
-        originalUrl: body.originalUrl || null,
+        originalUrl: body.originalUrl?.trim() || '',
         originalId: body.originalId || null,
         title: body.title || null,
         summary: body.summary || null,

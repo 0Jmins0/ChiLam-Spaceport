@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     const article = await prisma.newsArticle.create({
       data: {
         slug: body.slug,
-        originalUrl: body.originalUrl || null,
+        originalUrl: body.originalUrl?.trim() || '',
         title: body.title,
         summary: body.summary || null,
         source: body.source || null,
