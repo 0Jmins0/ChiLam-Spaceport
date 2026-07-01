@@ -4,18 +4,21 @@ import { cn } from '@/lib/cn';
 import { useEditMode } from './EditModeProvider';
 
 export function EditModeToggle() {
-  const { canShowEditButton, editMode, toggleEditMode } = useEditMode();
+  const { canShowEditButton, editMode, hasChanges, pendingOperations, saveStatus, toggleEditMode } =
+    useEditMode();
 
   if (!canShowEditButton) return null;
 
   return (
     <button
-      onClick={toggleEditMode}
+      onClick={() => void toggleEditMode()}
+      disabled={saveStatus === 'saving'}
       className={cn(
         'flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs tracking-wide transition-all duration-200',
         editMode
           ? 'bg-accent/20 text-accent border border-accent/40 shadow-[0_0_8px_rgba(var(--accent-rgb),0.15)]'
           : 'text-text-muted hover:text-accent border border-transparent hover:border-accent/20',
+        saveStatus === 'saving' && 'cursor-not-allowed opacity-60',
       )}
       aria-label={editMode ? '关闭编辑模式' : '开启编辑模式'}
       title={editMode ? '关闭编辑模式' : '开启编辑模式'}
@@ -35,6 +38,11 @@ export function EditModeToggle() {
         />
       </svg>
       {editMode && <span>编辑中</span>}
+      {editMode && hasChanges && (
+        <span className="rounded bg-accent/20 px-1.5 py-px text-[10px] leading-none">
+          {pendingOperations.length}
+        </span>
+      )}
     </button>
   );
 }

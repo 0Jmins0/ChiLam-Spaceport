@@ -16,7 +16,7 @@ pnpm dev --hostname 0.0.0.0 --port 3001
 
 ipconfig getifaddr en0
 
-# 网址：http://10.135.216.53:3001
+# 网址：http://172.20.10.3:3001
 ```
 
 3. 数据库更新

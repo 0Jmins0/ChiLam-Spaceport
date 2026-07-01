@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { EditableText } from '@/components/edit/EditableText';
 import { EditableImage } from '@/components/edit/EditableImage';
 import { EditableMediaGallery } from '@/components/edit/EditableMediaGallery';
+import { DeleteEntryButton } from '@/components/edit/DeleteEntryButton';
 import MarkdownContent from '@/components/ui/MarkdownContent';
 import { RelatedContentList } from '@/components/relations/RelatedContentList';
 import { getIncomingRelatedContent } from '@/lib/content-relations';
@@ -62,6 +63,9 @@ export default async function ScreenDetailPage({ params }: { params: Promise<{ s
         >
           &larr; 返回影视综
         </Link>
+      </div>
+      <div className="mb-4 flex justify-end">
+        <DeleteEntryButton entityType="production" entityId={production.id} />
       </div>
 
       {/* 主内容区 */}

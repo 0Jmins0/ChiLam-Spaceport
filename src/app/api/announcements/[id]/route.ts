@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import { AnnouncementType } from '@/generated/prisma/client';
 import { getAnnouncementById } from '@/lib/queries/announcements';
 import type { AnnouncementTab } from '@/lib/types';
+import { verifyAdmin } from '@/lib/auth';
 
 const tabToEnum: Record<AnnouncementTab, AnnouncementType> = {
   notice: AnnouncementType.NOTICE,
@@ -36,6 +37,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 // PUT - 更新公告
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const admin = await verifyAdmin(request);
+    if (!admin) {
+      return NextResponse.json(
+        { error: { message: '未授权', code: 'UNAUTHORIZED' } },
+        { status: 401 },
+      );
+    }
+
     const { id } = await params;
     const body = await request.json();
 
@@ -77,6 +86,14 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const admin = await verifyAdmin(request);
+    if (!admin) {
+      return NextResponse.json(
+        { error: { message: '未授权', code: 'UNAUTHORIZED' } },
+        { status: 401 },
+      );
+    }
+
     const { id } = await params;
 
     await prisma.announcement.delete({ where: { id } });

@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.5 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 + P6.13 + P6.15 + P6.16 + P6.17 + P6.19 + P6.20 + P6.21 + P6.22 + P6.23 + P6.24 + P6.25 + P6.26 + P6.27 已完成）
+## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.5 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 + P6.13 + P6.15 + P6.16 + P6.17 + P6.19 + P6.20 + P6.21 + P6.22 + P6.23 + P6.24 + P6.25 + P6.26 + P6.27 + P6.28 已完成）
 
 ---
 
@@ -21,8 +21,8 @@
 | 用户系统 | ✅ 已完成（注册/登录/权限） | 2026-06-10 |
 | 用户个人页面 | ✅ 已完成（个人中心/留言管理/设置/头像上传） | 2026-06-10 |
 | 公告模块 | ✅ 已完成 | 2026-06-07 |
-| 后台管理(API) | ✅ 已完成 | 2026-06-07 |
-| R2 存储配置 | ✅ 已完成 | 2026-06-07 |
+| 后台管理(API) | ✅ 已完成（管理员编辑会话 + 批量保存/删除 + 权限加固） | 2026-07-01 |
+| R2 存储配置 | ✅ 已完成（正式/临时编辑上传路径分离） | 2026-07-01 |
 | 相册模块 | ✅ 已完成（图片/视频/音频/合集 + Tag 筛选 + Lightbox + 相册集 + 瀑布流比例限制） | 2026-07-01 |
 | 全站检索 | ✅ 已完成 | 2026-06-10 |
 | 部署上线 | 未开始 | - |
@@ -30,6 +30,46 @@
 ---
 
 ## 详细记录
+
+### 2026-07-01 - P6.28 管理员编辑会话与媒体删除保存（已完成）
+
+#### 完成内容
+- **编辑会话机制**：编辑模式从即时写库改为前端会话暂存，支持统一保存和退出丢弃
+- **保存/退出状态栏**：编辑状态栏显示待保存项、上传中、保存中和错误状态，保存成功后刷新页面
+- **临时上传转正式媒体**：管理员编辑上传先写入 `temp/admin-edits/{sessionId}/...`，保存时复制到正式 `images/videos/audio/files` 路径并创建 `Media` 记录
+- **媒体删除支持**：图册图片/视频删除先标记，保存时批量断开关系；无其他引用时删除 `Media` 记录和 R2 文件
+- **封面/海报替换**：直接 FK 媒体替换走编辑会话，保存时更新关系并清理不再引用的旧媒体
+- **条目删除支持**：详情页编辑模式新增删除条目入口，保存时删除内容记录并清理不再引用的媒体
+- **关联清理**：删除内容条目时同步删除 `content_relations` 中作为 source/target 的关联，避免相关内容残留 404 链接
+- **批量删除修复**：保存时按 `target + targetId + relation` 分组去重断开媒体关系，避免重复删除导致提交失败
+- **删除标记保持**：删除条目和删除媒体状态从全局 pending 操作派生，重新进入详情页仍显示已标记状态
+- **后端权限加固**：主要内容详情 `PUT/DELETE` 接口补充管理员校验，避免非管理员直接调用编辑/删除 API
+- **上传兼容修复**：管理员编辑 presign 接口兼容前端未传 `uploadId` 的场景，并同时返回 `tempKey/publicTempUrl` 与 `key/publicUrl`
+
+#### 涉及文件
+- `src/components/edit/EditModeProvider.tsx` — 编辑会话、pending 操作、保存/退出流程
+- `src/components/edit/EditStatusBar.tsx` — 保存/退出和状态提示
+- `src/components/edit/EditModeToggle.tsx` — 切换编辑模式走会话退出逻辑
+- `src/components/edit/EditableText.tsx` — 文本编辑改为草稿注册
+- `src/components/edit/EditableImage.tsx` — 封面/海报替换改为临时上传 + 保存提交
+- `src/components/edit/EditableMediaGallery.tsx` — 图册上传/删除改为临时上传和 pending 状态
+- `src/components/edit/DeleteEntryButton.tsx` — 详情页删除条目入口
+- `src/components/edit/types.ts` — 编辑会话操作类型
+- `src/app/api/admin/edit/commit/route.ts` — 管理员编辑批量提交 API
+- `src/app/api/admin/edit/uploads/presign/route.ts` — 管理员临时上传预签名 API
+- `src/app/api/admin/edit/uploads/cleanup/route.ts` — 退出编辑时清理临时上传
+- `src/lib/admin-edit-commit.ts` — 批量保存、媒体转正、删除、关联清理逻辑
+- `src/lib/admin-edit-config.ts` — 可编辑字段白名单和字段类型转换
+- `src/lib/media-relations.ts` — 媒体直接 FK / 多对多关系配置
+- `src/lib/media-cleanup.ts` — 媒体引用检查和 R2 清理
+- `src/lib/r2.ts` — R2 copy、临时 key、正式 key、批量删除工具
+- 多个详情页 — 接入 `DeleteEntryButton`
+- 多个内容 API 路由 — 补充 `verifyAdmin` 写操作校验
+
+#### 验证
+- `pnpm exec tsc --noEmit` 通过
+- `pnpm build` 通过（需要联网获取 Google Fonts；沙箱网络下会因字体拉取失败，授权联网后通过）
+- 全量 `pnpm lint` 仍受既有 `scripts/*.ts` 中 `no-explicit-any` 问题阻塞，非本次改动引入
 
 ### 2026-07-01 - P6.27 相册瀑布流比例与详情适配（已完成）
 

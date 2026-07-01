@@ -6,6 +6,7 @@ import { getEndorsementBySlug } from '@/lib/queries/activities';
 import { EditableText } from '@/components/edit/EditableText';
 import { EditableImage } from '@/components/edit/EditableImage';
 import { EditableMediaGallery } from '@/components/edit/EditableMediaGallery';
+import { DeleteEntryButton } from '@/components/edit/DeleteEntryButton';
 import MarkdownContent from '@/components/ui/MarkdownContent';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Tag } from '@/components/ui/Tag';
@@ -53,6 +54,9 @@ export default async function EndorsementDetailPage({
         >
           &larr; 返回活动
         </Link>
+      </div>
+      <div className="mb-4 flex justify-end">
+        <DeleteEntryButton entityType="endorsement" entityId={endorsement.id} />
       </div>
 
       {/* Main content */}

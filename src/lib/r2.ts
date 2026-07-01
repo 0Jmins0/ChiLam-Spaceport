@@ -1,10 +1,19 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+  CopyObjectCommand,
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 function getEnv(key: string): string {
   const value = process.env[key];
   if (!value) throw new Error(`环境变量 ${key} 未配置`);
   return value;
+}
+
+function getBucketName(): string {
+  return getEnv('R2_BUCKET_NAME');
 }
 
 function getR2Client() {
@@ -64,6 +73,63 @@ function generateUniqueKey(folder: string, originalFilename: string): string {
   return `${folder}/${timestamp}-${random}.${ext}`;
 }
 
+function sanitizeFilename(filename: string): string {
+  const fallback = 'file';
+  const cleaned = filename
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^\p{L}\p{N}._-]/gu, '')
+    .replace(/-+/g, '-');
+  return cleaned || fallback;
+}
+
+export function getPublicUrl(key: string): string {
+  return `${getEnv('R2_PUBLIC_URL')}/${key}`;
+}
+
+export function getKeyFromUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+
+  try {
+    return new URL(url).pathname.slice(1) || null;
+  } catch {
+    const publicUrl = process.env.R2_PUBLIC_URL;
+    if (publicUrl && url.startsWith(`${publicUrl}/`)) {
+      return url.slice(publicUrl.length + 1);
+    }
+    return null;
+  }
+}
+
+export function generateFinalKey(
+  mimeType: string,
+  originalFilename: string,
+  context?: string,
+): string {
+  const folder = getFolderFromMimeType(mimeType);
+  const safeName = sanitizeFilename(originalFilename);
+  const ext = safeName.includes('.') ? safeName.split('.').pop() : '';
+  const base = safeName.replace(/\.[^.]+$/, '') || 'media';
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 8);
+  const prefix = context ? `${sanitizeFilename(context)}-` : '';
+  return `${folder}/${timestamp}-${prefix}${base}-${random}${ext ? `.${ext}` : ''}`;
+}
+
+export function generateTempKey(
+  sessionId: string,
+  uploadId: string,
+  originalFilename: string,
+): string {
+  return `temp/admin-edits/${sanitizeFilename(sessionId)}/${sanitizeFilename(uploadId)}-${sanitizeFilename(
+    originalFilename,
+  )}`;
+}
+
+export function isAdminEditTempKey(key: string, sessionId: string): boolean {
+  return key.startsWith(`temp/admin-edits/${sanitizeFilename(sessionId)}/`);
+}
+
 // 上传文件到 R2
 export async function uploadFile(
   fileBuffer: Buffer,
@@ -98,6 +164,53 @@ export async function deleteFile(key: string): Promise<void> {
   );
 }
 
+export async function deleteFiles(keys: Array<string | null | undefined>): Promise<void> {
+  await Promise.all(
+    keys.filter((key): key is string => Boolean(key)).map((key) => deleteFile(key)),
+  );
+}
+
+export async function copyFile(
+  sourceKey: string,
+  targetKey: string,
+): Promise<{ key: string; url: string }> {
+  await getR2Client().send(
+    new CopyObjectCommand({
+      Bucket: getBucketName(),
+      CopySource: encodeURI(`${getBucketName()}/${sourceKey}`),
+      Key: targetKey,
+    }),
+  );
+
+  return {
+    key: targetKey,
+    url: getPublicUrl(targetKey),
+  };
+}
+
+export async function getPresignedAdminEditUploadUrl(
+  sessionId: string,
+  uploadId: string,
+  originalFilename: string,
+  mimeType: string,
+): Promise<{ key: string; uploadUrl: string; publicUrl: string }> {
+  const key = generateTempKey(sessionId, uploadId, originalFilename);
+
+  const command = new PutObjectCommand({
+    Bucket: getBucketName(),
+    Key: key,
+    ContentType: mimeType,
+  });
+
+  const uploadUrl = await getSignedUrl(getR2Client(), command, { expiresIn: 3600 });
+
+  return {
+    key,
+    uploadUrl,
+    publicUrl: getPublicUrl(key),
+  };
+}
+
 // 生成预签名上传 URL（前端直传用）
 export async function getPresignedUploadUrl(
   originalFilename: string,
@@ -118,5 +231,22 @@ export async function getPresignedUploadUrl(
     key,
     uploadUrl,
     publicUrl: `${getEnv('R2_PUBLIC_URL')}/${key}`,
+  };
+}
+
+export async function getPresignedUploadUrlForKey(
+  key: string,
+  mimeType: string,
+): Promise<{ key: string; uploadUrl: string; publicUrl: string }> {
+  const command = new PutObjectCommand({
+    Bucket: getEnv('R2_BUCKET_NAME'),
+    Key: key,
+    ContentType: mimeType,
+  });
+
+  return {
+    key,
+    uploadUrl: await getSignedUrl(getR2Client(), command, { expiresIn: 3600 }),
+    publicUrl: getPublicUrl(key),
   };
 }

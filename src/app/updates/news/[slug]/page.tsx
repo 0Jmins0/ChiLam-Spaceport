@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import MarkdownContent from '@/components/ui/MarkdownContent';
 import { EditableText } from '@/components/edit/EditableText';
 import { EditableMediaGallery } from '@/components/edit/EditableMediaGallery';
+import { DeleteEntryButton } from '@/components/edit/DeleteEntryButton';
 import { UpdateItemVisibilityToggle } from '@/components/updates/UpdateItemVisibilityToggle';
 import { RelatedContentList } from '@/components/relations/RelatedContentList';
 import { ContentRelationEditor } from '@/components/relations/ContentRelationEditor';
@@ -52,6 +53,9 @@ export default async function NewsArticleDetailPage({
         >
           &larr; 返回动态
         </Link>
+      </div>
+      <div className="mb-4 flex justify-end">
+        <DeleteEntryButton entityType="newsArticle" entityId={article.id} />
       </div>
 
       <article className="mx-auto max-w-2xl">

@@ -8,6 +8,7 @@ import { Tag } from '@/components/ui/Tag';
 import { EditableText } from '@/components/edit/EditableText';
 import { EditableImage } from '@/components/edit/EditableImage';
 import { EditableMediaGallery } from '@/components/edit/EditableMediaGallery';
+import { DeleteEntryButton } from '@/components/edit/DeleteEntryButton';
 import { LinkedProduction } from '@/components/performances/LinkedProduction';
 import MarkdownContent from '@/components/ui/MarkdownContent';
 import { RelatedContentList } from '@/components/relations/RelatedContentList';
@@ -74,6 +75,9 @@ export default async function PerformanceDetailPage({
         >
           &larr; 返回演出
         </Link>
+      </div>
+      <div className="mb-4 flex justify-end">
+        <DeleteEntryButton entityType="performance" entityId={performance.id} />
       </div>
 
       {/* 主内容区：左封面 + 右信息 */}

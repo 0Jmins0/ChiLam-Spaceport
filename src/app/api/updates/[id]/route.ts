@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { verifyAdmin } from '@/lib/auth';
 
 // GET - 获取单条动态（尝试三个表）
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -38,6 +39,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 // PUT - 更新动态
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const admin = await verifyAdmin(request);
+    if (!admin) {
+      return NextResponse.json(
+        { error: { message: '未授权', code: 'UNAUTHORIZED' } },
+        { status: 401 },
+      );
+    }
+
     const { id } = await params;
     const body = await request.json();
     const { type, ...data } = body;
@@ -91,6 +100,14 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const admin = await verifyAdmin(request);
+    if (!admin) {
+      return NextResponse.json(
+        { error: { message: '未授权', code: 'UNAUTHORIZED' } },
+        { status: 401 },
+      );
+    }
+
     const { id } = await params;
     const body = await request.json().catch(() => ({}));
     const type = (body as Record<string, string>).type || request.nextUrl.searchParams.get('type');

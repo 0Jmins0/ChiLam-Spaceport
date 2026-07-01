@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { getAlbumBySlug } from '@/lib/queries/archives';
 import { EditableText } from '@/components/edit/EditableText';
 import { EditableImage } from '@/components/edit/EditableImage';
+import { DeleteEntryButton } from '@/components/edit/DeleteEntryButton';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Tag } from '@/components/ui/Tag';
 import { Button } from '@/components/ui/Button';
@@ -53,6 +54,9 @@ export default async function AlbumDetailPage({ params }: { params: Promise<{ sl
         >
           &larr; 返回资料库
         </Link>
+      </div>
+      <div className="mb-4 flex justify-end">
+        <DeleteEntryButton entityType="album" entityId={album.id} />
       </div>
 
       {/* Main content */}

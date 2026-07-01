@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/cn';
 import { getMediaAspectRatio } from '@/lib/update-media';
 import { useEditMode } from './EditModeProvider';
 import { LightboxViewer } from '@/components/gallery/LightboxViewer';
 import type { GalleryItem } from '@/lib/types';
+import type { EditMediaRemoveOperation, EditPendingOperation } from './types';
 
 interface MediaItem {
   id: string;
@@ -40,17 +40,27 @@ type MediaMetadata = {
   width?: number;
   height?: number;
   duration?: number;
-  thumbnailUrl?: string;
 };
 
-async function uploadFileToR2(file: File, adminToken?: string | null): Promise<UploadResult> {
-  const presignRes = await fetch('/api/upload/presign', {
+function isMediaRemoveOperation(
+  operation: EditPendingOperation,
+): operation is EditMediaRemoveOperation {
+  return operation.type === 'media_remove';
+}
+
+async function uploadFileToTempR2(
+  file: File,
+  sessionId: string,
+  adminToken?: string | null,
+): Promise<UploadResult> {
+  const presignRes = await fetch('/api/admin/edit/uploads/presign', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {}),
     },
     body: JSON.stringify({
+      sessionId,
       filename: file.name,
       mimeType: file.type,
       fileSize: file.size,
@@ -62,7 +72,7 @@ async function uploadFileToR2(file: File, adminToken?: string | null): Promise<U
     throw new Error(errData?.error || '获取上传链接失败');
   }
 
-  const { uploadUrl, publicUrl, key } = await presignRes.json();
+  const { uploadUrl, publicTempUrl, tempKey } = await presignRes.json();
 
   const uploadRes = await fetch(uploadUrl, {
     method: 'PUT',
@@ -76,7 +86,7 @@ async function uploadFileToR2(file: File, adminToken?: string | null): Promise<U
     throw new Error(`文件上传失败 (${uploadRes.status})`);
   }
 
-  return { key, publicUrl };
+  return { key: tempKey, publicUrl: publicTempUrl };
 }
 
 function getImageMetadata(file: File): Promise<MediaMetadata> {
@@ -186,22 +196,36 @@ export function EditableMediaGallery({
   entityId,
   relation,
   className,
-  onRemove,
 }: EditableMediaGalleryProps) {
-  const { editMode, adminToken } = useEditMode();
+  const {
+    editMode,
+    adminToken,
+    sessionId,
+    pendingOperations,
+    registerMediaRemove,
+    registerTempUpload,
+  } = useEditMode();
   const [uploadStatus, setUploadStatus] = useState<UploadStatus>('idle');
   const [errorMsg, setErrorMsg] = useState('');
-  const [removingId, setRemovingId] = useState<string | null>(null);
-  const [coverUpdatingId, setCoverUpdatingId] = useState<string | null>(null);
+  const [removedIds, setRemovedIds] = useState<Set<string>>(new Set());
+  const [pendingMedia, setPendingMedia] = useState<MediaItem[]>([]);
   const [playingSet, setPlayingSet] = useState<Set<string>>(new Set());
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const coverInputRef = useRef<HTMLInputElement>(null);
-  const coverTargetIdRef = useRef<string | null>(null);
-  const router = useRouter();
 
-  // 非编辑模式下，无媒体则不渲染
-  if (!editMode && media.length === 0) return null;
+  useEffect(() => {
+    if (editMode) return;
+    Promise.resolve().then(() => {
+      setRemovedIds(new Set());
+      setPendingMedia((items) => {
+        for (const item of items) {
+          if (item.url.startsWith('blob:')) URL.revokeObjectURL(item.url);
+          if (item.thumbnailUrl?.startsWith('blob:')) URL.revokeObjectURL(item.thumbnailUrl);
+        }
+        return [];
+      });
+    });
+  }, [editMode]);
 
   const handleUploadClick = () => {
     if (uploadStatus === 'uploading') return;
@@ -223,41 +247,40 @@ export function EditableMediaGallery({
       } else if (file.type.startsWith('video/')) {
         const videoResult = await getVideoMetadataAndThumbnail(file);
         metadata = videoResult.metadata;
-        if (videoResult.thumbnailFile) {
-          const coverUpload = await uploadFileToR2(videoResult.thumbnailFile, adminToken);
-          metadata.thumbnailUrl = coverUpload.publicUrl;
-        }
       }
 
-      const { key, publicUrl } = await uploadFileToR2(file, adminToken);
+      if (!sessionId) throw new Error('编辑会话未初始化');
+      const { key, publicUrl } = await uploadFileToTempR2(file, sessionId, adminToken);
 
-      // Step 3: 确认并创建 Media 记录 + 绑定
-      const confirmRes = await fetch('/api/upload/confirm', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {}),
-        },
-        body: JSON.stringify({
-          key,
-          url: publicUrl,
-          filename: file.name,
-          mimeType: file.type,
-          size: file.size,
-          target: entityType,
-          targetId: entityId,
-          relation: relation,
-          ...metadata,
-        }),
+      const objectUrl = URL.createObjectURL(file);
+      const pendingId = `pending-${crypto.randomUUID()}`;
+      const pendingItem: MediaItem = {
+        id: pendingId,
+        url: objectUrl,
+        type: file.type.startsWith('video/') ? 'VIDEO' : 'IMAGE',
+        alt: file.name,
+        thumbnailUrl: file.type.startsWith('video/') ? undefined : null,
+        width: metadata.width ?? null,
+        height: metadata.height ?? null,
+        duration: metadata.duration ?? null,
+      };
+
+      setPendingMedia((current) => [...current, pendingItem]);
+      registerTempUpload({
+        target: entityType,
+        targetId: entityId,
+        relation,
+        tempKey: key,
+        tempUrl: publicUrl,
+        filename: file.name,
+        mimeType: file.type,
+        size: file.size,
+        width: metadata.width ?? null,
+        height: metadata.height ?? null,
+        duration: metadata.duration ?? null,
       });
 
-      if (!confirmRes.ok) {
-        const errData = await confirmRes.json().catch(() => null);
-        throw new Error(errData?.error || '确认上传失败');
-      }
-
       setUploadStatus('done');
-      router.refresh();
       setTimeout(() => setUploadStatus('idle'), 2000);
     } catch (err) {
       setUploadStatus('error');
@@ -266,80 +289,58 @@ export function EditableMediaGallery({
     }
   };
 
-  const handleCoverEditClick = (mediaId: string) => {
-    coverTargetIdRef.current = mediaId;
-    coverInputRef.current?.click();
-  };
+  const pendingRemovedIds = useMemo(
+    () =>
+      new Set(
+        pendingOperations
+          .filter(isMediaRemoveOperation)
+          .filter(
+            (operation) =>
+              operation.target === entityType &&
+              operation.targetId === entityId &&
+              operation.relation === relation,
+          )
+          .map((operation) => operation.mediaId),
+      ),
+    [entityId, entityType, pendingOperations, relation],
+  );
 
-  const handleCoverFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    const targetId = coverTargetIdRef.current;
-    e.target.value = '';
+  const visibleRemovedIds = useMemo(
+    () => new Set([...Array.from(removedIds), ...Array.from(pendingRemovedIds)]),
+    [pendingRemovedIds, removedIds],
+  );
 
-    if (!file || !targetId) return;
-    if (!file.type.startsWith('image/')) {
-      setUploadStatus('error');
-      setErrorMsg('请选择图片作为封面');
-      setTimeout(() => setUploadStatus('idle'), 3000);
-      return;
-    }
-
-    setCoverUpdatingId(targetId);
-    setErrorMsg('');
-
-    try {
-      const { publicUrl } = await uploadFileToR2(file, adminToken);
-      const res = await fetch('/api/admin/edit', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {}),
-        },
-        body: JSON.stringify({
-          entityType: 'media',
-          entityId: targetId,
-          field: 'thumbnailUrl',
-          value: publicUrl,
-        }),
-      });
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => null);
-        throw new Error(errData?.error || '封面更新失败');
-      }
-
-      router.refresh();
-    } catch (err) {
-      setUploadStatus('error');
-      setErrorMsg(err instanceof Error ? err.message : '封面更新失败');
-      setTimeout(() => setUploadStatus('idle'), 4000);
-    } finally {
-      setCoverUpdatingId(null);
-      coverTargetIdRef.current = null;
-    }
-  };
-
-  const handleRemove = async (mediaId: string) => {
-    if (!onRemove) return;
+  const handleRemove = (mediaId: string) => {
+    if (visibleRemovedIds.has(mediaId)) return;
     if (!confirm('确定移除此媒体？')) return;
 
-    setRemovingId(mediaId);
-    try {
-      await onRemove(mediaId);
-      router.refresh();
-    } catch {
-      // 静默处理，页面会刷新
-    } finally {
-      setRemovingId(null);
-    }
+    setRemovedIds((current) => {
+      const next = new Set(current);
+      next.add(mediaId);
+      return next;
+    });
+    registerMediaRemove({
+      target: entityType,
+      targetId: entityId,
+      relation,
+      mediaId,
+    });
   };
+
+  const visibleMedia = [
+    ...media.filter((item) => !visibleRemovedIds.has(item.id)),
+    ...pendingMedia,
+  ];
+
+  // 非编辑模式下，无媒体则不渲染
+  if (!editMode && visibleMedia.length === 0) return null;
 
   return (
     <div className={cn('w-full', className)}>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        {media.map((item, index) => {
+        {visibleMedia.map((item, index) => {
           const isVideo = item.type === 'VIDEO';
-          const isRemoving = removingId === item.id;
+          const isPending = item.id.startsWith('pending-');
           const previewUrl = isVideo ? item.thumbnailUrl : item.url;
           const aspectRatio = getMediaAspectRatio(item);
 
@@ -348,13 +349,13 @@ export function EditableMediaGallery({
               key={item.id}
               className={cn(
                 'group relative overflow-hidden rounded-[var(--radius-card)] bg-white/5 transition-all',
-                isRemoving && 'pointer-events-none opacity-50',
+                isPending && 'ring-1 ring-accent/50',
                 !editMode && !isVideo && 'cursor-pointer',
               )}
               onClick={!editMode && !isVideo ? () => setLightboxIndex(index) : undefined}
             >
               {/* 编辑模式：删除按钮 */}
-              {editMode && onRemove && (
+              {editMode && !isPending && (
                 <button
                   onClick={() => handleRemove(item.id)}
                   className="absolute right-1.5 top-1.5 z-10 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-red-600/80 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-500"
@@ -432,19 +433,6 @@ export function EditableMediaGallery({
                         </svg>
                       </div>
                     </div>
-                  )}
-                  {editMode && (
-                    <button
-                      type="button"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        handleCoverEditClick(item.id);
-                      }}
-                      disabled={coverUpdatingId === item.id}
-                      className="absolute bottom-2 left-2 z-20 rounded bg-black/65 px-2 py-1 text-[11px] text-white transition-colors hover:bg-black/80 disabled:cursor-wait disabled:opacity-70"
-                    >
-                      {coverUpdatingId === item.id ? '更新中...' : '更换封面'}
-                    </button>
                   )}
                 </div>
               ) : (
@@ -546,18 +534,11 @@ export function EditableMediaGallery({
         onChange={handleFileChange}
         className="hidden"
       />
-      <input
-        ref={coverInputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleCoverFileChange}
-        className="hidden"
-      />
 
       {/* Lightbox（非编辑模式） */}
       {lightboxIndex !== null && !editMode && (
         <LightboxViewer
-          items={media.map(
+          items={visibleMedia.map(
             (item): GalleryItem => ({
               id: item.id,
               url: item.url,

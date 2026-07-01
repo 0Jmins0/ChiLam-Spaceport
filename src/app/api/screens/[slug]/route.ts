@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getProductionBySlug } from '@/lib/queries/productions';
+import { verifyAdmin } from '@/lib/auth';
 
 // GET - 获取单个影视作品详情
 export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
@@ -28,6 +29,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 // PUT - 更新影视作品
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
+    const admin = await verifyAdmin(request);
+    if (!admin) {
+      return NextResponse.json(
+        { error: { message: '未授权', code: 'UNAUTHORIZED' } },
+        { status: 401 },
+      );
+    }
+
     const { slug } = await params;
     const body = await request.json();
 
@@ -90,6 +99,14 @@ export async function DELETE(
   { params }: { params: Promise<{ slug: string }> },
 ) {
   try {
+    const admin = await verifyAdmin(request);
+    if (!admin) {
+      return NextResponse.json(
+        { error: { message: '未授权', code: 'UNAUTHORIZED' } },
+        { status: 401 },
+      );
+    }
+
     const { slug } = await params;
 
     await prisma.production.delete({ where: { slug } });

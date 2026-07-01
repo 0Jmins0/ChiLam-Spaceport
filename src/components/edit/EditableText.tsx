@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef, useEffect, type ReactNode, type ElementType } from 'react';
-import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/cn';
 import { useEditMode } from './EditModeProvider';
 
@@ -17,7 +16,7 @@ interface EditableTextProps {
   children: ReactNode;
 }
 
-type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+type SaveStatus = 'idle' | 'saved' | 'error';
 
 export function EditableText({
   value,
@@ -30,20 +29,13 @@ export function EditableText({
   placeholder = '点击输入...',
   children,
 }: EditableTextProps) {
-  const router = useRouter();
-  const { editMode, adminToken } = useEditMode();
+  const { editMode, registerFieldChange } = useEditMode();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value ?? '');
   const [displayValue, setDisplayValue] = useState(value ?? '');
   const [status, setStatus] = useState<SaveStatus>('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
-
-  // Sync when value prop changes externally
-  const currentValue = value ?? '';
-  if (currentValue !== displayValue && !editing) {
-    setDisplayValue(currentValue);
-  }
 
   // Focus input when entering edit state
   useEffect(() => {
@@ -60,42 +52,34 @@ export function EditableText({
   }
 
   const handleStartEdit = () => {
-    setDraft(displayValue);
+    const currentValue = value ?? '';
+    setDisplayValue(currentValue);
+    setDraft(currentValue);
     setEditing(true);
     setStatus('idle');
     setErrorMsg('');
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (draft === displayValue) {
       setEditing(false);
       return;
     }
 
-    setStatus('saving');
     try {
-      const res = await fetch('/api/admin/edit', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${adminToken}`,
-        },
-        body: JSON.stringify({ entityType, entityId, field, value: draft }),
+      registerFieldChange({
+        entityType,
+        entityId,
+        field,
+        value: draft,
       });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error?.message || `保存失败 (${res.status})`);
-      }
-
       setDisplayValue(draft);
       setStatus('saved');
       setEditing(false);
-      router.refresh();
       setTimeout(() => setStatus('idle'), 2000);
     } catch (err) {
       setStatus('error');
-      setErrorMsg(err instanceof Error ? err.message : '保存失败');
+      setErrorMsg(err instanceof Error ? err.message : '暂存失败');
     }
   };
 
@@ -141,10 +125,9 @@ export function EditableText({
           <div className="mt-2 flex items-center gap-2">
             <button
               onClick={handleSave}
-              disabled={status === 'saving'}
               className="rounded bg-accent/90 px-3 py-1 text-xs font-medium text-bg-darker transition-colors hover:bg-accent disabled:opacity-50"
             >
-              {status === 'saving' ? '保存中...' : '保存'}
+              暂存
             </button>
             <button
               onClick={handleCancel}

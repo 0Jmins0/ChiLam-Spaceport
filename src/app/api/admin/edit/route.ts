@@ -3,185 +3,12 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { verifyAdmin } from '@/lib/auth';
-
-/** 可编辑字段白名单 */
-const EDITABLE_FIELDS: Record<string, string[]> = {
-  production: [
-    'title',
-    'titleEn',
-    'synopsis',
-    'year',
-    'role',
-    'roleType',
-    'language',
-    'varietyRegion',
-    'varietyRole',
-    'posterId',
-    'releaseDate',
-  ],
-  performance: [
-    'title',
-    'titleEn',
-    'summary',
-    'year',
-    'venue',
-    'city',
-    'series',
-    'posterId',
-    'startDate',
-  ],
-  endorsement: [
-    'title',
-    'brand',
-    'category',
-    'description',
-    'role',
-    'startYear',
-    'endYear',
-    'startDate',
-    'coverImageId',
-  ],
-  interview: [
-    'title',
-    'titleEn',
-    'source',
-    'host',
-    'location',
-    'duration',
-    'summary',
-    'embedUrl',
-    'proofreadStatus',
-    'date',
-    'coverImageId',
-  ],
-  album: ['title', 'titleEn', 'releaseYear', 'language', 'coverId', 'releaseDate'],
-  magazine: ['title', 'issue', 'coverId'],
-  livestream: [
-    'title',
-    'summary',
-    'platform',
-    'duration',
-    'originalUrl',
-    'replayUrl',
-    'coverImageId',
-  ],
-  socialPost: [
-    'platform',
-    'originalUrl',
-    'originalId',
-    'title',
-    'summary',
-    'thumbnailUrl',
-    'publishedAt',
-    'contentText',
-    'isFullCopy',
-    'isVisible',
-  ],
-  newsArticle: [
-    'title',
-    'source',
-    'originalUrl',
-    'summary',
-    'thumbnailUrl',
-    'publishedAt',
-    'contentText',
-    'isFullCopy',
-    'isVisible',
-  ],
-  sighting: [
-    'title',
-    'summary',
-    'thumbnailUrl',
-    'sightedAt',
-    'authorName',
-    'originalUrl',
-    'content',
-    'isFullCopy',
-    'isVisible',
-  ],
-  media: [
-    'caption',
-    'alt',
-    'mediaTag',
-    'searchNote',
-    'thumbnailUrl',
-    'width',
-    'height',
-    'duration',
-  ],
-  mediaCollection: ['title', 'description', 'coverId'],
-};
-
-/** 需要 parseInt 的整数字段 */
-const INTEGER_FIELDS = new Set(['year', 'startYear', 'endYear', 'releaseYear']);
-const NUMBER_FIELDS = new Set(['width', 'height', 'duration']);
-
-/** 需要 Date 解析的字段 */
-const DATE_FIELDS = new Set([
-  'releaseDate',
-  'publishDate',
-  'date',
-  'startDate',
-  'publishedAt',
-  'sightedAt',
-]);
-
-/** 需要 Boolean 解析的字段 */
-const BOOLEAN_FIELDS = new Set(['isFullCopy', 'isVisible']);
-
-/** entityType → Prisma model accessor */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getPrismaModel(entityType: string): any {
-  const models: Record<string, unknown> = {
-    production: prisma.production,
-    performance: prisma.performance,
-    endorsement: prisma.endorsement,
-    interview: prisma.interview,
-    album: prisma.album,
-    magazine: prisma.magazine,
-    livestream: prisma.livestream,
-    socialPost: prisma.socialPost,
-    newsArticle: prisma.newsArticle,
-    sighting: prisma.sighting,
-    media: prisma.media,
-    mediaCollection: prisma.mediaCollection,
-  };
-  return models[entityType] || null;
-}
-
-/**
- * 将传入的 value 转换为对应字段的数据库类型
- */
-function convertValue(field: string, value: string | number | boolean | null): unknown {
-  if (value === null) return null;
-
-  if (INTEGER_FIELDS.has(field)) {
-    const parsed = parseInt(String(value), 10);
-    if (isNaN(parsed)) throw new Error(`字段 "${field}" 需要整数值`);
-    return parsed;
-  }
-
-  if (NUMBER_FIELDS.has(field)) {
-    const parsed = Number(value);
-    if (!Number.isFinite(parsed)) throw new Error(`字段 "${field}" 需要数字值`);
-    return parsed;
-  }
-
-  if (DATE_FIELDS.has(field)) {
-    const date = new Date(String(value));
-    if (isNaN(date.getTime())) throw new Error(`字段 "${field}" 需要有效的日期格式`);
-    return date;
-  }
-
-  if (BOOLEAN_FIELDS.has(field)) {
-    if (typeof value === 'boolean') return value;
-    if (value === 'true') return true;
-    if (value === 'false') return false;
-    throw new Error(`字段 "${field}" 需要布尔值`);
-  }
-
-  return String(value);
-}
+import {
+  assertEditableField,
+  convertEditableValue,
+  getEditableFields,
+  getEditableModel,
+} from '@/lib/admin-edit-config';
 
 /**
  * PATCH /api/admin/edit
@@ -203,14 +30,16 @@ export async function PATCH(request: Request) {
     };
 
     // 验证 entityType
-    const allowedFields = EDITABLE_FIELDS[entityType];
+    const allowedFields = getEditableFields(entityType);
     if (!allowedFields) {
       return NextResponse.json({ error: `不支持的实体类型: ${entityType}` }, { status: 400 });
     }
 
     // 验证 field 在白名单中
-    if (!allowedFields.includes(field)) {
-      return NextResponse.json({ error: `字段 "${field}" 不允许编辑` }, { status: 400 });
+    try {
+      assertEditableField(entityType, field);
+    } catch (error) {
+      return NextResponse.json({ error: (error as Error).message }, { status: 400 });
     }
 
     // 验证 entityId
@@ -218,7 +47,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: '无效的 entityId' }, { status: 400 });
     }
 
-    const model = getPrismaModel(entityType);
+    const model = getEditableModel(entityType);
 
     // 查找实体
     const entity = await model.findUnique({ where: { id: entityId } });
@@ -229,7 +58,7 @@ export async function PATCH(request: Request) {
     // 转换值
     let convertedValue: unknown;
     try {
-      convertedValue = convertValue(field, value);
+      convertedValue = convertEditableValue(field, value);
     } catch (err) {
       return NextResponse.json({ error: (err as Error).message }, { status: 400 });
     }

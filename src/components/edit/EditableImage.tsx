@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useRef, type ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, useRef, type ReactNode } from 'react';
 import { cn } from '@/lib/cn';
 import { useEditMode } from './EditModeProvider';
 
@@ -17,6 +16,13 @@ interface EditableImageProps {
 
 type UploadStatus = 'idle' | 'uploading' | 'saving' | 'done' | 'error';
 
+function inferDirectMediaRelation(field: string) {
+  if (field === 'posterId') return 'poster';
+  if (field === 'coverId' || field === 'coverImageId') return 'cover';
+  if (field === 'originalMediaId') return 'media';
+  return field;
+}
+
 export function EditableImage({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   src,
@@ -27,12 +33,22 @@ export function EditableImage({
   className,
   children,
 }: EditableImageProps) {
-  const { editMode, adminToken } = useEditMode();
+  const { editMode, adminToken, sessionId, registerMediaReplace } = useEditMode();
   const [status, setStatus] = useState<UploadStatus>('idle');
   const [progress, setProgress] = useState(0);
   const [errorMsg, setErrorMsg] = useState('');
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
+
+  useEffect(() => {
+    if (editMode) return;
+    Promise.resolve().then(() => {
+      setPreviewUrl((current) => {
+        if (current) URL.revokeObjectURL(current);
+        return null;
+      });
+    });
+  }, [editMode]);
 
   if (!editMode) {
     return <>{children}</>;
@@ -55,54 +71,63 @@ export function EditableImage({
     setErrorMsg('');
 
     try {
-      // Step 1: Upload file via server-side relay (FormData → R2)
-      const formData = new FormData();
-      formData.append('file', file);
-      if (alt) formData.append('alt', alt);
+      const currentSessionId = sessionId;
+      if (!currentSessionId) throw new Error('编辑会话未初始化');
 
-      const mediaRes = await fetch('/api/upload', {
+      const presignRes = await fetch('/api/admin/edit/uploads/presign', {
         method: 'POST',
-        body: formData,
-      });
-
-      if (!mediaRes.ok) {
-        const errData = await mediaRes.json().catch(() => null);
-        throw new Error(errData?.error || '上传失败');
-      }
-
-      const mediaData = await mediaRes.json();
-      setProgress(60);
-
-      // Step 2: Update entity field with new media ID
-      setStatus('saving');
-      const mediaId = mediaData.media?.id;
-      if (!mediaId) throw new Error('未获取到媒体 ID');
-
-      const editRes = await fetch('/api/admin/edit', {
-        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${adminToken}`,
+          ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {}),
         },
         body: JSON.stringify({
-          entityType,
-          entityId,
-          field,
-          value: mediaId,
+          sessionId: currentSessionId,
+          filename: file.name,
+          mimeType: file.type,
+          fileSize: file.size,
         }),
       });
 
-      if (!editRes.ok) {
-        const errData = await editRes.json().catch(() => null);
-        throw new Error(errData?.error || '更新关联失败');
+      if (!presignRes.ok) {
+        const errData = await presignRes.json().catch(() => null);
+        throw new Error(errData?.error || '获取临时上传链接失败');
       }
+
+      const { uploadUrl, tempKey, publicTempUrl } = await presignRes.json();
+      setProgress(30);
+
+      const uploadRes = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type },
+        body: file,
+      });
+
+      if (!uploadRes.ok) {
+        throw new Error(`临时上传失败 (${uploadRes.status})`);
+      }
+
+      setStatus('saving');
+      setProgress(80);
+      const nextPreviewUrl = URL.createObjectURL(file);
+      setPreviewUrl((current) => {
+        if (current) URL.revokeObjectURL(current);
+        return nextPreviewUrl;
+      });
+
+      registerMediaReplace({
+        target: entityType,
+        targetId: entityId,
+        relation: inferDirectMediaRelation(field),
+        tempKey,
+        tempUrl: publicTempUrl,
+        filename: file.name,
+        mimeType: file.type,
+        size: file.size,
+        alt: alt ?? null,
+      });
 
       setProgress(100);
       setStatus('done');
-
-      // Refresh page to show new image
-      router.refresh();
-
       setTimeout(() => setStatus('idle'), 2000);
     } catch (err) {
       setStatus('error');
@@ -114,6 +139,14 @@ export function EditableImage({
   return (
     <div className={cn('group/editable-img relative', className)}>
       {children}
+      {previewUrl && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={previewUrl}
+          alt={alt || '待保存图片'}
+          className="absolute inset-0 z-[1] h-full w-full rounded-[var(--radius-card)] object-cover"
+        />
+      )}
 
       {/* Hidden file input */}
       <input
@@ -128,7 +161,7 @@ export function EditableImage({
       <div
         onClick={handleClick}
         className={cn(
-          'absolute inset-0 flex cursor-pointer flex-col items-center justify-center rounded-[var(--radius-card)] transition-all duration-200',
+          'absolute inset-0 z-[2] flex cursor-pointer flex-col items-center justify-center rounded-[var(--radius-card)] transition-all duration-200',
           status === 'idle'
             ? 'bg-bg-darker/0 opacity-0 group-hover/editable-img:bg-bg-darker/60 group-hover/editable-img:opacity-100'
             : 'bg-bg-darker/70 opacity-100',

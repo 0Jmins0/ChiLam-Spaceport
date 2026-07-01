@@ -5,6 +5,7 @@ import InterviewSidebar from '@/components/interviews/InterviewDetail/InterviewS
 import InterviewMediaPanel from '@/components/interviews/InterviewDetail/InterviewMediaPanel';
 import InterviewContentArea from '@/components/interviews/InterviewDetail/InterviewContentArea';
 import ShareButton from '@/components/interviews/InterviewDetail/ShareButton';
+import { DeleteEntryButton } from '@/components/edit/DeleteEntryButton';
 
 export async function generateMetadata({
   params,
@@ -45,6 +46,10 @@ export default async function InterviewDetailPage({
 
   return (
     <div className="max-w-[var(--width-page)] mx-auto px-4 md:px-8 pt-16 pb-8">
+      <div className="mb-4 flex justify-end">
+        <DeleteEntryButton entityType="interview" entityId={interview.id} />
+      </div>
+
       {/* 移动端：媒体优先显示 */}
       <div className="lg:hidden mb-8">
         <InterviewMediaPanel
