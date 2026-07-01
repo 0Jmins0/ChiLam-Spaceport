@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { cn } from '@/lib/cn';
 import { Card } from '@/components/ui/Card';
@@ -37,12 +38,7 @@ export function NewsArticleCard({
   className,
 }: NewsArticleCardProps) {
   return (
-    <a
-      href={originalUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={cn('block break-inside-avoid mb-4', className)}
-    >
+    <Link href={originalUrl} className={cn('block break-inside-avoid mb-4', className)}>
       <Card className="p-0 overflow-hidden">
         <div className="flex flex-col md:flex-row">
           {/* Thumbnail */}
@@ -84,6 +80,6 @@ export function NewsArticleCard({
           </div>
         </div>
       </Card>
-    </a>
+    </Link>
   );
 }

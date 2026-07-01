@@ -35,7 +35,9 @@ export interface SocialPostItem {
   summary: string | null;
   thumbnailUrl: string | null;
   publishedAt: Date | null;
+  isVisible: boolean;
   tags: { name: string; slug: string }[];
+  mediaItems?: { id: string; url: string; type: string; alt: string | null }[];
 }
 
 // 新闻卡片
@@ -48,7 +50,9 @@ export interface NewsArticleItem {
   source: string | null;
   thumbnailUrl: string | null;
   publishedAt: Date | null;
+  isVisible: boolean;
   tags: { name: string; slug: string }[];
+  mediaItems?: { id: string; url: string; type: string; alt: string | null }[];
 }
 
 // 路透卡片
@@ -61,7 +65,9 @@ export interface SightingItem {
   thumbnailUrl: string | null;
   sightedAt: Date | null;
   authorName: string;
+  isVisible: boolean;
   tags: { name: string; slug: string }[];
+  mediaItems?: { id: string; url: string; type: string; alt: string | null }[];
 }
 
 // ─── 影视模块 ───

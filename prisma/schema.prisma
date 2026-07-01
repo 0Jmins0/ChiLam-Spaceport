@@ -529,11 +529,13 @@ model SocialPost {
   tags Tag[]
 
   importMethod ImportMethod @default(MANUAL) @map("import_method")
+  isVisible    Boolean      @default(true) @map("is_visible")
   createdAt    DateTime     @default(now()) @map("created_at")
   updatedAt    DateTime     @updatedAt @map("updated_at")
 
   @@unique([platform, originalId])
   @@index([platform])
+  @@index([isVisible])
   @@index([publishedAt(sort: Desc)])
   @@map("social_posts")
 }
@@ -556,9 +558,11 @@ model NewsArticle {
   // 标签 (多对多)
   tags Tag[]
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  isVisible Boolean  @default(true) @map("is_visible")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
+  @@index([isVisible])
   @@index([publishedAt(sort: Desc)])
   @@map("news_articles")
 }
@@ -585,10 +589,12 @@ model Sighting {
   // 标签 (多对多)
   tags Tag[]
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  isVisible Boolean  @default(true) @map("is_visible")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
   @@index([status])
+  @@index([isVisible])
   @@index([sightedAt(sort: Desc)])
   @@map("sightings")
 }

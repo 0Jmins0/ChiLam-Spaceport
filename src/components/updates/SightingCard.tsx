@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { cn } from '@/lib/cn';
 import { Card } from '@/components/ui/Card';
@@ -85,14 +86,9 @@ export function SightingCard({
 
   if (originalUrl) {
     return (
-      <a
-        href={originalUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={cn('block', className)}
-      >
+      <Link href={originalUrl} className={cn('block', className)}>
         {content}
-      </a>
+      </Link>
     );
   }
 

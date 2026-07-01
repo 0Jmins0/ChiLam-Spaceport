@@ -7,6 +7,12 @@ import { PageContainer } from '@/components/layout/PageContainer';
 import { Tag } from '@/components/ui/Tag';
 import { Button } from '@/components/ui/Button';
 import MarkdownContent from '@/components/ui/MarkdownContent';
+import { EditableText } from '@/components/edit/EditableText';
+import { EditableMediaGallery } from '@/components/edit/EditableMediaGallery';
+import { UpdateItemVisibilityToggle } from '@/components/updates/UpdateItemVisibilityToggle';
+import { RelatedContentList } from '@/components/relations/RelatedContentList';
+import { ContentRelationEditor } from '@/components/relations/ContentRelationEditor';
+import { getOutgoingRelatedContent } from '@/lib/content-relations';
 
 // Next.js 16: params 是 Promise
 export async function generateMetadata({
@@ -31,6 +37,7 @@ export default async function SightingDetailPage({
   const { slug } = await params;
   const sighting = await getSightingBySlug(slug);
   if (!sighting) notFound();
+  const relatedContent = await getOutgoingRelatedContent('sighting', sighting.id);
 
   return (
     <PageContainer>
@@ -46,8 +53,16 @@ export default async function SightingDetailPage({
 
       <article className="mx-auto max-w-2xl">
         {/* 作者 + 日期 */}
-        <div className="mb-4 flex items-center gap-3">
-          <Tag active>{sighting.authorName}</Tag>
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          <EditableText
+            value={sighting.authorName}
+            entityType="sighting"
+            entityId={sighting.id}
+            field="authorName"
+            as="span"
+          >
+            <Tag active>{sighting.authorName}</Tag>
+          </EditableText>
           {sighting.sightedAt && (
             <time className="text-sm text-text-muted">
               {new Date(sighting.sightedAt).toLocaleDateString('zh-CN', {
@@ -57,12 +72,25 @@ export default async function SightingDetailPage({
               })}
             </time>
           )}
+          <UpdateItemVisibilityToggle
+            type="sighting"
+            id={sighting.id}
+            isVisible={sighting.isVisible}
+          />
         </div>
 
         {/* 标题 */}
-        <h1 className="font-heading text-2xl font-semibold text-text-primary md:text-3xl">
+        <EditableText
+          value={sighting.title}
+          entityType="sighting"
+          entityId={sighting.id}
+          field="title"
+          as="h1"
+          placeholder="点击补充标题"
+          className="font-heading text-2xl font-semibold text-text-primary md:text-3xl"
+        >
           {sighting.title}
-        </h1>
+        </EditableText>
 
         {/* 金线分隔 */}
         <div className="my-6">
@@ -83,12 +111,32 @@ export default async function SightingDetailPage({
         )}
 
         {/* 概要/内容 */}
-        {(sighting.content || sighting.summary) && (
-          <MarkdownContent
-            content={sighting.content || sighting.summary}
-            className="text-text-secondary leading-relaxed"
+        <EditableText
+          value={sighting.content || sighting.summary}
+          entityType="sighting"
+          entityId={sighting.id}
+          field={sighting.content ? 'content' : 'summary'}
+          as="div"
+          multiline
+          placeholder="点击补充正文或摘要"
+          className="text-text-secondary leading-relaxed"
+        >
+          {sighting.content || sighting.summary ? (
+            <MarkdownContent
+              content={sighting.content || sighting.summary}
+              className="text-text-secondary leading-relaxed"
+            />
+          ) : null}
+        </EditableText>
+
+        <div className="mt-8">
+          <EditableMediaGallery
+            media={sighting.mediaItems}
+            entityType="sighting"
+            entityId={sighting.id}
+            relation="media"
           />
-        )}
+        </div>
 
         {/* 标签 */}
         {sighting.tags.length > 0 && (
@@ -107,6 +155,8 @@ export default async function SightingDetailPage({
             </a>
           </div>
         )}
+        <RelatedContentList items={relatedContent} />
+        <ContentRelationEditor sourceType="sighting" sourceId={sighting.id} />
       </article>
     </PageContainer>
   );

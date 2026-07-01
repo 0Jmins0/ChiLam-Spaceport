@@ -65,6 +65,40 @@ const EDITABLE_FIELDS: Record<string, string[]> = {
     'replayUrl',
     'coverImageId',
   ],
+  socialPost: [
+    'platform',
+    'originalUrl',
+    'originalId',
+    'title',
+    'summary',
+    'thumbnailUrl',
+    'publishedAt',
+    'contentText',
+    'isFullCopy',
+    'isVisible',
+  ],
+  newsArticle: [
+    'title',
+    'source',
+    'originalUrl',
+    'summary',
+    'thumbnailUrl',
+    'publishedAt',
+    'contentText',
+    'isFullCopy',
+    'isVisible',
+  ],
+  sighting: [
+    'title',
+    'summary',
+    'thumbnailUrl',
+    'sightedAt',
+    'authorName',
+    'originalUrl',
+    'content',
+    'isFullCopy',
+    'isVisible',
+  ],
   media: ['caption', 'alt', 'mediaTag', 'searchNote'],
   mediaCollection: ['title', 'description', 'coverId'],
 };
@@ -73,7 +107,17 @@ const EDITABLE_FIELDS: Record<string, string[]> = {
 const INTEGER_FIELDS = new Set(['year', 'startYear', 'endYear', 'releaseYear', 'duration']);
 
 /** 需要 Date 解析的字段 */
-const DATE_FIELDS = new Set(['releaseDate', 'publishDate', 'date', 'startDate']);
+const DATE_FIELDS = new Set([
+  'releaseDate',
+  'publishDate',
+  'date',
+  'startDate',
+  'publishedAt',
+  'sightedAt',
+]);
+
+/** 需要 Boolean 解析的字段 */
+const BOOLEAN_FIELDS = new Set(['isFullCopy', 'isVisible']);
 
 /** entityType → Prisma model accessor */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -86,6 +130,9 @@ function getPrismaModel(entityType: string): any {
     album: prisma.album,
     magazine: prisma.magazine,
     livestream: prisma.livestream,
+    socialPost: prisma.socialPost,
+    newsArticle: prisma.newsArticle,
+    sighting: prisma.sighting,
     media: prisma.media,
     mediaCollection: prisma.mediaCollection,
   };
@@ -95,7 +142,7 @@ function getPrismaModel(entityType: string): any {
 /**
  * 将传入的 value 转换为对应字段的数据库类型
  */
-function convertValue(field: string, value: string | number | null): unknown {
+function convertValue(field: string, value: string | number | boolean | null): unknown {
   if (value === null) return null;
 
   if (INTEGER_FIELDS.has(field)) {
@@ -108,6 +155,13 @@ function convertValue(field: string, value: string | number | null): unknown {
     const date = new Date(String(value));
     if (isNaN(date.getTime())) throw new Error(`字段 "${field}" 需要有效的日期格式`);
     return date;
+  }
+
+  if (BOOLEAN_FIELDS.has(field)) {
+    if (typeof value === 'boolean') return value;
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    throw new Error(`字段 "${field}" 需要布尔值`);
   }
 
   return String(value);
@@ -129,7 +183,7 @@ export async function PATCH(request: Request) {
       entityType: string;
       entityId: string;
       field: string;
-      value: string | number | null;
+      value: string | number | boolean | null;
     };
 
     // 验证 entityType

@@ -2,11 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { NAV_ITEMS } from '@/config/navigation';
 import { siteConfig } from '@/config/site';
 import { cn } from '@/lib/cn';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useEditMode } from '@/components/edit/EditModeProvider';
+import { useVisibleNavItems } from './useVisibleNavItems';
 
 interface MobileNavProps {
   open: boolean;
@@ -17,6 +17,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
   const pathname = usePathname();
   const { user, loading, openLogin, logout } = useAuth();
   const { canShowEditButton, editMode, toggleEditMode } = useEditMode();
+  const navItems = useVisibleNavItems();
 
   return (
     <div
@@ -55,7 +56,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
 
         {/* Nav items */}
         <nav className="flex flex-col gap-6">
-          {NAV_ITEMS.map((item) => (
+          {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}

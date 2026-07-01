@@ -7,6 +7,12 @@ import { PageContainer } from '@/components/layout/PageContainer';
 import { Tag } from '@/components/ui/Tag';
 import { Button } from '@/components/ui/Button';
 import MarkdownContent from '@/components/ui/MarkdownContent';
+import { EditableText } from '@/components/edit/EditableText';
+import { EditableMediaGallery } from '@/components/edit/EditableMediaGallery';
+import { UpdateItemVisibilityToggle } from '@/components/updates/UpdateItemVisibilityToggle';
+import { RelatedContentList } from '@/components/relations/RelatedContentList';
+import { ContentRelationEditor } from '@/components/relations/ContentRelationEditor';
+import { getOutgoingRelatedContent } from '@/lib/content-relations';
 
 // Next.js 16: params 是 Promise
 export async function generateMetadata({
@@ -31,6 +37,7 @@ export default async function SocialPostDetailPage({
   const { id } = await params;
   const post = await getSocialPostById(id);
   if (!post) notFound();
+  const relatedContent = await getOutgoingRelatedContent('social_post', post.id);
 
   // 平台中文名映射
   const platformLabels: Record<string, string> = {
@@ -55,8 +62,16 @@ export default async function SocialPostDetailPage({
 
       <article className="mx-auto max-w-2xl">
         {/* 平台 + 日期 */}
-        <div className="mb-4 flex items-center gap-3">
-          <Tag active>{platformLabels[post.platform] || post.platform}</Tag>
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          <EditableText
+            value={post.platform}
+            entityType="socialPost"
+            entityId={post.id}
+            field="platform"
+            as="span"
+          >
+            <Tag active>{platformLabels[post.platform] || post.platform}</Tag>
+          </EditableText>
           {post.publishedAt && (
             <time className="text-sm text-text-muted">
               {new Date(post.publishedAt).toLocaleDateString('zh-CN', {
@@ -66,14 +81,21 @@ export default async function SocialPostDetailPage({
               })}
             </time>
           )}
+          <UpdateItemVisibilityToggle type="social" id={post.id} isVisible={post.isVisible} />
         </div>
 
         {/* 标题 */}
-        {post.title && (
-          <h1 className="font-heading text-2xl font-semibold text-text-primary md:text-3xl">
-            {post.title}
-          </h1>
-        )}
+        <EditableText
+          value={post.title}
+          entityType="socialPost"
+          entityId={post.id}
+          field="title"
+          as="h1"
+          placeholder="点击补充标题"
+          className="font-heading text-2xl font-semibold text-text-primary md:text-3xl"
+        >
+          {post.title}
+        </EditableText>
 
         {/* 金线分隔 */}
         <div className="my-6">
@@ -94,12 +116,32 @@ export default async function SocialPostDetailPage({
         )}
 
         {/* 概要/内容 */}
-        {(post.contentText || post.summary) && (
-          <MarkdownContent
-            content={post.contentText || post.summary}
-            className="text-text-secondary leading-relaxed"
+        <EditableText
+          value={post.contentText || post.summary}
+          entityType="socialPost"
+          entityId={post.id}
+          field={post.contentText ? 'contentText' : 'summary'}
+          as="div"
+          multiline
+          placeholder="点击补充正文或摘要"
+          className="text-text-secondary leading-relaxed"
+        >
+          {post.contentText || post.summary ? (
+            <MarkdownContent
+              content={post.contentText || post.summary}
+              className="text-text-secondary leading-relaxed"
+            />
+          ) : null}
+        </EditableText>
+
+        <div className="mt-8">
+          <EditableMediaGallery
+            media={post.mediaItems}
+            entityType="socialPost"
+            entityId={post.id}
+            relation="media"
           />
-        )}
+        </div>
 
         {/* 标签 */}
         {post.tags.length > 0 && (
@@ -116,6 +158,8 @@ export default async function SocialPostDetailPage({
             <Button variant="primary">查看原文 &#8599;</Button>
           </a>
         </div>
+        <RelatedContentList items={relatedContent} />
+        <ContentRelationEditor sourceType="social_post" sourceId={post.id} />
       </article>
     </PageContainer>
   );

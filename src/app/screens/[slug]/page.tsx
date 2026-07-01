@@ -10,6 +10,8 @@ import { EditableText } from '@/components/edit/EditableText';
 import { EditableImage } from '@/components/edit/EditableImage';
 import { EditableMediaGallery } from '@/components/edit/EditableMediaGallery';
 import MarkdownContent from '@/components/ui/MarkdownContent';
+import { RelatedContentList } from '@/components/relations/RelatedContentList';
+import { getIncomingRelatedContent } from '@/lib/content-relations';
 
 const typeLabels: Record<string, string> = {
   MOVIE: '电影',
@@ -46,6 +48,9 @@ export default async function ScreenDetailPage({ params }: { params: Promise<{ s
   const production = await getProductionBySlug(slug);
 
   if (!production) notFound();
+  const relatedUpdates = await getIncomingRelatedContent('production', production.id, {
+    sourceTypes: ['social_post', 'news_article', 'sighting'],
+  });
 
   return (
     <PageContainer>
@@ -285,11 +290,7 @@ export default async function ScreenDetailPage({ params }: { params: Promise<{ s
           </div>
         )}
 
-      {/* 相关资讯占位 */}
-      <div className="mt-8">
-        <h2 className="font-heading text-lg text-text-primary mb-4">相关资讯</h2>
-        <p className="text-sm text-text-muted">即将上线，敬请期待</p>
-      </div>
+      <RelatedContentList items={relatedUpdates} title="相关动态" />
     </PageContainer>
   );
 }

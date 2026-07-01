@@ -36,7 +36,7 @@ export function EditableMediaGallery({
   className,
   onRemove,
 }: EditableMediaGalleryProps) {
-  const { editMode } = useEditMode();
+  const { editMode, adminToken } = useEditMode();
   const [uploadStatus, setUploadStatus] = useState<UploadStatus>('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const [removingId, setRemovingId] = useState<string | null>(null);
@@ -109,7 +109,10 @@ export function EditableMediaGallery({
       // Step 3: 确认并创建 Media 记录 + 绑定
       const confirmRes = await fetch('/api/upload/confirm', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {}),
+        },
         body: JSON.stringify({
           key,
           url: publicUrl,

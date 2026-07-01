@@ -6,11 +6,16 @@ import { NewsArticleCard } from '@/components/updates/NewsArticleCard';
 import { SightingCard } from '@/components/updates/SightingCard';
 import { MasonryLayout } from '@/components/ui/MasonryLayout';
 import { Pagination } from '@/components/updates/Pagination';
+import { CreateEntryTrigger } from '@/components/edit/CreateEntryTrigger';
+import { UpdateCategoryVisibilityPanel } from '@/components/updates/UpdateCategoryVisibilityPanel';
+import { UpdatesAdminPanel } from '@/components/updates/UpdatesAdminPanel';
 import {
   getSocialPosts,
   getNewsArticles,
   getSightings,
   getUpdateCounts,
+  getUpdateCategoryStates,
+  getUpdateFilterOptions,
 } from '@/lib/queries/updates';
 
 export const dynamic = 'force-dynamic';
@@ -44,12 +49,24 @@ export default async function UpdatesPage({
   const sightingType = params.sightingType;
   const page = Number(params.page) || 1;
 
-  const counts = await getUpdateCounts();
+  const [counts, categoryStates, filterOptions, allFilterOptions] = await Promise.all([
+    getUpdateCounts(),
+    getUpdateCategoryStates(),
+    getUpdateFilterOptions(),
+    getUpdateFilterOptions({ includeHidden: true }),
+  ]);
+  const rootVisible = categoryStates.find((category) => category.key === 'root')?.isVisible ?? true;
+  const activeTabState = categoryStates.find((category) => category.key === tab);
+  const currentTabVisible = rootVisible && (activeTabState?.isVisible ?? true);
   const baseUrl = buildBaseUrl(tab, platform, sightingType);
 
   let content;
 
-  if (tab === 'social') {
+  if (!rootVisible) {
+    content = <p className="py-16 text-center text-sm text-text-muted">动态栏目暂未开放</p>;
+  } else if (!currentTabVisible) {
+    content = <p className="py-16 text-center text-sm text-text-muted">该分类暂未开放</p>;
+  } else if (tab === 'social') {
     const data = await getSocialPosts({ platform, page });
 
     content =
@@ -63,10 +80,10 @@ export default async function UpdatesPage({
                 key={post.id}
                 id={post.id}
                 platform={post.platform}
-                originalUrl={post.originalUrl}
+                originalUrl={`/updates/social/${post.id}`}
                 title={post.title ?? undefined}
                 summary={post.summary ?? undefined}
-                thumbnailUrl={post.thumbnailUrl ?? undefined}
+                thumbnailUrl={post.thumbnailUrl ?? post.mediaItems?.[0]?.url ?? undefined}
                 publishedAt={post.publishedAt ?? (post as unknown as { createdAt: Date }).createdAt}
                 tags={post.tags.map((t) => t.name)}
                 priority={index < 3}
@@ -96,11 +113,11 @@ export default async function UpdatesPage({
                 key={article.id}
                 id={article.id}
                 slug={article.slug}
-                originalUrl={article.originalUrl}
+                originalUrl={`/updates/news/${article.slug}`}
                 title={article.title}
                 summary={article.summary ?? undefined}
                 source={article.source ?? undefined}
-                thumbnailUrl={article.thumbnailUrl ?? undefined}
+                thumbnailUrl={article.thumbnailUrl ?? article.mediaItems?.[0]?.url ?? undefined}
                 publishedAt={
                   article.publishedAt ?? (article as unknown as { createdAt: Date }).createdAt
                 }
@@ -132,10 +149,10 @@ export default async function UpdatesPage({
                 key={sighting.id}
                 id={sighting.id}
                 slug={sighting.slug}
-                originalUrl={sighting.originalUrl ?? undefined}
+                originalUrl={`/updates/sightings/${sighting.slug}`}
                 title={sighting.title}
                 summary={sighting.summary ?? undefined}
-                thumbnailUrl={sighting.thumbnailUrl ?? undefined}
+                thumbnailUrl={sighting.thumbnailUrl ?? sighting.mediaItems?.[0]?.url ?? undefined}
                 sightedAt={
                   sighting.sightedAt ?? (sighting as unknown as { createdAt: Date }).createdAt
                 }
@@ -158,13 +175,25 @@ export default async function UpdatesPage({
   return (
     <PageContainer>
       <PageHeader title="动态" titleEn="Updates" description="关注他的每一个日常" />
+      <UpdateCategoryVisibilityPanel />
+      <div className="mb-6 flex justify-end">
+        {tab === 'social' && <CreateEntryTrigger entityType="socialPost" label="新增社交动态" />}
+        {tab === 'news' && <CreateEntryTrigger entityType="newsArticle" label="新增新闻" />}
+        {tab === 'sighting' && <CreateEntryTrigger entityType="sighting" label="新增路透" />}
+      </div>
       <UpdatesFilterBar
         currentTab={tab}
         currentPlatform={platform}
         currentSightingType={sightingType}
         counts={counts}
+        categoryStates={categoryStates.filter((category) => category.key !== 'root')}
+        platformFilters={filterOptions.platforms}
+        sightingTypeFilters={filterOptions.sightingTypes}
+        allPlatformFilters={allFilterOptions.platforms}
+        allSightingTypeFilters={allFilterOptions.sightingTypes}
         className="mb-8"
       />
+      <UpdatesAdminPanel currentTab={tab} />
       {content}
     </PageContainer>
   );

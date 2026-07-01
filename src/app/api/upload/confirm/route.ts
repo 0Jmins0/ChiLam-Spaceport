@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ALLOWED_TYPES } from '@/lib/r2';
 import { prisma } from '@/lib/db';
 import { MediaType, MediaCategory } from '@/generated/prisma/client';
+import { verifyAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -94,6 +95,13 @@ export async function POST(request: NextRequest) {
         { error: 'target、targetId、relation 必须同时提供' },
         { status: 400 },
       );
+    }
+
+    if (wantsBind) {
+      const admin = await verifyAdmin(request);
+      if (!admin) {
+        return NextResponse.json({ error: '未授权访问' }, { status: 401 });
+      }
     }
 
     const bindKey = `${target}:${relation}`;

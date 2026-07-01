@@ -27,6 +27,7 @@ const TYPE_LABELS: Record<SearchResultType, string> = {
 
 async function searchSocialPosts(q: string, take: number, skip: number = 0) {
   const where = {
+    isVisible: true,
     OR: [
       { title: { contains: q, mode: 'insensitive' as const } },
       { summary: { contains: q, mode: 'insensitive' as const } },
@@ -52,6 +53,7 @@ async function searchSocialPosts(q: string, take: number, skip: number = 0) {
 
 async function searchNewsArticles(q: string, take: number, skip: number = 0) {
   const where = {
+    isVisible: true,
     OR: [
       { title: { contains: q, mode: 'insensitive' as const } },
       { summary: { contains: q, mode: 'insensitive' as const } },
@@ -78,6 +80,7 @@ async function searchNewsArticles(q: string, take: number, skip: number = 0) {
 async function searchSightings(q: string, take: number, skip: number = 0) {
   const where = {
     status: { not: ModerationStatus.REJECTED },
+    isVisible: true,
     OR: [
       { title: { contains: q, mode: 'insensitive' as const } },
       { summary: { contains: q, mode: 'insensitive' as const } },

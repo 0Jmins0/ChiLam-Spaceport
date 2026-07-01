@@ -7,6 +7,12 @@ import { PageContainer } from '@/components/layout/PageContainer';
 import { Tag } from '@/components/ui/Tag';
 import { Button } from '@/components/ui/Button';
 import MarkdownContent from '@/components/ui/MarkdownContent';
+import { EditableText } from '@/components/edit/EditableText';
+import { EditableMediaGallery } from '@/components/edit/EditableMediaGallery';
+import { UpdateItemVisibilityToggle } from '@/components/updates/UpdateItemVisibilityToggle';
+import { RelatedContentList } from '@/components/relations/RelatedContentList';
+import { ContentRelationEditor } from '@/components/relations/ContentRelationEditor';
+import { getOutgoingRelatedContent } from '@/lib/content-relations';
 
 // Next.js 16: params 是 Promise
 export async function generateMetadata({
@@ -31,6 +37,7 @@ export default async function NewsArticleDetailPage({
   const { slug } = await params;
   const article = await getNewsArticleBySlug(slug);
   if (!article) notFound();
+  const relatedContent = await getOutgoingRelatedContent('news_article', article.id);
 
   return (
     <PageContainer>
@@ -46,8 +53,18 @@ export default async function NewsArticleDetailPage({
 
       <article className="mx-auto max-w-2xl">
         {/* 来源 + 日期 */}
-        <div className="mb-4 flex items-center gap-3">
-          {article.source && <Tag active>{article.source}</Tag>}
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          {article.source && (
+            <EditableText
+              value={article.source}
+              entityType="newsArticle"
+              entityId={article.id}
+              field="source"
+              as="span"
+            >
+              <Tag active>{article.source}</Tag>
+            </EditableText>
+          )}
           {article.publishedAt && (
             <time className="text-sm text-text-muted">
               {new Date(article.publishedAt).toLocaleDateString('zh-CN', {
@@ -57,12 +74,21 @@ export default async function NewsArticleDetailPage({
               })}
             </time>
           )}
+          <UpdateItemVisibilityToggle type="news" id={article.id} isVisible={article.isVisible} />
         </div>
 
         {/* 标题 */}
-        <h1 className="font-heading text-2xl font-semibold text-text-primary md:text-3xl">
+        <EditableText
+          value={article.title}
+          entityType="newsArticle"
+          entityId={article.id}
+          field="title"
+          as="h1"
+          placeholder="点击补充标题"
+          className="font-heading text-2xl font-semibold text-text-primary md:text-3xl"
+        >
           {article.title}
-        </h1>
+        </EditableText>
 
         {/* 金线分隔 */}
         <div className="my-6">
@@ -83,12 +109,32 @@ export default async function NewsArticleDetailPage({
         )}
 
         {/* 概要/内容 */}
-        {(article.contentText || article.summary) && (
-          <MarkdownContent
-            content={article.contentText || article.summary}
-            className="text-text-secondary leading-relaxed"
+        <EditableText
+          value={article.contentText || article.summary}
+          entityType="newsArticle"
+          entityId={article.id}
+          field={article.contentText ? 'contentText' : 'summary'}
+          as="div"
+          multiline
+          placeholder="点击补充正文或摘要"
+          className="text-text-secondary leading-relaxed"
+        >
+          {article.contentText || article.summary ? (
+            <MarkdownContent
+              content={article.contentText || article.summary}
+              className="text-text-secondary leading-relaxed"
+            />
+          ) : null}
+        </EditableText>
+
+        <div className="mt-8">
+          <EditableMediaGallery
+            media={article.mediaItems}
+            entityType="newsArticle"
+            entityId={article.id}
+            relation="media"
           />
-        )}
+        </div>
 
         {/* 标签 */}
         {article.tags.length > 0 && (
@@ -105,6 +151,8 @@ export default async function NewsArticleDetailPage({
             <Button variant="primary">查看原文 &#8599;</Button>
           </a>
         </div>
+        <RelatedContentList items={relatedContent} />
+        <ContentRelationEditor sourceType="news_article" sourceId={article.id} />
       </article>
     </PageContainer>
   );

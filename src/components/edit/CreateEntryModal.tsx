@@ -22,6 +22,9 @@ const ENTITY_LABELS: Record<string, string> = {
   livestream: '直播',
   album: '专辑',
   magazine: '杂志',
+  socialPost: '社交动态',
+  newsArticle: '新闻',
+  sighting: '路透',
 };
 
 const API_ROUTES: Record<string, string> = {
@@ -32,6 +35,9 @@ const API_ROUTES: Record<string, string> = {
   livestream: '/api/activities/livestreams',
   album: '/api/archives/albums',
   magazine: '/api/archives/magazines',
+  socialPost: '/api/updates/social',
+  newsArticle: '/api/updates/news',
+  sighting: '/api/updates/sightings',
 };
 
 const DETAIL_ROUTES: Record<string, (slug: string) => string> = {
@@ -42,6 +48,9 @@ const DETAIL_ROUTES: Record<string, (slug: string) => string> = {
   livestream: (slug) => `/activities/livestreams/${slug}`,
   album: (slug) => `/archives/albums/${slug}`,
   magazine: (slug) => `/archives/magazines/${slug}`,
+  socialPost: (id) => `/updates/social/${id}`,
+  newsArticle: (slug) => `/updates/news/${slug}`,
+  sighting: (slug) => `/updates/sightings/${slug}`,
 };
 
 const TYPE_OPTIONS: Record<string, { value: string; label: string }[]> = {
@@ -66,6 +75,13 @@ const TYPE_OPTIONS: Record<string, { value: string; label: string }[]> = {
     { value: 'INSTAGRAM', label: 'Instagram' },
     { value: 'YOUTUBE', label: 'YouTube' },
     { value: 'OTHER', label: '其他' },
+  ],
+  socialPost: [
+    { value: 'weibo', label: '微博' },
+    { value: 'xiaohongshu', label: '小红书' },
+    { value: 'douyin', label: '抖音' },
+    { value: 'instagram', label: 'Instagram' },
+    { value: 'facebook', label: 'Facebook' },
   ],
 };
 
@@ -174,6 +190,33 @@ function getFieldConfigs(entityType: string): FieldConfig[] {
       return [
         { key: 'title', label: '标题', type: 'text', required: true },
         { key: 'date', label: '日期', type: 'date', required: true },
+      ];
+    case 'socialPost':
+      return [
+        {
+          key: 'platform',
+          label: '平台',
+          type: 'select',
+          required: true,
+          options: TYPE_OPTIONS.socialPost,
+        },
+        { key: 'originalUrl', label: '原文链接', type: 'text', required: true },
+        { key: 'publishedAt', label: '发布时间', type: 'date', required: false },
+        { key: 'title', label: '标题', type: 'text', required: false },
+      ];
+    case 'newsArticle':
+      return [
+        { key: 'title', label: '标题', type: 'text', required: true },
+        { key: 'originalUrl', label: '原文链接', type: 'text', required: true },
+        { key: 'source', label: '来源', type: 'text', required: false },
+        { key: 'publishedAt', label: '发布时间', type: 'date', required: false },
+      ];
+    case 'sighting':
+      return [
+        { key: 'title', label: '标题', type: 'text', required: true },
+        { key: 'authorName', label: '作者/来源', type: 'text', required: true },
+        { key: 'originalUrl', label: '原文链接', type: 'text', required: false },
+        { key: 'sightedAt', label: '路透时间', type: 'date', required: false },
       ];
     default:
       return [];
@@ -287,7 +330,10 @@ export function CreateEntryModal({
       }
 
       // Use slug from API response if available, otherwise use generated one
-      const finalSlug = resData?.data?.slug || resData?.slug || slug;
+      const finalSlug =
+        entityType === 'socialPost'
+          ? resData?.data?.id
+          : resData?.data?.slug || resData?.slug || slug;
 
       // Navigate to detail page
       const detailRoute = DETAIL_ROUTES[entityType];

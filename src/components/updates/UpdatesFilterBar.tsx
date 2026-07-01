@@ -6,41 +6,36 @@ import { useCallback } from 'react';
 import { cn } from '@/lib/cn';
 import { TabBar } from '@/components/ui/TabBar';
 import { Tag } from '@/components/ui/Tag';
+import { useEditMode } from '@/components/edit/EditModeProvider';
 
 interface UpdatesFilterBarProps {
   currentTab: string;
   currentPlatform?: string;
   currentSightingType?: string;
   counts?: { social: number; news: number; sighting: number };
+  categoryStates?: { key: string; label: string; isVisible: boolean }[];
+  platformFilters?: { label: string; value: string; count: number }[];
+  sightingTypeFilters?: { label: string; value: string; count: number }[];
+  allPlatformFilters?: { label: string; value: string; count: number }[];
+  allSightingTypeFilters?: { label: string; value: string; count: number }[];
   className?: string;
 }
-
-const platformFilters = [
-  { label: '全部', value: '' },
-  { label: '微博', value: 'weibo' },
-  { label: '小红书', value: 'xiaohongshu' },
-  { label: '抖音', value: 'douyin' },
-  { label: 'Instagram', value: 'instagram' },
-  { label: 'Facebook', value: 'facebook' },
-];
-
-const sightingTypeFilters = [
-  { label: '全部', value: '' },
-  { label: '机场', value: 'airport' },
-  { label: '片场', value: 'set' },
-  { label: '偶遇', value: 'encounter' },
-  { label: '其他', value: 'other' },
-];
 
 export function UpdatesFilterBar({
   currentTab,
   currentPlatform,
   currentSightingType,
   counts,
+  categoryStates,
+  platformFilters = [],
+  sightingTypeFilters = [],
+  allPlatformFilters,
+  allSightingTypeFilters,
   className,
 }: UpdatesFilterBarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { editMode } = useEditMode();
 
   const buildUrl = useCallback(
     (params: Record<string, string>) => {
@@ -81,20 +76,34 @@ export function UpdatesFilterBar({
     [router, buildUrl],
   );
 
+  const tabStates = new Map(categoryStates?.map((category) => [category.key, category]));
   const tabs = [
     {
       label: counts ? `社交媒体 (${counts.social})` : '社交媒体',
       value: 'social',
+      visible: tabStates.get('social')?.isVisible ?? true,
     },
     {
       label: counts ? `新闻报道 (${counts.news})` : '新闻报道',
       value: 'news',
+      visible: tabStates.get('news')?.isVisible ?? true,
     },
     {
       label: counts ? `路透 (${counts.sighting})` : '路透',
       value: 'sighting',
+      visible: tabStates.get('sighting')?.isVisible ?? true,
     },
-  ];
+  ].filter((tab) => editMode || tab.visible);
+
+  const visiblePlatformFilters = [
+    { label: '全部', value: '', count: counts?.social ?? 0 },
+    ...(editMode ? (allPlatformFilters ?? platformFilters) : platformFilters),
+  ].filter((filter) => editMode || filter.value === '' || filter.count > 0);
+
+  const visibleSightingTypeFilters = [
+    { label: '全部', value: '', count: counts?.sighting ?? 0 },
+    ...(editMode ? (allSightingTypeFilters ?? sightingTypeFilters) : sightingTypeFilters),
+  ].filter((filter) => editMode || filter.value === '' || filter.count > 0);
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -103,7 +112,7 @@ export function UpdatesFilterBar({
       {/* Platform sub-filters for social tab */}
       {currentTab === 'social' && (
         <div className="flex flex-wrap gap-2">
-          {platformFilters.map((filter) => (
+          {visiblePlatformFilters.map((filter) => (
             <Tag
               key={filter.value}
               active={currentPlatform === filter.value || (!currentPlatform && filter.value === '')}
@@ -118,7 +127,7 @@ export function UpdatesFilterBar({
       {/* Sighting type sub-filters for sighting tab */}
       {currentTab === 'sighting' && (
         <div className="flex flex-wrap gap-2">
-          {sightingTypeFilters.map((filter) => (
+          {visibleSightingTypeFilters.map((filter) => (
             <Tag
               key={filter.value}
               active={

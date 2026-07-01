@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { NAV_ITEMS } from '@/config/navigation';
 import { siteConfig } from '@/config/site';
 import { cn } from '@/lib/cn';
 import { MobileNav } from './MobileNav';
@@ -11,6 +10,7 @@ import { SearchModal } from './SearchModal';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { UserMenu } from '@/components/auth/UserMenu';
 import { EditModeToggle } from '@/components/edit/EditModeToggle';
+import { useVisibleNavItems } from './useVisibleNavItems';
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -18,6 +18,7 @@ export function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const pathname = usePathname();
   const { user, loading, openLogin } = useAuth();
+  const navItems = useVisibleNavItems();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -57,7 +58,7 @@ export function Header() {
 
           {/* Desktop Nav */}
           <nav className="hidden items-center gap-8 md:flex">
-            {NAV_ITEMS.map((item) => (
+            {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}

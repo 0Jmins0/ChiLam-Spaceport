@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.5 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 + P6.13 + P6.15 + P6.16 + P6.17 + P6.19 + P6.20 + P6.21 + P6.22 + P6.23 + P6.24 + P6.25 已完成）
+## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.5 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 + P6.13 + P6.15 + P6.16 + P6.17 + P6.19 + P6.20 + P6.21 + P6.22 + P6.23 + P6.24 + P6.25 + P6.26 已完成）
 
 ---
 
@@ -11,7 +11,7 @@
 | 项目初始化 | ✅ 已完成 | 2026-06-06 |
 | 数据库设计 | ✅ 已完成 | 2026-06-06 |
 | 首页 | ✅ 已完成 | 2026-06-06 |
-| 动态模块 | ✅ 已完成 | 2026-06-06 |
+| 动态模块 | ✅ 已完成（已重新开放 + 大标题/单条开关 + 媒体上传 + 跨栏目关联） | 2026-07-01 |
 | 影视模块 | ✅ 已完成 | 2026-06-06 |
 | 演出模块 | ✅ 已完成 | 2026-06-06 |
 | 活动模块 | ✅ 已完成（代言+直播，封面+媒体上传，访谈已独立） | 2026-06-15 |
@@ -30,6 +30,50 @@
 ---
 
 ## 详细记录
+
+### 2026-07-01 - P6.26 动态模块重新开放与维护增强（已完成）
+
+#### 完成内容
+- **动态入口恢复**：主导航重新开放 `/updates`，并通过 `Category.isVisible` 控制普通前台是否展示动态整体入口
+- **大标题开关**：编辑模式下可维护「动态整体 / 社交媒体 / 新闻 / 路透」四个栏目开关；普通模式只显示已开放栏目
+- **单条内容开关**：`social_posts`、`news_articles`、`sightings` 新增 `isVisible` 字段，每条动态可单独控制前台展示
+- **tag/filter 展示规则**：普通模式只显示有可见内容的筛选项；编辑模式显示全部平台/tag，便于提前维护
+- **动态详情维护**：社交媒体、新闻、路透详情页接入 `EditableText` 和 `EditableMediaGallery`，支持编辑标题/正文/来源信息，上传图片、GIF 动图和视频
+- **上传安全收紧**：带 `target/relation` 的媒体绑定接口需要管理员 token，避免直接调用 API 绑定内容
+- **站内详情入口**：动态列表卡片跳转站内详情页，原文链接保留在详情页按钮中，便于进入编辑维护流程
+- **跨栏目双向关联**：新增通用内容关联 API 和组件，动态详情页可关联影视/演出/活动/访谈/资料库；影视与演出详情页反向显示相关动态
+- **隐藏内容防泄露**：普通查询、详情查询和全站搜索默认过滤 `isVisible=false` 的动态内容；隐藏内容管理走管理员 API
+
+#### 涉及文件
+- `prisma/schema.prisma` — SocialPost / NewsArticle / Sighting 新增 `isVisible`
+- `prisma/migrations/20260701090000_add_update_visibility/migration.sql` — 新增可见性字段与索引
+- `src/config/navigation.ts` — 恢复动态导航
+- `src/lib/queries/updates.ts` — 可见性过滤、栏目状态、平台/tag 统计、媒体预览
+- `src/lib/queries/search.ts` — 搜索过滤隐藏动态
+- `src/app/updates/page.tsx` — 栏目开关面板、全量管理面板、新增入口、站内卡片跳转
+- `src/components/updates/UpdateCategoryVisibilityPanel.tsx` — 动态整体与大标题开关
+- `src/components/updates/UpdatesAdminPanel.tsx` — 当前 tab 全量内容维护列表
+- `src/components/updates/UpdateItemVisibilityToggle.tsx` — 单条内容展示开关
+- `src/components/updates/UpdatesFilterBar.tsx` — 普通/编辑模式下不同筛选展示规则
+- `src/app/updates/social/[id]/page.tsx` — 社交动态详情编辑、媒体上传、内容关联
+- `src/app/updates/news/[slug]/page.tsx` — 新闻详情编辑、媒体上传、内容关联
+- `src/app/updates/sightings/[slug]/page.tsx` — 路透详情编辑、媒体上传、内容关联
+- `src/components/relations/ContentRelationEditor.tsx` — 通用关联编辑器
+- `src/components/relations/RelatedContentList.tsx` — 通用关联展示列表
+- `src/app/api/admin/updates/categories/route.ts` — 动态栏目开关管理 API
+- `src/app/api/admin/updates/items/route.ts` — 单条动态开关管理 API
+- `src/app/api/admin/content-relations/route.ts` — 通用内容关联管理 API
+- `src/app/api/admin/content-search/route.ts` — 管理端关联搜索 API
+- `src/app/screens/[slug]/page.tsx` — 影视详情反向显示相关动态
+- `src/app/performances/[slug]/page.tsx` — 演出详情反向显示相关动态
+
+#### 验证
+- `pnpm exec prisma generate` 通过
+- 本次改动范围定向 ESLint 通过
+- `pnpm build` 通过
+- 全量 `pnpm lint` 仍受既有 `scripts/*.ts` 中 `no-explicit-any` 问题阻塞，非本次改动引入
+
+---
 
 ### 2026-06-16 - P6.25 移动端编辑模式按钮（已完成）
 

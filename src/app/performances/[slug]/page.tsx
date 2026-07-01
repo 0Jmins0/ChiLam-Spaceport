@@ -10,6 +10,8 @@ import { EditableImage } from '@/components/edit/EditableImage';
 import { EditableMediaGallery } from '@/components/edit/EditableMediaGallery';
 import { LinkedProduction } from '@/components/performances/LinkedProduction';
 import MarkdownContent from '@/components/ui/MarkdownContent';
+import { RelatedContentList } from '@/components/relations/RelatedContentList';
+import { getIncomingRelatedContent } from '@/lib/content-relations';
 
 const typeLabels: Record<string, string> = {
   CONCERT: '演唱会',
@@ -53,6 +55,9 @@ export default async function PerformanceDetailPage({
 
   if (!performance) notFound();
 
+  const relatedUpdates = await getIncomingRelatedContent('performance', performance.id, {
+    sourceTypes: ['social_post', 'news_article', 'sighting'],
+  });
   const isStage = performance.type === 'STAGE';
 
   // 按 mediaTag 分组 gallery
@@ -249,6 +254,8 @@ export default async function PerformanceDetailPage({
           />
         </div>
       )}
+
+      <RelatedContentList items={relatedUpdates} title="相关动态" />
     </PageContainer>
   );
 }

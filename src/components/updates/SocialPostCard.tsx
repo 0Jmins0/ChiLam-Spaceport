@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { cn } from '@/lib/cn';
 import { Card } from '@/components/ui/Card';
@@ -52,12 +53,7 @@ export function SocialPostCard({
   className,
 }: SocialPostCardProps) {
   return (
-    <a
-      href={originalUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={cn('block', className)}
-    >
+    <Link href={originalUrl} className={cn('block', className)}>
       <Card className="p-0 overflow-hidden">
         {/* Thumbnail */}
         <div className="relative aspect-[4/5] w-full bg-bg-darker">
@@ -97,6 +93,6 @@ export function SocialPostCard({
           <p className="text-xs text-text-muted">{formatDate(publishedAt)}</p>
         </div>
       </Card>
-    </a>
+    </Link>
   );
 }
