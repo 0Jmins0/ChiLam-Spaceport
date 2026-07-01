@@ -18,6 +18,7 @@ export function GalleryCard({ item, onClick, onDelete, priority = false }: Galle
   const [deleting, setDeleting] = useState(false);
   const isVideo = item.category === 'VIDEO' || item.type === 'VIDEO';
   const isAudio = item.category === 'AUDIO' || item.type === 'AUDIO';
+  const imagePreviewUrl = isVideo ? item.thumbnailUrl : item.thumbnailUrl || item.url;
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -54,10 +55,10 @@ export function GalleryCard({ item, onClick, onDelete, priority = false }: Galle
       )}
 
       {/* 图片/视频缩略图 */}
-      {!isAudio ? (
+      {!isAudio && imagePreviewUrl ? (
         <div className="relative w-full overflow-hidden">
           <Image
-            src={item.thumbnailUrl || item.url}
+            src={imagePreviewUrl}
             alt={item.alt || item.caption || '媒体文件'}
             width={item.width || 400}
             height={item.height || 300}
@@ -75,6 +76,17 @@ export function GalleryCard({ item, onClick, onDelete, priority = false }: Galle
               </div>
             </div>
           )}
+        </div>
+      ) : isVideo ? (
+        <div className="relative flex aspect-video w-full items-center justify-center bg-bg-darker">
+          <span className="text-sm text-text-muted">视频</span>
+          <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm">
+              <svg className="ml-1 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+          </div>
         </div>
       ) : (
         /* 音频卡片样式 */

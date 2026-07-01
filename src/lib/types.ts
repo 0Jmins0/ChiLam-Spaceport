@@ -30,21 +30,30 @@ export interface TimelineEventItem {
 export interface SocialPostItem {
   id: string;
   platform: string;
-  originalUrl: string;
+  originalUrl: string | null;
   title: string | null;
   summary: string | null;
   thumbnailUrl: string | null;
   publishedAt: Date | null;
   isVisible: boolean;
   tags: { name: string; slug: string }[];
-  mediaItems?: { id: string; url: string; type: string; alt: string | null }[];
+  mediaItems?: {
+    id: string;
+    url: string;
+    thumbnailUrl: string | null;
+    type: string;
+    alt: string | null;
+    width: number | null;
+    height: number | null;
+    duration: number | null;
+  }[];
 }
 
 // 新闻卡片
 export interface NewsArticleItem {
   id: string;
   slug: string;
-  originalUrl: string;
+  originalUrl: string | null;
   title: string;
   summary: string | null;
   source: string | null;
@@ -52,7 +61,16 @@ export interface NewsArticleItem {
   publishedAt: Date | null;
   isVisible: boolean;
   tags: { name: string; slug: string }[];
-  mediaItems?: { id: string; url: string; type: string; alt: string | null }[];
+  mediaItems?: {
+    id: string;
+    url: string;
+    thumbnailUrl: string | null;
+    type: string;
+    alt: string | null;
+    width: number | null;
+    height: number | null;
+    duration: number | null;
+  }[];
 }
 
 // 路透卡片
@@ -67,7 +85,16 @@ export interface SightingItem {
   authorName: string;
   isVisible: boolean;
   tags: { name: string; slug: string }[];
-  mediaItems?: { id: string; url: string; type: string; alt: string | null }[];
+  mediaItems?: {
+    id: string;
+    url: string;
+    thumbnailUrl: string | null;
+    type: string;
+    alt: string | null;
+    width: number | null;
+    height: number | null;
+    duration: number | null;
+  }[];
 }
 
 // ─── 影视模块 ───

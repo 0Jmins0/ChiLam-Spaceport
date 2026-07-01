@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { cn } from '@/lib/cn';
+import { getMediaAspectRatio, type UpdateMediaPreview } from '@/lib/update-media';
 import { Card } from '@/components/ui/Card';
 import { Tag } from '@/components/ui/Tag';
 
@@ -12,7 +13,7 @@ interface NewsArticleCardProps {
   title: string;
   summary?: string;
   source?: string;
-  thumbnailUrl?: string;
+  previewMedia?: UpdateMediaPreview | null;
   publishedAt: string | Date;
   tags?: string[];
   priority?: boolean;
@@ -32,35 +33,47 @@ export function NewsArticleCard({
   title,
   summary,
   source,
-  thumbnailUrl,
+  previewMedia,
   publishedAt,
   priority,
   className,
 }: NewsArticleCardProps) {
+  const hasPreview = Boolean(previewMedia?.url);
+  const isVideo = previewMedia?.type === 'VIDEO';
+
   return (
     <Link href={originalUrl} className={cn('block break-inside-avoid mb-4', className)}>
       <Card className="p-0 overflow-hidden">
-        <div className="flex flex-col md:flex-row">
+        <div className={cn('flex flex-col', hasPreview && 'md:flex-row')}>
           {/* Thumbnail */}
-          <div className="relative aspect-video w-full shrink-0 bg-bg-darker md:aspect-[16/9] md:w-[200px]">
-            {thumbnailUrl ? (
+          {hasPreview && (
+            <div
+              className="relative w-full shrink-0 bg-bg-darker md:w-[220px]"
+              style={{ aspectRatio: getMediaAspectRatio(previewMedia) }}
+            >
               <Image
-                src={thumbnailUrl}
+                src={previewMedia!.url}
                 alt={title}
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 200px"
+                sizes="(max-width: 768px) 100vw, 220px"
                 priority={priority}
               />
-            ) : (
-              <div className="flex h-full items-center justify-center">
-                <span className="text-2xl font-heading text-accent/40">NEWS</span>
-              </div>
-            )}
-          </div>
+              {isVideo && (
+                <div className="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/65 text-white backdrop-blur-sm">
+                  <span className="ml-0.5 text-sm">▶</span>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Content */}
-          <div className="flex flex-1 flex-col justify-between space-y-2 p-4">
+          <div
+            className={cn(
+              'flex flex-1 flex-col justify-between space-y-3 p-4',
+              !hasPreview && 'p-5 md:p-6',
+            )}
+          >
             <div className="space-y-2">
               {source && (
                 <div>
@@ -71,7 +84,12 @@ export function NewsArticleCard({
                 {title}
               </h3>
               {summary && (
-                <p className="line-clamp-3 text-xs leading-relaxed text-text-secondary">
+                <p
+                  className={cn(
+                    'text-xs leading-relaxed text-text-secondary',
+                    hasPreview ? 'line-clamp-3' : 'line-clamp-5',
+                  )}
+                >
                   {summary}
                 </p>
               )}

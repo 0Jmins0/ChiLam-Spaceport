@@ -13,6 +13,7 @@ import { UpdateItemVisibilityToggle } from '@/components/updates/UpdateItemVisib
 import { RelatedContentList } from '@/components/relations/RelatedContentList';
 import { ContentRelationEditor } from '@/components/relations/ContentRelationEditor';
 import { getOutgoingRelatedContent } from '@/lib/content-relations';
+import { getMediaAspectRatio, getUpdatePreviewMedia } from '@/lib/update-media';
 
 // Next.js 16: params 是 Promise
 export async function generateMetadata({
@@ -38,6 +39,8 @@ export default async function NewsArticleDetailPage({
   const article = await getNewsArticleBySlug(slug);
   if (!article) notFound();
   const relatedContent = await getOutgoingRelatedContent('news_article', article.id);
+  const previewMedia = getUpdatePreviewMedia(article.thumbnailUrl, article.mediaItems);
+  const primaryMedia = article.mediaItems[0];
 
   return (
     <PageContainer>
@@ -95,16 +98,30 @@ export default async function NewsArticleDetailPage({
           <div className="gold-line" />
         </div>
 
-        {/* 缩略图 */}
-        {article.thumbnailUrl && (
-          <div className="relative mb-6 aspect-video w-full overflow-hidden rounded-[var(--radius-card)]">
-            <Image
-              src={article.thumbnailUrl}
-              alt={article.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 672px"
-            />
+        {/* 首图/视频 */}
+        {previewMedia?.url && (
+          <div
+            className="relative mb-6 w-full overflow-hidden rounded-[var(--radius-card)] bg-bg-darker"
+            style={{ aspectRatio: getMediaAspectRatio(previewMedia) }}
+          >
+            {previewMedia.type === 'VIDEO' && primaryMedia ? (
+              <video
+                src={primaryMedia.url}
+                poster={previewMedia.url}
+                controls
+                playsInline
+                preload="metadata"
+                className="h-full w-full object-contain"
+              />
+            ) : (
+              <Image
+                src={previewMedia.url}
+                alt={article.title}
+                fill
+                className="object-contain"
+                sizes="(max-width: 768px) 100vw, 672px"
+              />
+            )}
           </div>
         )}
 
@@ -146,11 +163,13 @@ export default async function NewsArticleDetailPage({
         )}
 
         {/* 查看原文按钮 */}
-        <div className="mt-8">
-          <a href={article.originalUrl} target="_blank" rel="noopener noreferrer">
-            <Button variant="primary">查看原文 &#8599;</Button>
-          </a>
-        </div>
+        {article.originalUrl && (
+          <div className="mt-8">
+            <a href={article.originalUrl} target="_blank" rel="noopener noreferrer">
+              <Button variant="primary">查看原文 &#8599;</Button>
+            </a>
+          </div>
+        )}
         <RelatedContentList items={relatedContent} />
         <ContentRelationEditor sourceType="news_article" sourceId={article.id} />
       </article>

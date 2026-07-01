@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { cn } from '@/lib/cn';
+import { getMediaAspectRatio, type UpdateMediaPreview } from '@/lib/update-media';
 import { Card } from '@/components/ui/Card';
 import { Tag } from '@/components/ui/Tag';
 
@@ -11,7 +12,7 @@ interface SocialPostCardProps {
   originalUrl: string;
   title?: string;
   summary?: string;
-  thumbnailUrl?: string;
+  previewMedia?: UpdateMediaPreview | null;
   publishedAt: string | Date;
   tags?: string[];
   priority?: boolean;
@@ -47,19 +48,25 @@ export function SocialPostCard({
   originalUrl,
   title,
   summary,
-  thumbnailUrl,
+  previewMedia,
   publishedAt,
   priority,
   className,
 }: SocialPostCardProps) {
+  const hasPreview = Boolean(previewMedia?.url);
+  const isVideo = previewMedia?.type === 'VIDEO';
+
   return (
-    <Link href={originalUrl} className={cn('block', className)}>
+    <Link href={originalUrl} className={cn('mb-4 block break-inside-avoid', className)}>
       <Card className="p-0 overflow-hidden">
         {/* Thumbnail */}
-        <div className="relative aspect-[4/5] w-full bg-bg-darker">
-          {thumbnailUrl ? (
+        <div
+          className="relative w-full bg-bg-darker"
+          style={{ aspectRatio: getMediaAspectRatio(previewMedia) }}
+        >
+          {hasPreview ? (
             <Image
-              src={thumbnailUrl}
+              src={previewMedia!.url}
               alt={title || '社交媒体帖子'}
               fill
               className="object-cover"
@@ -78,6 +85,11 @@ export function SocialPostCard({
           <div className="absolute left-3 top-3">
             <Tag active>{platformLabels[platform] || platform}</Tag>
           </div>
+          {isVideo && (
+            <div className="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/65 text-white backdrop-blur-sm">
+              <span className="ml-0.5 text-sm">▶</span>
+            </div>
+          )}
         </div>
 
         {/* Content */}

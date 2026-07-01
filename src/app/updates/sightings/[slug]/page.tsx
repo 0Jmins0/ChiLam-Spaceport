@@ -13,6 +13,7 @@ import { UpdateItemVisibilityToggle } from '@/components/updates/UpdateItemVisib
 import { RelatedContentList } from '@/components/relations/RelatedContentList';
 import { ContentRelationEditor } from '@/components/relations/ContentRelationEditor';
 import { getOutgoingRelatedContent } from '@/lib/content-relations';
+import { getMediaAspectRatio, getUpdatePreviewMedia } from '@/lib/update-media';
 
 // Next.js 16: params 是 Promise
 export async function generateMetadata({
@@ -38,6 +39,8 @@ export default async function SightingDetailPage({
   const sighting = await getSightingBySlug(slug);
   if (!sighting) notFound();
   const relatedContent = await getOutgoingRelatedContent('sighting', sighting.id);
+  const previewMedia = getUpdatePreviewMedia(sighting.thumbnailUrl, sighting.mediaItems);
+  const primaryMedia = sighting.mediaItems[0];
 
   return (
     <PageContainer>
@@ -97,16 +100,30 @@ export default async function SightingDetailPage({
           <div className="gold-line" />
         </div>
 
-        {/* 缩略图 */}
-        {sighting.thumbnailUrl && (
-          <div className="relative mb-6 aspect-video w-full overflow-hidden rounded-[var(--radius-card)]">
-            <Image
-              src={sighting.thumbnailUrl}
-              alt={sighting.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 672px"
-            />
+        {/* 首图/视频 */}
+        {previewMedia?.url && (
+          <div
+            className="relative mb-6 w-full overflow-hidden rounded-[var(--radius-card)] bg-bg-darker"
+            style={{ aspectRatio: getMediaAspectRatio(previewMedia) }}
+          >
+            {previewMedia.type === 'VIDEO' && primaryMedia ? (
+              <video
+                src={primaryMedia.url}
+                poster={previewMedia.url}
+                controls
+                playsInline
+                preload="metadata"
+                className="h-full w-full object-contain"
+              />
+            ) : (
+              <Image
+                src={previewMedia.url}
+                alt={sighting.title}
+                fill
+                className="object-contain"
+                sizes="(max-width: 768px) 100vw, 672px"
+              />
+            )}
           </div>
         )}
 

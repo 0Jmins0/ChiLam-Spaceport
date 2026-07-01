@@ -35,11 +35,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // 基本验证
-    if (!body.title || !body.originalUrl || !body.slug) {
+    if (!body.title || !body.slug) {
       return NextResponse.json(
         {
           error: {
-            message: '缺少必填字段: title, originalUrl, slug',
+            message: '缺少必填字段: title, slug',
             code: 'VALIDATION_ERROR',
           },
         },
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     const article = await prisma.newsArticle.create({
       data: {
         slug: body.slug,
-        originalUrl: body.originalUrl,
+        originalUrl: body.originalUrl || null,
         title: body.title,
         summary: body.summary || null,
         source: body.source || null,

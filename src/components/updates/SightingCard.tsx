@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { cn } from '@/lib/cn';
+import { getMediaAspectRatio, type UpdateMediaPreview } from '@/lib/update-media';
 import { Card } from '@/components/ui/Card';
 import { Tag } from '@/components/ui/Tag';
 
@@ -11,7 +12,7 @@ interface SightingCardProps {
   originalUrl?: string;
   title: string;
   summary?: string;
-  thumbnailUrl?: string;
+  previewMedia?: UpdateMediaPreview | null;
   sightedAt: string | Date;
   authorName?: string;
   tags?: string[];
@@ -30,12 +31,14 @@ export function SightingCard({
   originalUrl,
   title,
   summary,
-  thumbnailUrl,
+  previewMedia,
   sightedAt,
   authorName,
   tags,
   className,
 }: SightingCardProps) {
+  const hasPreview = Boolean(previewMedia?.url);
+  const isVideo = previewMedia?.type === 'VIDEO';
   const sightingTypeTag = tags?.find(
     (tag) =>
       tag === '机场' || tag === '片场' || tag === '偶遇' || tag === 'airport' || tag === 'set',
@@ -44,10 +47,13 @@ export function SightingCard({
   const content = (
     <Card className="p-0 overflow-hidden">
       {/* Thumbnail */}
-      <div className="relative aspect-[4/5] w-full bg-bg-darker">
-        {thumbnailUrl ? (
+      <div
+        className="relative w-full bg-bg-darker"
+        style={{ aspectRatio: getMediaAspectRatio(previewMedia) }}
+      >
+        {hasPreview ? (
           <Image
-            src={thumbnailUrl}
+            src={previewMedia!.url}
             alt={title}
             fill
             className="object-cover"
@@ -63,6 +69,11 @@ export function SightingCard({
         {sightingTypeTag && (
           <div className="absolute left-3 top-3">
             <Tag active>{sightingTypeTag}</Tag>
+          </div>
+        )}
+        {isVideo && (
+          <div className="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/65 text-white backdrop-blur-sm">
+            <span className="ml-0.5 text-sm">▶</span>
           </div>
         )}
       </div>

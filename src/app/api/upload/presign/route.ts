@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPresignedUploadUrl, ALLOWED_TYPES, SIZE_LIMITS, getSizeCategory } from '@/lib/r2';
+import { verifyAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
+    const admin = await verifyAdmin(request);
+    if (!admin) {
+      return NextResponse.json({ error: '未授权访问' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { filename, mimeType, fileSize } = body;
 

@@ -110,6 +110,7 @@ export function LightboxViewer({ items, currentIndex, onClose, onNavigate }: Lig
           <video
             key={current.id}
             src={current.url}
+            poster={current.thumbnailUrl ?? undefined}
             controls
             playsInline
             preload="auto"

@@ -513,7 +513,7 @@ model SocialPost {
   platform String
 
   // Phase 1 (链接优先)
-  originalUrl  String    @map("original_url")
+  originalUrl  String?   @map("original_url")
   originalId   String?   @map("original_id")
   title        String?
   summary      String?
@@ -544,7 +544,7 @@ model SocialPost {
 model NewsArticle {
   id           String    @id @default(cuid())
   slug         String    @unique
-  originalUrl  String    @map("original_url")
+  originalUrl  String?   @map("original_url")
   title        String
   summary      String?
   source       String?

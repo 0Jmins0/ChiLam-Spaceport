@@ -99,12 +99,22 @@ const EDITABLE_FIELDS: Record<string, string[]> = {
     'isFullCopy',
     'isVisible',
   ],
-  media: ['caption', 'alt', 'mediaTag', 'searchNote'],
+  media: [
+    'caption',
+    'alt',
+    'mediaTag',
+    'searchNote',
+    'thumbnailUrl',
+    'width',
+    'height',
+    'duration',
+  ],
   mediaCollection: ['title', 'description', 'coverId'],
 };
 
 /** 需要 parseInt 的整数字段 */
-const INTEGER_FIELDS = new Set(['year', 'startYear', 'endYear', 'releaseYear', 'duration']);
+const INTEGER_FIELDS = new Set(['year', 'startYear', 'endYear', 'releaseYear']);
+const NUMBER_FIELDS = new Set(['width', 'height', 'duration']);
 
 /** 需要 Date 解析的字段 */
 const DATE_FIELDS = new Set([
@@ -148,6 +158,12 @@ function convertValue(field: string, value: string | number | boolean | null): u
   if (INTEGER_FIELDS.has(field)) {
     const parsed = parseInt(String(value), 10);
     if (isNaN(parsed)) throw new Error(`字段 "${field}" 需要整数值`);
+    return parsed;
+  }
+
+  if (NUMBER_FIELDS.has(field)) {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) throw new Error(`字段 "${field}" 需要数字值`);
     return parsed;
   }
 

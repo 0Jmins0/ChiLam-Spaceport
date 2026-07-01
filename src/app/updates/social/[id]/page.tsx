@@ -13,6 +13,7 @@ import { UpdateItemVisibilityToggle } from '@/components/updates/UpdateItemVisib
 import { RelatedContentList } from '@/components/relations/RelatedContentList';
 import { ContentRelationEditor } from '@/components/relations/ContentRelationEditor';
 import { getOutgoingRelatedContent } from '@/lib/content-relations';
+import { getMediaAspectRatio, getUpdatePreviewMedia } from '@/lib/update-media';
 
 // Next.js 16: params 是 Promise
 export async function generateMetadata({
@@ -38,6 +39,8 @@ export default async function SocialPostDetailPage({
   const post = await getSocialPostById(id);
   if (!post) notFound();
   const relatedContent = await getOutgoingRelatedContent('social_post', post.id);
+  const previewMedia = getUpdatePreviewMedia(post.thumbnailUrl, post.mediaItems);
+  const primaryMedia = post.mediaItems[0];
 
   // 平台中文名映射
   const platformLabels: Record<string, string> = {
@@ -102,16 +105,30 @@ export default async function SocialPostDetailPage({
           <div className="gold-line" />
         </div>
 
-        {/* 缩略图 */}
-        {post.thumbnailUrl && (
-          <div className="relative mb-6 aspect-video w-full overflow-hidden rounded-[var(--radius-card)]">
-            <Image
-              src={post.thumbnailUrl}
-              alt={post.title || ''}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 672px"
-            />
+        {/* 首图/视频 */}
+        {previewMedia?.url && (
+          <div
+            className="relative mb-6 w-full overflow-hidden rounded-[var(--radius-card)] bg-bg-darker"
+            style={{ aspectRatio: getMediaAspectRatio(previewMedia) }}
+          >
+            {previewMedia.type === 'VIDEO' && primaryMedia ? (
+              <video
+                src={primaryMedia.url}
+                poster={previewMedia.url}
+                controls
+                playsInline
+                preload="metadata"
+                className="h-full w-full object-contain"
+              />
+            ) : (
+              <Image
+                src={previewMedia.url}
+                alt={post.title || ''}
+                fill
+                className="object-contain"
+                sizes="(max-width: 768px) 100vw, 672px"
+              />
+            )}
           </div>
         )}
 
@@ -153,11 +170,13 @@ export default async function SocialPostDetailPage({
         )}
 
         {/* 查看原文按钮 */}
-        <div className="mt-8">
-          <a href={post.originalUrl} target="_blank" rel="noopener noreferrer">
-            <Button variant="primary">查看原文 &#8599;</Button>
-          </a>
-        </div>
+        {post.originalUrl && (
+          <div className="mt-8">
+            <a href={post.originalUrl} target="_blank" rel="noopener noreferrer">
+              <Button variant="primary">查看原文 &#8599;</Button>
+            </a>
+          </div>
+        )}
         <RelatedContentList items={relatedContent} />
         <ContentRelationEditor sourceType="social_post" sourceId={post.id} />
       </article>

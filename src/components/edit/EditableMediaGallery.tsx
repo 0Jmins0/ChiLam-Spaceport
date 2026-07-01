@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { cn } from '@/lib/cn';
+import { getMediaAspectRatio } from '@/lib/update-media';
 import { useEditMode } from './EditModeProvider';
 import { LightboxViewer } from '@/components/gallery/LightboxViewer';
 import type { GalleryItem } from '@/lib/types';
@@ -13,8 +14,10 @@ interface MediaItem {
   url: string;
   type: string; // 'IMAGE' | 'VIDEO' | 'AUDIO' | 'FILE'
   alt?: string | null;
+  thumbnailUrl?: string | null;
   width?: number | null;
   height?: number | null;
+  duration?: number | null;
 }
 
 interface EditableMediaGalleryProps {
@@ -28,6 +31,155 @@ interface EditableMediaGalleryProps {
 
 type UploadStatus = 'idle' | 'uploading' | 'done' | 'error';
 
+type UploadResult = {
+  key: string;
+  publicUrl: string;
+};
+
+type MediaMetadata = {
+  width?: number;
+  height?: number;
+  duration?: number;
+  thumbnailUrl?: string;
+};
+
+async function uploadFileToR2(file: File, adminToken?: string | null): Promise<UploadResult> {
+  const presignRes = await fetch('/api/upload/presign', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {}),
+    },
+    body: JSON.stringify({
+      filename: file.name,
+      mimeType: file.type,
+      fileSize: file.size,
+    }),
+  });
+
+  if (!presignRes.ok) {
+    const errData = await presignRes.json().catch(() => null);
+    throw new Error(errData?.error || '获取上传链接失败');
+  }
+
+  const { uploadUrl, publicUrl, key } = await presignRes.json();
+
+  const uploadRes = await fetch(uploadUrl, {
+    method: 'PUT',
+    headers: { 'Content-Type': file.type },
+    body: file,
+  });
+
+  if (!uploadRes.ok) {
+    const errText = await uploadRes.text().catch(() => '');
+    console.error('[Upload] R2 response error:', uploadRes.status, errText);
+    throw new Error(`文件上传失败 (${uploadRes.status})`);
+  }
+
+  return { key, publicUrl };
+}
+
+function getImageMetadata(file: File): Promise<MediaMetadata> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new window.Image();
+
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve({ width: img.naturalWidth, height: img.naturalHeight });
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('读取图片尺寸失败'));
+    };
+    img.src = url;
+  });
+}
+
+function waitForVideoEvent(video: HTMLVideoElement, eventName: string) {
+  return new Promise<void>((resolve, reject) => {
+    const timeout = window.setTimeout(() => {
+      cleanup();
+      reject(new Error('读取视频信息超时'));
+    }, 5000);
+
+    function cleanup() {
+      window.clearTimeout(timeout);
+      video.removeEventListener(eventName, handleEvent);
+      video.removeEventListener('error', handleError);
+    }
+
+    function handleEvent() {
+      cleanup();
+      resolve();
+    }
+
+    function handleError() {
+      cleanup();
+      reject(new Error('读取视频信息失败'));
+    }
+
+    video.addEventListener(eventName, handleEvent, { once: true });
+    video.addEventListener('error', handleError, { once: true });
+  });
+}
+
+async function getVideoMetadataAndThumbnail(file: File): Promise<{
+  metadata: MediaMetadata;
+  thumbnailFile: File | null;
+}> {
+  const url = URL.createObjectURL(file);
+  const video = document.createElement('video');
+  video.preload = 'metadata';
+  video.muted = true;
+  video.playsInline = true;
+  video.src = url;
+
+  try {
+    await waitForVideoEvent(video, 'loadedmetadata');
+
+    const metadata: MediaMetadata = {
+      width: video.videoWidth || undefined,
+      height: video.videoHeight || undefined,
+      duration: Number.isFinite(video.duration) ? video.duration : undefined,
+    };
+
+    if (!metadata.width || !metadata.height) {
+      return { metadata, thumbnailFile: null };
+    }
+
+    const seekTime = metadata.duration && metadata.duration > 0.2 ? 0.1 : 0;
+    if (seekTime > 0) {
+      const seekedPromise = waitForVideoEvent(video, 'seeked').catch(() => undefined);
+      video.currentTime = seekTime;
+      await seekedPromise;
+    } else if (video.readyState < 2) {
+      await waitForVideoEvent(video, 'loadeddata').catch(() => undefined);
+    }
+
+    const maxWidth = 1280;
+    const scale = Math.min(1, maxWidth / metadata.width);
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(metadata.width * scale);
+    canvas.height = Math.round(metadata.height * scale);
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return { metadata, thumbnailFile: null };
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, 'image/jpeg', 0.82),
+    );
+    if (!blob) return { metadata, thumbnailFile: null };
+
+    const baseName = file.name.replace(/\.[^.]+$/, '') || 'video-cover';
+    const thumbnailFile = new File([blob], `${baseName}-cover.jpg`, { type: 'image/jpeg' });
+    return { metadata, thumbnailFile };
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
 export function EditableMediaGallery({
   media,
   entityType,
@@ -40,9 +192,12 @@ export function EditableMediaGallery({
   const [uploadStatus, setUploadStatus] = useState<UploadStatus>('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [coverUpdatingId, setCoverUpdatingId] = useState<string | null>(null);
   const [playingSet, setPlayingSet] = useState<Set<string>>(new Set());
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+  const coverTargetIdRef = useRef<string | null>(null);
   const router = useRouter();
 
   // 非编辑模式下，无媒体则不渲染
@@ -62,49 +217,19 @@ export function EditableMediaGallery({
     setErrorMsg('');
 
     try {
-      // Step 1: 获取预签名 URL
-      const presignRes = await fetch('/api/upload/presign', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          filename: file.name,
-          mimeType: file.type,
-          fileSize: file.size,
-        }),
-      });
-
-      if (!presignRes.ok) {
-        const errData = await presignRes.json().catch(() => null);
-        throw new Error(errData?.error || '获取上传链接失败');
+      let metadata: MediaMetadata = {};
+      if (file.type.startsWith('image/')) {
+        metadata = await getImageMetadata(file);
+      } else if (file.type.startsWith('video/')) {
+        const videoResult = await getVideoMetadataAndThumbnail(file);
+        metadata = videoResult.metadata;
+        if (videoResult.thumbnailFile) {
+          const coverUpload = await uploadFileToR2(videoResult.thumbnailFile, adminToken);
+          metadata.thumbnailUrl = coverUpload.publicUrl;
+        }
       }
 
-      const { uploadUrl, publicUrl, key } = await presignRes.json();
-
-      // Step 2: 直传 R2
-      console.log('[Upload] Step 2: PUT to R2', {
-        uploadUrl: uploadUrl.substring(0, 80) + '...',
-        fileSize: file.size,
-        fileType: file.type,
-      });
-      let uploadRes: Response;
-      try {
-        uploadRes = await fetch(uploadUrl, {
-          method: 'PUT',
-          headers: { 'Content-Type': file.type },
-          body: file,
-        });
-      } catch (networkErr) {
-        console.error('[Upload] Step 2 network error:', networkErr);
-        throw new Error(
-          `直传 R2 失败: ${networkErr instanceof Error ? networkErr.message : '网络错误'}`,
-        );
-      }
-
-      if (!uploadRes.ok) {
-        const errText = await uploadRes.text().catch(() => '');
-        console.error('[Upload] Step 2 response error:', uploadRes.status, errText);
-        throw new Error(`文件上传失败 (${uploadRes.status})`);
-      }
+      const { key, publicUrl } = await uploadFileToR2(file, adminToken);
 
       // Step 3: 确认并创建 Media 记录 + 绑定
       const confirmRes = await fetch('/api/upload/confirm', {
@@ -122,6 +247,7 @@ export function EditableMediaGallery({
           target: entityType,
           targetId: entityId,
           relation: relation,
+          ...metadata,
         }),
       });
 
@@ -137,6 +263,59 @@ export function EditableMediaGallery({
       setUploadStatus('error');
       setErrorMsg(err instanceof Error ? err.message : '上传失败');
       setTimeout(() => setUploadStatus('idle'), 4000);
+    }
+  };
+
+  const handleCoverEditClick = (mediaId: string) => {
+    coverTargetIdRef.current = mediaId;
+    coverInputRef.current?.click();
+  };
+
+  const handleCoverFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    const targetId = coverTargetIdRef.current;
+    e.target.value = '';
+
+    if (!file || !targetId) return;
+    if (!file.type.startsWith('image/')) {
+      setUploadStatus('error');
+      setErrorMsg('请选择图片作为封面');
+      setTimeout(() => setUploadStatus('idle'), 3000);
+      return;
+    }
+
+    setCoverUpdatingId(targetId);
+    setErrorMsg('');
+
+    try {
+      const { publicUrl } = await uploadFileToR2(file, adminToken);
+      const res = await fetch('/api/admin/edit', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {}),
+        },
+        body: JSON.stringify({
+          entityType: 'media',
+          entityId: targetId,
+          field: 'thumbnailUrl',
+          value: publicUrl,
+        }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => null);
+        throw new Error(errData?.error || '封面更新失败');
+      }
+
+      router.refresh();
+    } catch (err) {
+      setUploadStatus('error');
+      setErrorMsg(err instanceof Error ? err.message : '封面更新失败');
+      setTimeout(() => setUploadStatus('idle'), 4000);
+    } finally {
+      setCoverUpdatingId(null);
+      coverTargetIdRef.current = null;
     }
   };
 
@@ -161,6 +340,8 @@ export function EditableMediaGallery({
         {media.map((item, index) => {
           const isVideo = item.type === 'VIDEO';
           const isRemoving = removingId === item.id;
+          const previewUrl = isVideo ? item.thumbnailUrl : item.url;
+          const aspectRatio = getMediaAspectRatio(item);
 
           return (
             <div
@@ -219,9 +400,10 @@ export function EditableMediaGallery({
               )}
 
               {isVideo ? (
-                <div className="relative aspect-[4/3]">
+                <div className="relative" style={{ aspectRatio }}>
                   <video
                     src={item.url}
+                    poster={item.thumbnailUrl ?? undefined}
                     preload="auto"
                     playsInline
                     controls
@@ -251,11 +433,24 @@ export function EditableMediaGallery({
                       </div>
                     </div>
                   )}
+                  {editMode && (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleCoverEditClick(item.id);
+                      }}
+                      disabled={coverUpdatingId === item.id}
+                      className="absolute bottom-2 left-2 z-20 rounded bg-black/65 px-2 py-1 text-[11px] text-white transition-colors hover:bg-black/80 disabled:cursor-wait disabled:opacity-70"
+                    >
+                      {coverUpdatingId === item.id ? '更新中...' : '更换封面'}
+                    </button>
+                  )}
                 </div>
               ) : (
-                <div className="relative aspect-[4/3]">
+                <div className="relative" style={{ aspectRatio }}>
                   <Image
-                    src={item.url}
+                    src={previewUrl ?? item.url}
                     alt={item.alt || '媒体文件'}
                     fill
                     sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -351,6 +546,13 @@ export function EditableMediaGallery({
         onChange={handleFileChange}
         className="hidden"
       />
+      <input
+        ref={coverInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleCoverFileChange}
+        className="hidden"
+      />
 
       {/* Lightbox（非编辑模式） */}
       {lightboxIndex !== null && !editMode && (
@@ -363,11 +565,11 @@ export function EditableMediaGallery({
               category: item.type === 'VIDEO' ? 'VIDEO' : null,
               alt: item.alt ?? null,
               caption: null,
-              thumbnailUrl: null,
+              thumbnailUrl: item.thumbnailUrl ?? null,
               filename: null,
               width: item.width ?? null,
               height: item.height ?? null,
-              duration: null,
+              duration: item.duration ?? null,
               createdAt: new Date().toISOString(),
               source: null,
               mediaTag: null,

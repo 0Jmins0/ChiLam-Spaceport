@@ -69,6 +69,10 @@ export async function POST(request: NextRequest) {
     const alt = formData.get('alt') as string | null;
     const caption = formData.get('caption') as string | null;
     const mediaTag = formData.get('mediaTag') as string | null;
+    const thumbnailUrl = formData.get('thumbnailUrl') as string | null;
+    const width = Number(formData.get('width'));
+    const height = Number(formData.get('height'));
+    const duration = Number(formData.get('duration'));
 
     if (!file) {
       return NextResponse.json({ error: '未提供文件' }, { status: 400 });
@@ -135,6 +139,10 @@ export async function POST(request: NextRequest) {
           filename: file.name,
           mimeType: file.type,
           size: file.size,
+          thumbnailUrl: thumbnailUrl || undefined,
+          width: Number.isFinite(width) && width > 0 ? width : undefined,
+          height: Number.isFinite(height) && height > 0 ? height : undefined,
+          duration: Number.isFinite(duration) && duration > 0 ? duration : undefined,
           alt: alt || undefined,
           caption: caption || undefined,
         },
@@ -158,6 +166,10 @@ export async function POST(request: NextRequest) {
           filename: file.name,
           mimeType: file.type,
           size: file.size,
+          thumbnailUrl: thumbnailUrl || undefined,
+          width: Number.isFinite(width) && width > 0 ? width : undefined,
+          height: Number.isFinite(height) && height > 0 ? height : undefined,
+          duration: Number.isFinite(duration) && duration > 0 ? duration : undefined,
           alt: alt || undefined,
           caption: caption || undefined,
         },

@@ -36,11 +36,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // 基本验证
-    if (!body.platform || !body.originalUrl) {
+    if (!body.platform) {
       return NextResponse.json(
         {
           error: {
-            message: '缺少必填字段: platform, originalUrl',
+            message: '缺少必填字段: platform',
             code: 'VALIDATION_ERROR',
           },
         },
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     const post = await prisma.socialPost.create({
       data: {
         platform: body.platform,
-        originalUrl: body.originalUrl,
+        originalUrl: body.originalUrl || null,
         originalId: body.originalId || null,
         title: body.title || null,
         summary: body.summary || null,

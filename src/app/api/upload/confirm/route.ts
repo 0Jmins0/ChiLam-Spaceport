@@ -76,6 +76,10 @@ export async function POST(request: NextRequest) {
       alt,
       caption,
       mediaTag,
+      thumbnailUrl,
+      width,
+      height,
+      duration,
     } = body;
 
     if (!key || !url || !filename || !mimeType || typeof size !== 'number') {
@@ -136,6 +140,10 @@ export async function POST(request: NextRequest) {
           filename,
           mimeType,
           size,
+          thumbnailUrl: thumbnailUrl || undefined,
+          width: typeof width === 'number' ? width : undefined,
+          height: typeof height === 'number' ? height : undefined,
+          duration: typeof duration === 'number' ? duration : undefined,
           alt: alt || undefined,
           caption: caption || undefined,
         },
@@ -159,6 +167,10 @@ export async function POST(request: NextRequest) {
           filename,
           mimeType,
           size,
+          thumbnailUrl: thumbnailUrl || undefined,
+          width: typeof width === 'number' ? width : undefined,
+          height: typeof height === 'number' ? height : undefined,
+          duration: typeof duration === 'number' ? duration : undefined,
           alt: alt || undefined,
           caption: caption || undefined,
         },

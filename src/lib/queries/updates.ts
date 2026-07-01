@@ -15,7 +15,16 @@ export const UPDATE_CATEGORY_SLUGS = {
 
 const tagSelect = { select: { name: true, slug: true } } as const;
 const mediaPreviewSelect = {
-  select: { id: true, url: true, type: true, alt: true, width: true, height: true },
+  select: {
+    id: true,
+    url: true,
+    thumbnailUrl: true,
+    type: true,
+    alt: true,
+    width: true,
+    height: true,
+    duration: true,
+  },
   orderBy: { createdAt: 'asc' },
 } as const;
 
@@ -183,7 +192,9 @@ export async function getUpdateCategoryStates(): Promise<UpdateCategoryState[]> 
     where: { slug: { in: entries.map(([, slug]) => slug) } },
     select: { slug: true, isVisible: true },
   });
-  const visibilityBySlug = new Map(categories.map((category) => [category.slug, category.isVisible]));
+  const visibilityBySlug = new Map(
+    categories.map((category) => [category.slug, category.isVisible]),
+  );
 
   return entries.map(([key, slug]) => ({
     key,

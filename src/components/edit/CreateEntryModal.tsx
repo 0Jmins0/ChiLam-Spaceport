@@ -200,14 +200,14 @@ function getFieldConfigs(entityType: string): FieldConfig[] {
           required: true,
           options: TYPE_OPTIONS.socialPost,
         },
-        { key: 'originalUrl', label: '原文链接', type: 'text', required: true },
+        { key: 'originalUrl', label: '原文链接', type: 'text', required: false },
         { key: 'publishedAt', label: '发布时间', type: 'date', required: false },
         { key: 'title', label: '标题', type: 'text', required: false },
       ];
     case 'newsArticle':
       return [
         { key: 'title', label: '标题', type: 'text', required: true },
-        { key: 'originalUrl', label: '原文链接', type: 'text', required: true },
+        { key: 'originalUrl', label: '原文链接', type: 'text', required: false },
         { key: 'source', label: '来源', type: 'text', required: false },
         { key: 'publishedAt', label: '发布时间', type: 'date', required: false },
       ];

@@ -4,7 +4,7 @@ import { UpdatesFilterBar } from '@/components/updates/UpdatesFilterBar';
 import { SocialPostCard } from '@/components/updates/SocialPostCard';
 import { NewsArticleCard } from '@/components/updates/NewsArticleCard';
 import { SightingCard } from '@/components/updates/SightingCard';
-import { MasonryLayout } from '@/components/ui/MasonryLayout';
+import { WaterfallLayout } from '@/components/ui/WaterfallLayout';
 import { Pagination } from '@/components/updates/Pagination';
 import { CreateEntryTrigger } from '@/components/edit/CreateEntryTrigger';
 import { UpdateCategoryVisibilityPanel } from '@/components/updates/UpdateCategoryVisibilityPanel';
@@ -17,6 +17,7 @@ import {
   getUpdateCategoryStates,
   getUpdateFilterOptions,
 } from '@/lib/queries/updates';
+import { getUpdatePreviewMedia } from '@/lib/update-media';
 
 export const dynamic = 'force-dynamic';
 
@@ -74,7 +75,7 @@ export default async function UpdatesPage({
         <p className="py-16 text-center text-sm text-text-muted">暂无内容</p>
       ) : (
         <>
-          <MasonryLayout>
+          <WaterfallLayout>
             {data.items.map((post, index) => (
               <SocialPostCard
                 key={post.id}
@@ -83,13 +84,13 @@ export default async function UpdatesPage({
                 originalUrl={`/updates/social/${post.id}`}
                 title={post.title ?? undefined}
                 summary={post.summary ?? undefined}
-                thumbnailUrl={post.thumbnailUrl ?? post.mediaItems?.[0]?.url ?? undefined}
+                previewMedia={getUpdatePreviewMedia(post.thumbnailUrl, post.mediaItems)}
                 publishedAt={post.publishedAt ?? (post as unknown as { createdAt: Date }).createdAt}
                 tags={post.tags.map((t) => t.name)}
                 priority={index < 3}
               />
             ))}
-          </MasonryLayout>
+          </WaterfallLayout>
           {data.totalPages > 1 && (
             <Pagination
               currentPage={data.currentPage}
@@ -117,7 +118,7 @@ export default async function UpdatesPage({
                 title={article.title}
                 summary={article.summary ?? undefined}
                 source={article.source ?? undefined}
-                thumbnailUrl={article.thumbnailUrl ?? article.mediaItems?.[0]?.url ?? undefined}
+                previewMedia={getUpdatePreviewMedia(article.thumbnailUrl, article.mediaItems)}
                 publishedAt={
                   article.publishedAt ?? (article as unknown as { createdAt: Date }).createdAt
                 }
@@ -143,7 +144,7 @@ export default async function UpdatesPage({
         <p className="py-16 text-center text-sm text-text-muted">暂无内容</p>
       ) : (
         <>
-          <MasonryLayout>
+          <WaterfallLayout>
             {data.items.map((sighting) => (
               <SightingCard
                 key={sighting.id}
@@ -152,7 +153,7 @@ export default async function UpdatesPage({
                 originalUrl={`/updates/sightings/${sighting.slug}`}
                 title={sighting.title}
                 summary={sighting.summary ?? undefined}
-                thumbnailUrl={sighting.thumbnailUrl ?? sighting.mediaItems?.[0]?.url ?? undefined}
+                previewMedia={getUpdatePreviewMedia(sighting.thumbnailUrl, sighting.mediaItems)}
                 sightedAt={
                   sighting.sightedAt ?? (sighting as unknown as { createdAt: Date }).createdAt
                 }
@@ -160,7 +161,7 @@ export default async function UpdatesPage({
                 tags={sighting.tags.map((t) => t.name)}
               />
             ))}
-          </MasonryLayout>
+          </WaterfallLayout>
           {data.totalPages > 1 && (
             <Pagination
               currentPage={data.currentPage}
