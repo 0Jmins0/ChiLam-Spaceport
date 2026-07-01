@@ -65,3 +65,33 @@ export function getMediaAspectRatio(
   if (media?.type === 'VIDEO') return 16 / 9;
   return 4 / 5;
 }
+
+export function getClampedMediaAspectRatio(
+  media:
+    | {
+        type?: string | null;
+        width?: number | null;
+        height?: number | null;
+      }
+    | null
+    | undefined,
+  options?: {
+    min?: number;
+    max?: number;
+    fallback?: number;
+  },
+) {
+  const min = options?.min ?? 9 / 16;
+  const max = options?.max ?? 16 / 9;
+  const fallback = options?.fallback ?? (media?.type === 'VIDEO' ? 16 / 9 : 3 / 4);
+  let ratio = fallback;
+
+  if (media?.width && media.height) {
+    const originalRatio = media.width / media.height;
+    if (Number.isFinite(originalRatio) && originalRatio > 0) ratio = originalRatio;
+  }
+
+  const safeRatio = Number.isFinite(ratio) && ratio > 0 ? ratio : fallback;
+
+  return Math.min(max, Math.max(min, safeRatio));
+}

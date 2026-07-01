@@ -63,14 +63,11 @@ export function LightboxViewer({ items, currentIndex, onClose, onNavigate }: Lig
   const sourceUrl = getSourceUrl(current.source);
 
   const content = (
-    <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-[100] flex h-[100dvh] flex-col bg-black/90" onClick={onClose}>
       {/* 关闭按钮 */}
       <button
         onClick={onClose}
-        className="absolute right-4 top-4 z-10 rounded-full p-2 text-white/70 hover:bg-white/10 hover:text-white"
+        className="absolute right-4 top-4 z-20 rounded-full bg-black/30 p-2 text-white/70 hover:bg-white/10 hover:text-white"
       >
         <svg
           className="h-6 w-6"
@@ -90,7 +87,7 @@ export function LightboxViewer({ items, currentIndex, onClose, onNavigate }: Lig
             e.stopPropagation();
             onNavigate(currentIndex - 1);
           }}
-          className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/40 p-3 text-white/70 hover:bg-black/60 hover:text-white"
+          className="absolute left-2 top-1/2 z-20 -translate-y-1/2 rounded-full bg-black/40 p-3 text-white/70 hover:bg-black/60 hover:text-white sm:left-4"
         >
           <svg
             className="h-6 w-6"
@@ -105,7 +102,10 @@ export function LightboxViewer({ items, currentIndex, onClose, onNavigate }: Lig
       )}
 
       {/* 媒体内容 */}
-      <div className="relative max-h-[85vh] max-w-[90vw]" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="flex min-h-0 flex-1 items-center justify-center px-12 py-6 sm:px-16"
+        onClick={(e) => e.stopPropagation()}
+      >
         {current.type === 'VIDEO' || current.category === 'VIDEO' ? (
           <video
             key={current.id}
@@ -114,10 +114,10 @@ export function LightboxViewer({ items, currentIndex, onClose, onNavigate }: Lig
             controls
             playsInline
             preload="auto"
-            className="max-h-[85vh] max-w-[90vw] rounded"
+            className="max-h-full max-w-full rounded object-contain"
           />
         ) : current.type === 'AUDIO' || current.category === 'AUDIO' ? (
-          <div className="flex flex-col items-center gap-6 px-8 py-12">
+          <div className="flex max-w-full flex-col items-center gap-6 px-8 py-12">
             <svg
               className="h-20 w-20 text-amber-500/80"
               fill="none"
@@ -134,7 +134,13 @@ export function LightboxViewer({ items, currentIndex, onClose, onNavigate }: Lig
             {current.filename && (
               <p className="max-w-sm truncate text-sm text-white/70">{current.filename}</p>
             )}
-            <audio key={current.id} src={current.url} controls autoPlay className="w-80" />
+            <audio
+              key={current.id}
+              src={current.url}
+              controls
+              autoPlay
+              className="w-full max-w-80"
+            />
           </div>
         ) : (
           <Image
@@ -142,7 +148,7 @@ export function LightboxViewer({ items, currentIndex, onClose, onNavigate }: Lig
             alt={current.alt || current.caption || ''}
             width={current.width || 1200}
             height={current.height || 800}
-            className="max-h-[85vh] w-auto object-contain"
+            className="h-auto max-h-full w-auto max-w-full object-contain"
             priority
           />
         )}
@@ -155,7 +161,7 @@ export function LightboxViewer({ items, currentIndex, onClose, onNavigate }: Lig
             e.stopPropagation();
             onNavigate(currentIndex + 1);
           }}
-          className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/40 p-3 text-white/70 hover:bg-black/60 hover:text-white"
+          className="absolute right-2 top-1/2 z-20 -translate-y-1/2 rounded-full bg-black/40 p-3 text-white/70 hover:bg-black/60 hover:text-white sm:right-4"
         >
           <svg
             className="h-6 w-6"
@@ -171,11 +177,15 @@ export function LightboxViewer({ items, currentIndex, onClose, onNavigate }: Lig
 
       {/* 底部信息 */}
       <div
-        className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 pt-12"
+        className="shrink-0 border-t border-white/10 bg-black/75 px-6 py-3"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mx-auto max-w-2xl text-center">
-          {current.caption && <p className="mb-2 text-sm text-white/80">{current.caption}</p>}
+          {current.caption && (
+            <p className="mb-2 line-clamp-2 text-sm leading-relaxed text-white/80">
+              {current.caption}
+            </p>
+          )}
           {current.source && sourceUrl && (
             <Link
               href={sourceUrl}

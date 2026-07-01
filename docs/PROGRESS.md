@@ -1,6 +1,6 @@
 # 开发进度记录
 
-## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.5 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 + P6.13 + P6.15 + P6.16 + P6.17 + P6.19 + P6.20 + P6.21 + P6.22 + P6.23 + P6.24 + P6.25 + P6.26 已完成）
+## 当前阶段: P6 用户反馈迭代（P6.1 + P6.2 + P6.3 + P6.4 + P6.5 + P6.6 + P6.8 + P6.10 + P6.11 + P6.12 + P6.13 + P6.15 + P6.16 + P6.17 + P6.19 + P6.20 + P6.21 + P6.22 + P6.23 + P6.24 + P6.25 + P6.26 + P6.27 已完成）
 
 ---
 
@@ -23,13 +23,33 @@
 | 公告模块 | ✅ 已完成 | 2026-06-07 |
 | 后台管理(API) | ✅ 已完成 | 2026-06-07 |
 | R2 存储配置 | ✅ 已完成 | 2026-06-07 |
-| 相册模块 | ✅ 已完成（图片/视频/音频/合集 + Tag 筛选 + Lightbox + 相册集） | 2026-06-15 |
+| 相册模块 | ✅ 已完成（图片/视频/音频/合集 + Tag 筛选 + Lightbox + 相册集 + 瀑布流比例限制） | 2026-07-01 |
 | 全站检索 | ✅ 已完成 | 2026-06-10 |
 | 部署上线 | 未开始 | - |
 
 ---
 
 ## 详细记录
+
+### 2026-07-01 - P6.27 相册瀑布流比例与详情适配（已完成）
+
+#### 完成内容
+- **瀑布流比例范围**：新增 `getClampedMediaAspectRatio`，相册卡片按 `9:16` 到 `16:9` 范围展示，避免超长图或超宽图撑破瀑布流
+- **卡片自动裁剪**：相册图片/视频封面改为固定比例容器 + `object-cover`，超出比例范围的画面自动裁剪
+- **默认比例优化**：无尺寸信息的图片默认使用 `3:4`，视频默认使用 `16:9`
+- **详情页适配视口**：Lightbox 改为媒体区 + 底部信息区布局，图片/视频使用 `object-contain` 在视口内完整展示
+- **信息区不遮挡媒体**：底部 caption/source/index 从覆盖层改为独立区域，长说明限制两行，避免遮挡长图
+
+#### 涉及文件
+- `src/lib/update-media.ts` — 新增媒体比例钳制工具
+- `src/components/gallery/GalleryCard.tsx` — 相册卡片使用比例范围和裁剪预览
+- `src/components/gallery/LightboxViewer.tsx` — 详情弹层改为视口内完整适配
+
+#### 验证
+- `pnpm exec eslint src/lib/update-media.ts src/components/gallery/GalleryCard.tsx src/components/gallery/LightboxViewer.tsx` 通过
+- `pnpm exec prettier --check src/lib/update-media.ts src/components/gallery/GalleryCard.tsx src/components/gallery/LightboxViewer.tsx` 通过
+- `pnpm exec tsc --noEmit --incremental false` 通过
+- 全量 `pnpm lint` 仍受既有 `scripts/*.ts` 中 `no-explicit-any` 问题阻塞，非本次改动引入
 
 ### 2026-07-01 - P6.26 动态模块重新开放与维护增强（已完成）
 

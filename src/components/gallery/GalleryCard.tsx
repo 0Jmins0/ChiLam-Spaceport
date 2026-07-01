@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/cn';
+import { getClampedMediaAspectRatio } from '@/lib/update-media';
 import { useEditMode } from '@/components/edit/EditModeProvider';
 import type { GalleryItem } from '@/lib/types';
 
@@ -19,6 +20,9 @@ export function GalleryCard({ item, onClick, onDelete, priority = false }: Galle
   const isVideo = item.category === 'VIDEO' || item.type === 'VIDEO';
   const isAudio = item.category === 'AUDIO' || item.type === 'AUDIO';
   const imagePreviewUrl = isVideo ? item.thumbnailUrl : item.thumbnailUrl || item.url;
+  const previewAspectRatio = getClampedMediaAspectRatio(item, {
+    fallback: isVideo ? 16 / 9 : 3 / 4,
+  });
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -56,14 +60,16 @@ export function GalleryCard({ item, onClick, onDelete, priority = false }: Galle
 
       {/* 图片/视频缩略图 */}
       {!isAudio && imagePreviewUrl ? (
-        <div className="relative w-full overflow-hidden">
+        <div
+          className="relative w-full overflow-hidden bg-bg-darker"
+          style={{ aspectRatio: previewAspectRatio }}
+        >
           <Image
             src={imagePreviewUrl}
             alt={item.alt || item.caption || '媒体文件'}
-            width={item.width || 400}
-            height={item.height || 300}
+            fill
             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="h-auto w-full transition-transform duration-300 group-hover:scale-105"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
             priority={priority}
           />
           {/* 视频播放图标叠层 */}
